@@ -243,6 +243,23 @@ align-items: center;
 justify-content: center;
 gap: 8px;
 }
+#pauseBtn {
+  background: #6b7280; /* gris oscuro */
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: none; /* para ocultarlo por defecto */
+}
+
+#pauseBtn:hover {
+  background: #4b5563;
+}
+
 .speak-btn:hover, .center-btn:hover, .route-btn:hover {
 background: #a30000;
 }
@@ -465,6 +482,7 @@ background: #94a3b8;
 <h2>📍 Sitios del Recorrido</h2>
 <div id="siteButtons" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;"></div>
 </div>
+
 <div id="distance">Distancia al destino: -</div>
 
 <!-- Información del recorrido -->
@@ -1027,6 +1045,11 @@ ${translations[currentLang].nextImage} ❯
 <button onclick="speakDescription('${siteData.description.replace(/'/g, "\\'")}', '${siteName.replace(/'/g, "\\'")}'); return false;" class="speak-btn">
 🔊 ${translations[currentLang].listenDescription}
 </button>
+
+<button onclick="toggleSpeech();" id="pauseBtn" class="speak-btn" style="display: none;">
+  ⏸️ Pausar
+</button>
+
 <button onclick="centerMapOnSite(${site.lat}, ${site.lng})" class="center-btn">
 🎯 ${translations[currentLang].centerMap}
 </button>
@@ -1052,13 +1075,27 @@ updateProgressBar();
 
 // Cerrar panel lateral
 function closeSidebar() {
-const sidebar = document.getElementById('sidebar');
-sidebar.classList.remove('active');
-// Detener carrusel
-if (carouselInterval) {
-clearInterval(carouselInterval);
+  const sidebar = document.getElementById('sidebar');
+  sidebar.classList.remove('active');
+
+  if (carouselInterval) {
+    clearInterval(carouselInterval);
+  }
+
+  // Detener la voz si se está leyendo
+  if ('speechSynthesis' in window) {
+    speechSynthesis.cancel();
+  }
+
+  // Ocultar botón de pausa si está visible
+  const pauseBtn = document.getElementById('pauseBtn');
+  if (pauseBtn) {
+    pauseBtn.style.display = 'none';
+  }
+
+  isPaused = false;
 }
-}
+
 
 // Iniciar carrusel automático
 function startCarousel(totalImages) {
@@ -1128,31 +1165,74 @@ startCarousel(images.length);
 }
 }
 
-// Función para text-to-speech
+let isPaused = false;
+
 function speakDescription(text, title) {
-if ('speechSynthesis' in window) {
-speechSynthesis.cancel();
-const fullText = `${title}. ${text}`;
-const utterance = new SpeechSynthesisUtterance(fullText);
-utterance.lang = currentLang === 'es' ? 'es-MX' : 'en-US';
-utterance.rate = 0.8;
-const speakBtn = document.querySelector('.speak-btn');
-if (speakBtn) {
-const originalText = speakBtn.innerHTML;
-speakBtn.innerHTML = '⏸️ Reproduciendo...';
-speakBtn.disabled = true;
-utterance.onend = () => {
-speakBtn.innerHTML = originalText;
-speakBtn.disabled = false;
-};
-utterance.onerror = () => {
-speakBtn.innerHTML = originalText;
-speakBtn.disabled = false;
-};
+  if ('speechSynthesis' in window) {
+    speechSynthesis.cancel(); // detener cualquier lectura anterior
+
+    const fullText = `${title}. ${text}`;
+    const utterance = new SpeechSynthesisUtterance(fullText);
+    utterance.lang = currentLang === 'es' ? 'es-MX' : 'en-US';
+    utterance.rate = 0.8;
+
+    const speakBtn = document.querySelector('.speak-btn');
+    const pauseBtn = document.getElementById('pauseBtn');
+
+    if (speakBtn) {
+      const originalText = speakBtn.innerHTML;
+      speakBtn.innerHTML = '⏸️ Reproduciendo...';
+      speakBtn.disabled = true;
+      if (pauseBtn) {
+        pauseBtn.style.display = 'inline-block';
+        pauseBtn.innerText = '⏸️ Pausar';
+        isPaused = false;
+      }
+
+      utterance.onend = () => {
+        speakBtn.innerHTML = originalText;
+        speakBtn.disabled = false;
+        if (pauseBtn) {
+          pauseBtn.style.display = 'none';
+        }
+        isPaused = false;
+      };
+
+      utterance.onerror = () => {
+        speakBtn.innerHTML = originalText;
+        speakBtn.disabled = false;
+        if (pauseBtn) {
+          pauseBtn.style.display = 'none';
+        }
+        isPaused = false;
+      };
+    }
+
+    speechSynthesis.speak(utterance);
+  }
 }
-speechSynthesis.speak(utterance);
+
+
+function toggleSpeech() {
+  const pauseBtn = document.getElementById('pauseBtn');
+  if ('speechSynthesis' in window && speechSynthesis.speaking) {
+    if (isPaused) {
+      speechSynthesis.resume();
+      pauseBtn.innerText = '⏸️ Pausar';
+      isPaused = false;
+    } else {
+      speechSynthesis.pause();
+      pauseBtn.innerText = '▶️ Reanudar';
+      isPaused = true;
+    }
+  }
 }
-}
+
+
+
+
+
+
 
 // Centrar mapa en sitio específico
 function centerMapOnSite(lat, lng) {
