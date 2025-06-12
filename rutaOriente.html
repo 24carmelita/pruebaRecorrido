@@ -1032,22 +1032,18 @@ function closeSidebar() {
   const sidebar = document.getElementById('sidebar');
   sidebar.classList.remove('active');
 
+  // Detener carrusel
   if (carouselInterval) {
     clearInterval(carouselInterval);
   }
 
-  // Detener la voz si se está leyendo
-  if ('speechSynthesis' in window) {
-    speechSynthesis.cancel();
+  // SOLO PAUSAR (NO CANCELAR)
+  if ('speechSynthesis' in window && speechSynthesis.speaking && !speechSynthesis.paused) {
+    speechSynthesis.pause();
+    isPaused = true;
+    const pauseBtn = document.getElementById('pauseBtn');
+    if (pauseBtn) pauseBtn.innerText = '▶️ Reanudar';
   }
-
-  // Ocultar botón de pausa si está visible
-  const pauseBtn = document.getElementById('pauseBtn');
-  if (pauseBtn) {
-    pauseBtn.style.display = 'none';
-  }
-
-  isPaused = false;
 }
 
 
@@ -1181,6 +1177,7 @@ function toggleSpeech() {
     }
   }
 }
+
 
 
 
