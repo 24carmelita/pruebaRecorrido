@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Acerca De - Campeche</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f8f8f8;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header {
+      background-color: #702c37;
+      color: rgb(111, 96, 12);
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .logo {
+      height: 90px;
+      max-width: 80%;
+      width: auto;
+      transition: all 0.3s ease;
+    }
+    #language-selector {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+    .lang-btn {
+      background-color: white;
+      color: #333;
+      border-radius: 5px;
+      padding: 8px 15px;
+      font-size: 1em;
+      cursor: pointer;
+      border: 2px solid #8B0000;
+      transition: all 0.3s ease;
+    }
+    .lang-btn:hover,
+    .active {
+      background-color: #6e0909;
+      color: white;
+    }
+    #main-content {
+      padding: 40px 20px;
+      text-align: center;
+      flex: 1;
+    }
+    h2 {
+      color: #333;
+      font-size: 2em;
+      margin-bottom: 15px;
+    }
+    p {
+      max-width: 800px;
+      margin: 0 auto;
+      font-size: 1.1em;
+      line-height: 1.6;
+      color: #444;
+      white-space: pre-wrap;
+      /* para respetar saltos de línea */
+    }
+    a {
+      color: #702c37;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    footer {
+      background-color: #702c37;
+      color: #b38b28;
+      text-align: center;
+      padding: 30px 10px;
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    footer a {
+      color: #b38b28;
+      margin: 0 12px;
+      text-decoration: none;
+    }
+    @media (max-width: 600px) {
+      header {
+        flex-direction: column;
+        text-align: center;
+      }
+      .logo {
+        height: 70px;
+        margin-bottom: 10px;
+      }
+      .lang-btn {
+        font-size: 0.9em;
+        padding: 6px 12px;
+      }
+      footer nav,
+      footer div,
+      footer p {
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="img/LogoINAH_Dorado.png" alt="Logo" class="logo" />
+    <h1 id="title">Acerca de la aplicación</h1>
+    <div id="language-selector">
+      <button class="lang-btn" id="btn-es" onclick="changeLanguage('es')">Español</button>
+      <button class="lang-btn" id="btn-en" onclick="changeLanguage('en')">English</button>
+    </div>
+  </header>
+
+  <div id="main-content">
+    <h2 id="subtitle">Conoce más sobre este proyecto</h2>
+   <p id="description">
+  La Subdirección de Arqueología Subacuática (SAS) del Instituto Nacional de Antropología e Historia (INAH) se encarga de investigar, conservar, proteger y difundir el Patrimonio Cultural Subacuático de México.
+
+¿Qué es el Patrimonio Cultural Subacuático (PCS)?
+De acuerdo a la Convención UNESCO de 2001 sobre la Protección del Patrimonio Cultural Subacuático el PCS lo conforma  “todos  los  rastros  de  existencia  humana que tengan un carácter cultural, histórico o arqueológico, que hayan estado  bajo el agua,  parcial  o  totalmente,  de  forma  periódica  o  continua,  por  lo  menos  durante  100  años,  tales como:   los  sitios,  estructuras,  edificios,  objetos  y  restos  humanos,  junto  con  su  contexto  arqueológico y natural; los  buques,  aeronaves,  otros  medios  de  transporte  o  cualquier  parte  de  ellos,  su  cargamento u otro contenido, junto con su contexto arqueológico y natural; y los objetos de carácter prehistórico”.
+
+¿Qué hago si encuentro Patrimonio Cultural en aguas mexicanas?
+Debido a que el PCS es muy delicado y se puede dañar al cambiar de ambiente, es fundamental que te comuniques con el INAH para contribuir a su protección, y evitar así su destrucción y saqueo. Ponte en contacto con la Oficina Regional de la Subdirección de Arqueología Subacuática (SAS) en la Península de Yucatán al <a href="tel:+529818115510">981 81 1 55 10</a> o al correo electrónico <a href="mailto:sas.inah.peninsula.yucatan@gmail.com">sas.inah.peninsula.yucatan@gmail.com</a>,  donde recibiremos y atenderemos tu denuncia.
+</p>
+
+  </div>
+
+  <footer>
+    <div style="margin-bottom: 20px;">
+      <img src="img/LogoINAH_Dorado2.png" alt="Logo" style="width:90px; margin-bottom:10px;" />
+    </div>
+
+    <nav style="margin-bottom: 20px;">
+      <a href="inicio.html">Inicio</a>
+      <a href="https://www.google.com/maps?q=19.843044,-90.538832" target="_blank" rel="noopener noreferrer">Dirección</a>
+      <a href="tel:+5211234567890">Contacto</a>
+    </nav>
+
+    <div style="margin-bottom: 25px;">
+      <a href="https://www.facebook.com/share/1AkUxZpZFM/" target="_blank" rel="noopener noreferrer"><i class="fab fa-facebook-f"></i></a>
+      <a href="https://www.instagram.com/inahmx?igsh=MWVyYjY4b2gxODczMw==" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
+      <a href="https://twitter.com" target="_blank" rel="noopener noreferrer"><i class="fab fa-twitter"></i></a>
+      <a href="https://youtube.com/@inahtv?si=dTPfND_makjeZTEm" target="_blank" rel="noopener noreferrer"><i class="fab fa-youtube"></i></a>
+    </div>
+
+    <hr style="border-color: #8c5d54; width: 80%; margin-bottom: 15px;" />
+
+    <p style="font-size: 14px; margin: 0;">© 2025 Miguiaa_mx. Todos los derechos reservados.</p>
+    <p style="font-weight: 600; font-size: 14px; margin: 5px 0 0 0;">DISEÑADO POR INAH CAMPECHE</p>
+  </footer>
+
+  <script>
+    const translations = {
+      es: {
+        title: "Acerca de la aplicación",
+        subtitle: "Conoce más sobre este proyecto",
+        description: `La Subdirección de Arqueología Subacuática (SAS) del Instituto Nacional de Antropología e Historia (INAH) se encarga de investigar, conservar, proteger y difundir el Patrimonio Cultural Subacuático de México.
+
+¿Qué es el Patrimonio Cultural Subacuático (PCS)?
+De acuerdo a la Convención UNESCO de 2001 sobre la Protección del Patrimonio Cultural Subacuático el PCS lo conforma  “todos  los  rastros  de  existencia  humana que tengan un carácter cultural, histórico o arqueológico, que hayan estado  bajo el agua,  parcial  o  totalmente,  de  forma  periódica  o  continua,  por  lo  menos  durante  100  años,  tales como:   los  sitios,  estructuras,  edificios,  objetos  y  restos  humanos,  junto  con  su  contexto  arqueológico y natural; los  buques,  aeronaves,  otros  medios  de  transporte  o  cualquier  parte  de  ellos,  su  cargamento u otro contenido, junto con su contexto arqueológico y natural; y los objetos de carácter prehistórico”.
+
+¿Qué hago si encuentro Patrimonio Cultural en aguas mexicanas?
+Debido a que el PCS es muy delicado y se puede dañar al cambiar de ambiente, es fundamental que te comuniques con el INAH para contribuir a su protección, y evitar así su destrucción y saqueo. Ponte en contacto con la Oficina Regional de la Subdirección de Arqueología Subacuática (SAS) en la Península de Yucatán al <a href="tel:+529818115510">981 81 1 55 10</a> o al correo electrónico <a href="mailto:sas.inah.peninsula.yucatan@gmail.com">sas.inah.peninsula.yucatan@gmail.com</a>,  donde recibiremos y atenderemos tu denuncia.`
+      },
+      en: {
+        title: "About the App",
+        subtitle: "Learn more about this project",
+        description: `The Underwater Archaeology Subdirectorate (SAS) of the National Institute of Anthropology and History (INAH) is responsible for researching, conserving, protecting, and disseminating Mexico's Underwater Cultural Heritage.
+
+What is Underwater Cultural Heritage (UCH)?
+According to the 2001 UNESCO Convention on the Protection of Underwater Cultural Heritage, UCH includes “all traces of human existence that have cultural, historical, or archaeological character, which have been underwater, partially or totally, periodically or continuously, for at least 100 years, such as: sites, structures, buildings, objects, and human remains, along with their archaeological and natural context; ships, aircraft, other means of transport or any part thereof, their cargo or other contents, along with their archaeological and natural context; and prehistoric objects.”
+
+What should I do if I find Cultural Heritage in Mexican waters?
+Since UCH is very delicate and can be damaged by changing environments, it is essential that you contact INAH to contribute to its protection and thus avoid its destruction and looting. Contact the Regional Office of the Underwater Archaeology Subdirectorate (SAS) in the Yucatan Peninsula at <a href="tel:+529818115510">981 81 1 55 10</a> or by email at <a href="mailto:sas.inah.peninsula.yucatan@gmail.com">sas.inah.peninsula.yucatan@gmail.com</a>, where we will receive and handle your report.`
+      }
+    };
+
+    function changeLanguage(lang) {
+      document.getElementById('title').textContent = translations[lang].title;
+      document.getElementById('subtitle').textContent = translations[lang].subtitle;
+      document.getElementById('description').innerHTML = translations[lang].description; // Acá se usa innerHTML para que reconozca los enlaces
+
+      // Cambiar estilos del botón activo
+      document.getElementById('btn-es').classList.toggle('active', lang === 'es');
+      document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+    }
+
+    // Inicializar en español
+    changeLanguage('es');
+  </script>
+</body>
+</html>

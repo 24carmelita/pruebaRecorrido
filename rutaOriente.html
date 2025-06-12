@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Recorrido en Coche - Campeche</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<style>
+body {
+margin: 0;
+font-family: 'Segoe UI', sans-serif;
+background-color: #f8f8f8;
+}
+header {
+background-color: #4a0303;
+color: white;
+padding: 20px;
+text-align: center;
+position: relative;
+}
+.logo {
+position: absolute;
+top: 35px;
+left: 10px;
+height: 50px;
+width: auto;
+transition: all 0.3s ease;
+}
+@media screen and (max-width: 768px) {
+.logo {
+height: 40px;
+top: 5px;
+left: 5px;
+}
+header h1 {
+font-size: 1.5em;
+padding: 10px 0;
+}
+}
+.container {
+display: flex;
+position: relative;
+height: 500px;
+width: 90%;
+max-width: 1200px;
+margin: 20px auto;
+border-radius: 15px;
+box-shadow: 0 0 15px #00000022;
+overflow: hidden;
+}
+#map {
+flex: 1;
+height: 100%;
+z-index: 1;
+}
+/* Panel lateral */
+#sidebar {
+position: absolute;
+top: 0;
+right: -400px;
+width: 400px;
+height: 100%;
+background: white;
+box-shadow: -4px 0 20px rgba(0,0,0,0.15);
+transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+z-index: 1000;
+overflow-y: auto;
+border-left: 3px solid #8B0000;
+}
+#sidebar.active {
+right: 0;
+}
+.sidebar-header {
+display: flex;
+justify-content: space-between;
+align-items: flex-start;
+padding: 20px;
+border-bottom: 2px solid #e5e7eb;
+background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+position: sticky;
+top: 0;
+z-index: 10;
+}
+.header-content {
+flex: 1;
+}
+.sidebar-header h2 {
+color: #8B0000;
+font-size: 1.4rem;
+margin: 0 0 8px 0;
+font-weight: 700;
+line-height: 1.3;
+}
+.distance-info {
+display: flex;
+align-items: center;
+gap: 8px;
+margin-top: 8px;
+}
+.distance-label {
+font-size: 14px;
+color: #6b7280;
+font-weight: 500;
+}
+.distance-value {
+font-size: 14px;
+color: #059669;
+font-weight: 600;
+background: #d1fae5;
+padding: 2px 8px;
+border-radius: 12px;
+}
+.close-btn {
+background: #8B0000;
+color: white;
+border: none;
+padding: 8px 12px;
+border-radius: 8px;
+cursor: pointer;
+font-size: 14px;
+font-weight: 600;
+transition: all 0.3s ease;
+margin-left: 15px;
+}
+.close-btn:hover {
+background: #a30000;
+}
+/* Carrusel de imágenes */
+.image-carousel {
+padding: 20px;
+}
+.carousel-container {
+position: relative;
+background: #f8fafc;
+border-radius: 12px;
+overflow: hidden;
+box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+border: 1px solid #e5e7eb;
+}
+.carousel-images {
+position: relative;
+height: 250px;
+overflow: hidden;
+}
+.carousel-image {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+object-fit: cover;
+opacity: 0;
+transition: opacity 0.6s ease-in-out;
+border-radius: 12px 12px 0 0;
+}
+.carousel-image.active {
+opacity: 1;
+}
+.carousel-controls {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 15px;
+background: white;
+}
+.carousel-btn {
+background: #8B0000;
+color: white;
+border: none;
+padding: 8px 12px;
+border-radius: 8px;
+cursor: pointer;
+font-size: 12px;
+font-weight: 600;
+transition: all 0.3s ease;
+}
+.carousel-btn:hover {
+background: #a30000;
+}
+.carousel-indicators {
+display: flex;
+gap: 8px;
+align-items: center;
+}
+.indicator {
+width: 10px;
+height: 10px;
+border-radius: 50%;
+background: #d1d5db;
+cursor: pointer;
+transition: all 0.3s ease;
+}
+.indicator.active {
+background: #8B0000;
+transform: scale(1.2);
+}
+.carousel-progress {
+height: 3px;
+background: #e5e7eb;
+position: relative;
+overflow: hidden;
+}
+.progress-bar {
+height: 100%;
+background: #8B0000;
+width: 0%;
+transition: none;
+}
+/* Descripción del sitio */
+.site-description {
+padding: 0 20px 20px;
+}
+.site-description p {
+line-height: 1.6;
+color: #374151;
+margin-bottom: 15px;
+text-align: justify;
+font-size: 14px;
+background: #f9fafb;
+padding: 15px;
+border-radius: 10px;
+border-left: 4px solid #8B0000;
+}
+.action-buttons {
+display: flex;
+gap: 10px;
+flex-direction: column;
+}
+.speak-btn, .center-btn, .route-btn {
+background: #8B0000;
+color: white;
+border: none;
+padding: 10px 15px;
+border-radius: 8px;
+cursor: pointer;
+font-size: 14px;
+font-weight: 600;
+transition: all 0.3s ease;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 8px;
+}
+.speak-btn:hover, .center-btn:hover, .route-btn:hover {
+background: #a30000;
+}
+.speak-btn:disabled {
+background: #9ca3af;
+cursor: not-allowed;
+}
+/* Botón especial para crear ruta en sidebar */
+.route-btn {
+background: linear-gradient(135deg, #059669 0%, #047857 100%);
+}
+.route-btn:hover {
+background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+}
+#distance,
+#description {
+text-align: center;
+margin-top: 10px;
+font-size: 1.2em;
+font-weight: bold;
+}
+#description {
+padding: 10px;
+margin-bottom: 10px;
+}
+.btn-red-vino {
+background-color: #8B0000;
+color: #fff;
+border: none;
+cursor: pointer;
+transition: background 0.3s;
+padding: 6px 12px;
+border-radius: 8px;
+margin: 2px;
+}
+.btn-red-vino:hover {
+background-color: #a30000;
+}
+/* Botón cancelar ruta */
+.btn-cancel {
+background-color: #dc3545;
+color: #fff;
+border: none;
+cursor: pointer;
+transition: background 0.3s;
+padding: 6px 12px;
+border-radius: 8px;
+margin: 2px;
+}
+.btn-cancel:hover {
+background-color: #c82333;
+}
+/* Contenedor de botones de control */
+.route-controls {
+text-align: center;
+margin-top: 10px;
+display: flex;
+justify-content: center;
+gap: 10px;
+flex-wrap: wrap;
+}
+/* Estado de ruta activa */
+.route-status {
+background: #d1fae5;
+color: #065f46;
+padding: 8px 15px;
+border-radius: 8px;
+margin: 10px auto;
+display: none;
+max-width: 300px;
+text-align: center;
+font-weight: 600;
+border: 1px solid #10b981;
+}
+.route-status.active {
+display: block;
+}
+/* Información del recorrido */
+.tour-info {
+background: #e0f2fe;
+color: #0277bd;
+padding: 10px 15px;
+border-radius: 8px;
+margin: 10px auto;
+max-width: 400px;
+text-align: center;
+font-size: 14px;
+border: 1px solid #29b6f6;
+}
+/* Botón ir al recorrido en popup */
+.popup-route-btn {
+background: linear-gradient(135deg, #059669 0%, #047857 100%);
+color: white;
+border: none;
+padding: 8px 16px;
+border-radius: 6px;
+cursor: pointer;
+font-size: 12px;
+font-weight: 600;
+margin-top: 8px;
+width: 100%;
+transition: all 0.3s ease;
+box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2);
+}
+.popup-route-btn:hover {
+background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+transform: translateY(-1px);
+box-shadow: 0 4px 8px rgba(5, 150, 105, 0.3);
+}
+.lang-switch {
+position: absolute;
+top: 10px;
+right: 10px;
+}
+img {
+max-width: 100%;
+height: auto;
+border-radius: 10px;
+margin-bottom: 10px;
+}
+.popup-btn {
+display: inline-block;
+margin-top: 10px;
+width: 100%;
+text-align: center;
+}
+.btn-back {
+background-color: #8B0000;
+color: #fff;
+padding: 10px 20px;
+border: none;
+border-radius: 8px;
+font-size: 1.2em;
+cursor: pointer;
+margin-top: 20px;
+margin-bottom: 40px;
+transition: background-color 0.3s;
+}
+.btn-back:hover {
+background-color: #a30000;
+}
+/* Popup simplificado */
+.simple-popup {
+text-align: center;
+padding: 10px;
+max-width: 200px;
+}
+.simple-popup h3 {
+margin: 0 0 10px 0;
+font-size: 16px;
+font-weight: bold;
+color: #8B0000;
+}
+.simple-popup img {
+width: 100%;
+height: 120px;
+object-fit: cover;
+border-radius: 8px;
+margin: 0;
+}
+/* Responsive */
+@media (max-width: 768px) {
+#sidebar {
+width: 100%;
+right: -100%;
+}
+.carousel-images {
+height: 200px;
+}
+.sidebar-header {
+padding: 15px;
+}
+.sidebar-header h2 {
+font-size: 1.2rem;
+}
+.image-carousel {
+padding: 15px;
+}
+.site-description {
+padding: 0 15px 15px;
+}
+.route-controls {
+flex-direction: column;
+align-items: center;
+}
+.popup-route-btn {
+font-size: 11px;
+padding: 6px 12px;
+}
+}
+/* Scrollbar personalizado */
+#sidebar::-webkit-scrollbar {
+width: 6px;
+}
+#sidebar::-webkit-scrollbar-track {
+background: #f1f5f9;
+}
+#sidebar::-webkit-scrollbar-thumb {
+background: #cbd5e1;
+border-radius: 3px;
+}
+#sidebar::-webkit-scrollbar-thumb:hover {
+background: #94a3b8;
+}
+</style>
+</head>
+<body>
+<header>
+<img src="img/LogoINAH_Dorado.png" alt="Logo" class="logo">
+<h1>Recorrido turistico cultural lado oriente</h1>
+<div class="lang-switch">
+<button id="btnEs" class="btn-red-vino">🇲🇽 Español</button>
+<button id="btnEn" class="btn-red-vino">🇺🇸 English</button>
+</div>
+</header>
+<div id="description">
+<p>Bienvenido al recorrido en coche por la ciudad de Campeche. Explora lugares históricos y hermosos paisajes. Recorrerás sitios emblemáticos de la ciudad y conocerás su rica historia. Asegúrate de disfrutar cada momento mientras avanzas en el recorrido. ¡Comencemos!</p>
+</div>
+<div id="siteMenu" style="text-align: center; margin: 20px;">
+<h2>📍 Sitios del Recorrido</h2>
+<div id="siteButtons" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;"></div>
+</div>
+<div id="distance">Distancia al destino: -</div>
+
+<!-- Información del recorrido -->
+<div id="tourInfo" class="tour-info">
+<span id="tourInfoText">💡 Haz clic en los iconos del mapa para crear rutas, o usa los botones de abajo para ver el recorrido completo</span>
+</div>
+
+<!-- Estado de ruta activa -->
+<div id="routeStatus" class="route-status">
+<span id="routeStatusText">Ruta activa a: </span>
+</div>
+
+<!-- Controles de ruta -->
+<div class="route-controls">
+<button id="startRouteBtn" class="btn-red-vino">🗺️ Ver Recorrido Completo</button>
+<button id="startTourBtn" class="btn-red-vino">🚗 Ir al Primer Sitio</button>
+<button id="cancelRouteBtn" class="btn-cancel" style="display: none;">❌ Cancelar Ruta</button>
+<button id="clearAllRoutesBtn" class="btn-cancel" style="display: none;">🗑️ Limpiar Todo</button>
+</div>
+
+<div class="container" id="mapContainer">
+<div id="map"></div>
+<!-- Panel lateral -->
+<div id="sidebar">
+<div id="sidebar-content">
+<!-- El contenido se genera dinámicamente -->
+</div>
+</div>
+</div>
+<div style="text-align: center;">
+<a href="inicio.html">
+<button class="btn-back">Regresar al Inicio</button>
+</a>
+</div>
+
+<footer style="background-color:#702c37; color:#b38b28; text-align:center; padding:30px 10px; font-family: 'Arial', sans-serif;">
+  <div style="margin-bottom: 20px;">
+    <!-- Logo -->
+    <img src="img/LogoINAH_Dorado2.png" alt="Logo" style="width:90px; margin-bottom:10px;">
+  </div>
+
+  <nav style="margin-bottom: 20px;">
+    <a href="inicio.html" style="color:#b38b28; margin: 0 12px; text-decoration:none;">Inicio</a>
+      <a href="acercaDe.html" style="color:#b38b28; margin: 0 12px; text-decoration:none;">Acerca De</a>
+    <a href="https://www.google.com/maps?q=19.843044,-90.538832" target="_blank" style="color:#b38b28; margin: 0 12px; text-decoration:none;">
+      Dirección
+    </a>
+    <a href="tel:+5211234567890" style="color:#b38b28; margin: 0 12px; text-decoration:none;">
+      Contacto
+    </a>
+  </nav>
+
+  <div style="margin-bottom: 25px;">
+    <!-- Redes sociales -->
+    <a href="https://www.facebook.com/share/1AkUxZpZFM/" target="_blank" style="color:#b38b28; margin: 0 8px; font-size: 18px; text-decoration:none;">
+      <i class="fab fa-facebook-f"></i> 
+    </a>
+    <a href="https://www.instagram.com/inahmx?igsh=MWVyYjY4b2gxODczMw==" target="_blank" style="color:#b38b28; margin: 0 8px; font-size: 18px; text-decoration:none;">
+      <i class="fab fa-instagram"></i> 
+    </a>
+    <a href="https://twitter.com" target="_blank" style="color:#b38b28; margin: 0 8px; font-size: 18px; text-decoration:none;">
+      <i class="fab fa-twitter"></i> 
+    </a>
+    <a href="https://youtube.com/@inahtv?si=dTPfND_makjeZTEm" target="_blank" style="color:#b38b28; margin: 0 8px; font-size: 18px; text-decoration:none;">
+      <i class="fab fa-youtube"></i> 
+    </a>
+  </div>
+
+  <hr style="border-color: #8c5d54; margin-bottom: 15px;">
+
+  <p style="font-size: 14px; margin: 0;">© 2025 Miguiaa_mx. Todos los derechos reservados.</p>
+  <p style="font-weight: 600; font-size: 14px; margin: 5px 0 0 0;">DISEÑADO POR INAH CAMPECHE</p>
+</footer>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+// Variables globales
+let map;
+let userMarker;
+let followUser = true;
+let currentCarouselIndex = 0;
+let carouselInterval;
+let blueRouteLine;
+let selectedRouteLine;
+let selectedSite = null;
+let routeToStartLine;
+let distanceInterval;
+let activeRouteType = null; // 'selected', 'start', 'complete'
+
+// Función para detectar si es dispositivo móvil
+function isMobileDevice() {
+return window.innerWidth <= 768;
+}
+
+// Función para hacer scroll suave hacia el contenedor del mapa en móviles
+function scrollToMapOnMobile() {
+if (isMobileDevice()) {
+const mapContainer = document.getElementById('mapContainer');
+if (mapContainer) {
+// Pequeño delay para que la animación del sidebar se complete
+setTimeout(() => {
+mapContainer.scrollIntoView({
+behavior: 'smooth',
+block: 'start'
+});
+}, 200);
+}
+}
+}
+
+// Inicializar mapa
+const mapInstance = L.map('map').setView([19.845, -90.523], 12);
+map = mapInstance;
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+// Desactiva el seguimiento si el usuario empieza a mover el mapa manualmente
+map.on('movestart', () => {
+followUser = false;
+});
+
+const translations = {
+es: {
+welcome: 'Bienvenido al recorrido en auto por la ciudad de Campeche. Explora lugares históricos y paisajes hermosos. Visitarás sitios emblemáticos de la ciudad y conocerás su rica historia. Asegúrate de disfrutar cada momento mientras avanzas en el recorrido. ¡Comencemos!',
+distance: 'Distancia al destino',
+closeSidebar: 'Cerrar',
+prevImage: 'Anterior',
+nextImage: 'Siguiente',
+listenDescription: 'Escuchar descripción',
+centerMap: 'Centrar en mapa',
+createRoute: 'Crear Ruta a Este Sitio',
+meters: 'metros',
+kilometers: 'kilómetros',
+viewCompleteRoute: '🗺️ Ver Recorrido Completo',
+goToFirstSite: '🚗 Ir al Primer Sitio',
+cancelRoute: '❌ Cancelar Ruta',
+clearAll: '🗑️ Limpiar Todo',
+routeActive: 'Ruta activa a: ',
+routeToStart: 'Ruta al sitio más cercano',
+routeCanceled: 'Ruta cancelada',
+allRoutesCleared: 'Todas las rutas eliminadas',
+tourInfoDefault: '💡 Haz clic en los iconos del mapa para crear rutas, o usa los botones de abajo para ver el recorrido completo',
+tourInfoComplete: '🗺️ Mostrando recorrido completo entre todos los sitios',
+tourInfoToSite: '🚗 Ruta creada desde tu ubicación hasta el sitio más cercano',
+goToRoute: '🚗 Ir al Recorrido',
+routeCreated: 'Ruta creada hacia',
+locationNotAvailable: 'Ubicación no disponible',
+'Vapor Lolá': {
+description: 'El Vapor Lolá es un emblemático buque de vapor de la marina mercante francesa que encalló frente a las costas de Campeche en 1864 debido a una maniobra errónea de su capitán, según una crónica que data del siglo XX. Con una eslora de 65 metros y una manga de 9.35 metros, esta embarcación representa un hito en la evolución de la tecnología marítima de la Revolución Industrial. Sus restos, visibles desde el malecón Justo Sierra Méndez, han sido reconocidos como Patrimonio Cultural Subacuático por el INAH desde 2007.',
+images: ['imgOriente/VaporLola1.jpg', 'imgOriente/VaporLola2.jpg', 'imgOriente/VaporLola3.jpg']
+},
+'Batería de San Luis': {
+description: 'Construida en 1791 al pie del Fuerte de San Miguel, la Batería de San Luis es una fortificación costera clave en la defensa de Campeche durante el siglo XVIII. Diseñada para disparar fuego rasante y evitar desembarcos enemigos, esta estructura rectangular cuenta con un foso, garitas y espacios como cuarteles y almacenes de pólvora. En 1862, protagonizó un enfrentamiento con la cañonera francesa L’Eclair durante la Segunda Intervención Francesa en México. ',
+images: ['imgOriente/sanLuis1.jpg', 'imgOriente/sanLuis2.jpg', 'imgOriente/sanLuis3.jpg']
+},
+'Fuerte de San Miguel': {
+description: 'El Reducto o Fuerte de San Miguel, diseñado por el ingeniero militar Agustín Crame y construido en el siglo XVIII, es una de las estructuras defensivas más importantes del puerto de Campeche. Se ubica en una colina al sur de la ciudad conocida como “Cerro de Buenavista”, ofreciendo una vista panorámica de la bahía de Campeche. Su función original fue la de vigilar la costa para evitar el desembarco de enemigos por la costa del poblado de Lerma, aún conserva cañones, un foso y su puente levadizo original. Hoy día, el fuerte alberga el Museo de Arqueología Maya, con una destacada colección de piezas provenientes de sitios arqueológicos como Calakmul, Edzná y Jaina.',
+images: ['imgOriente/sanMiguel1.jpg', 'imgOriente/sanMiguel2.jpg', 'imgOriente/sanMiguel3.jpg']
+},
+'Parque de Lerma': {
+description: 'Ubicado en el corazón de la comunidad pesquera de Lerma, a solo 8 km de la ciudad de Campeche. Muy cerca de este parque se encontraba un reducto o fuerte de vigilancia costera que fue demolido a finales del siglo XIX. ¿Sabías que por esta costa desembarcaron piratas como Cristopher Mings, Edward Mansvelt, Laurens de Graaff “Lorencillo” y “Barbillas”? Este último saqueó e incendio el poblado de Lerma y secuestró al gobernador de Yucatán Fernando Meneses y Bravo, pidiendo un rescate para liberarlo. Enfrente se ubica la iglesia en honor a la Virgen de la Asunción construida en 1812, en el interior cerca de la sacristía se encuentra la lápida funeraria del ilustre marino campechano don Pedro Sáenz de Baranda y Quijano quién falleció en Lerma en 1891.',
+images: ['imgOriente/parqueLerma1.jpg', 'imgOriente/parqueLerma2.jpg','imgOriente/parqueLerma3.jpg']
+},
+'Playa Bonita': {
+description: 'Playa Bonita es una de las playas más visitadas de Campeche, ubicada en el poblado de Lerma, a solo 15 minutos de la ciudad. De aguas tranquilas y arena clara, es ideal para familias y quienes buscan relajarse junto al mar. Cuenta con servicios básicos, restaurantes y áreas recreativas, lo que la convierte en un lugar cómodo y accesible para refrescarse y disfrutar las aguas del Golfo de México.',
+images: ['imgOriente/playaBonita1.jpg', 'imgOriente/playaBonita2.jpg',  'imgOriente/playaBonita3.jpg']
+}
+},
+'en': {
+welcome: 'Welcome to the car tour through the city of Campeche. Explore historical places and beautiful landscapes. You will visit emblematic sites of the city and learn about its rich history. Be sure to enjoy every moment as you progress through the tour. Let\'s get started!',
+distance: 'Distance to destination',
+closeSidebar: 'Close',
+prevImage: 'Previous',
+nextImage: 'Next',
+listenDescription: 'Listen to description',
+centerMap: 'Center on map',
+createRoute: 'Create Route to This Site',
+meters: 'meters',
+kilometers: 'kilometers',
+viewCompleteRoute: '🗺️ View Complete Route',
+goToFirstSite: '🚗 Go to First Site',
+cancelRoute: '❌ Cancel Route',
+clearAll: '🗑️ Clear All',
+routeActive: 'Active route to: ',
+routeToStart: 'Route to nearest site',
+routeCanceled: 'Route canceled',
+allRoutesCleared: 'All routes cleared',
+tourInfoDefault: '💡 Click on map icons to create routes, or use the buttons below to view the complete tour',
+tourInfoComplete: '🗺️ Showing complete route between all sites',
+tourInfoToSite: '🚗 Route created from your location to the nearest site',
+goToRoute: '🚗 Go to Route',
+routeCreated: 'Route created to',
+locationNotAvailable: 'Location not available',
+'Vapor Lolá': {
+description: 'The Vapor Lolá is an iconic French merchant marine steamship that ran aground off the coast of Campeche in 1864 due to an erroneous maneuver by its captain, according to a 20th-century chronicle. Measuring 65 meters in length and 9.35 meters wide, this vessel represents a milestone in the evolution of maritime technology during the Industrial Revolution. Its remains, visible from the Justo Sierra Méndez seawall, have been recognized as Underwater Cultural Heritage by the INAH (National Institute of Natural History) since 2007.',
+images: ['imgOriente/VaporLola1.jpg', 'imgOriente/VaporLola2.jpg', 'imgOriente/VaporLola3.jpg']
+
+},
+'Batería de San Luis': {
+description: 'Built in 1791 at the foot of San Miguel Fort, the San Luis Battery is a key coastal fortification in the defense of Campeche during the 18th century. Designed to fire low and prevent enemy landings, this rectangular structure features a moat, sentry boxes, and spaces for barracks and gunpowder stores. In 1862, it was involved in a clash with the French gunboat  L\'Eclair during the Second French Intervention in Mexico.',
+images: ['imgOriente/sanLuis1.jpg', 'imgOriente/sanLuis2.jpg', 'imgOriente/sanLuis3.jpg']
+},
+'Fuerte de San Miguel': {
+description: 'The San Miguel Redoubt or Fort, designed by military engineer Agustín Crame and built in the 18th century, is one of the most important defensive structures in the port of Campeche. It is located on a hill south of the city known as "Cerro de Buenavista," offering a panoramic view of the Bay of Campeche. Its original function was to guard the coast to prevent enemy landings along the shore of the town of Lerma. It still preserves cannons, a moat, and its original drawbridge. Today, the fort houses the Museum of Maya Archaeology, with an outstanding collection of artifacts from archaeological sites such as Calakmul, Edzná, and Jaina.',
+images: ['imgOriente/sanMiguel1.jpg', 'imgOriente/sanMiguel2.jpg', 'imgOriente/sanMiguel3.jpg']
+},
+'Parque de Lerma': {
+description: 'Located in the heart of the fishing community of Lerma, just 8 km from the city of Campeche. Very close to this park was a coastal redoubt or fort that was demolished at the end of the 19th century. Did you know that pirates such as Christopher Mings, Edward Mansvelt, Laurens de Graaff "Lorencillo," and "Barbillas" landed on this coast? The latter sacked and burned the town of Lerma and kidnapped the governor of Yucatán, Fernando Meneses y Bravo, demanding a ransom for his release. Opposite is the church in honor of the Virgin of the Assumption, built in 1812. Inside, near the sacristy, is the tombstone of the illustrious Campeche sailor Don Pedro Sáenz de Baranda y Quijano, who died in Lerma in 1891.',
+images: ['imgOriente/parqueLerma1.jpg', 'imgOriente/parqueLerma2.jpg','imgOriente/parqueLerma3.jpg']
+},
+'Playa Bonita': {
+description: 'Playa Bonita is one of Campeche\'s most visited beaches, located in the town of Lerma, just 15 minutes from the city. With calm waters and clear sand, it\'s ideal for families and those looking to relax by the sea. It offers basic services, restaurants, and recreational areas, making it a comfortable and accessible place to cool off and enjoy the waters of the Gulf of Mexico.',
+images: ['imgOriente/playaBonita1.jpg', 'imgOriente/playaBonita2.jpg',  'imgOriente/playaBonita3.jpg']
+}
+}
+};
+
+let currentLang = 'es';
+const sites = [
+{ lat: 19.833565, lng: -90.557789, name: 'Vapor Lolá', image: 'img/VaporLola.jpg' },
+{ lat: 19.825526, lng: -90.57013, name: 'Batería de San Luis', image: 'img/bateria_san_miguel.jpg' },
+{ lat: 19.824654, lng: -90.56867, name: 'Fuerte de San Miguel', image: 'img/fuerteSanMiguel.jpg' },
+{ lat: 19.805915, lng: -90.600995, name: 'Parque de Lerma', image: 'img/parque.jpg' },
+{ lat: 19.7932242, lng: -90.6240417, name: 'Playa Bonita', image: 'img/playa.jpg' }
+];
+
+// Crear popup SIMPLE para iconos del mapa (solo imagen, título y botón)
+function createSimplePopup(site) {
+return `
+<div class="simple-popup">
+<h3>${site.name}</h3>
+<img src="${site.image}" alt="${site.name}">
+<button onclick="startRouteToSite('${site.name}', ${site.lat}, ${site.lng})" class="popup-route-btn">
+${translations[currentLang].goToRoute}
+</button>
+</div>
+`;
+}
+
+// Función para iniciar ruta desde popup
+function startRouteToSite(siteName, lat, lng) {
+if (!userMarker) {
+console.log('Ubicación del usuario no disponible');
+return;
+}
+
+// Cancelar cualquier ruta existente automáticamente
+if (selectedRouteLine) {
+map.removeLayer(selectedRouteLine);
+selectedRouteLine = null;
+}
+
+if (routeToStartLine) {
+map.removeLayer(routeToStartLine);
+routeToStartLine = null;
+}
+
+if (blueRouteLine) {
+map.removeLayer(blueRouteLine);
+blueRouteLine = null;
+}
+
+// Crear nueva ruta al sitio seleccionado
+const site = sites.find(s => s.name === siteName);
+if (site) {
+selectedSite = site;
+drawRouteToSite(lat, lng, siteName);
+}
+
+// Cerrar popup
+map.closePopup();
+}
+
+// Función para crear ruta desde el panel lateral
+function createRouteFromSidebar(siteName) {
+const site = sites.find(s => s.name === siteName);
+if (!site) return;
+
+if (!userMarker) {
+console.log('Ubicación del usuario no disponible');
+return;
+}
+
+// Cancelar cualquier ruta existente automáticamente
+if (selectedRouteLine) {
+map.removeLayer(selectedRouteLine);
+selectedRouteLine = null;
+}
+
+if (routeToStartLine) {
+map.removeLayer(routeToStartLine);
+routeToStartLine = null;
+}
+
+if (blueRouteLine) {
+map.removeLayer(blueRouteLine);
+blueRouteLine = null;
+}
+
+// Crear nueva ruta al sitio seleccionado
+selectedSite = site;
+drawRouteToSite(site.lat, site.lng, siteName);
+}
+
+const siteIcons = {
+'Vapor Lolá': L.icon({
+iconUrl: 'iconos/barco.png',
+iconSize: [32, 32],
+iconAnchor: [16, 32],
+popupAnchor: [0, -32]
+}),
+'Batería de San Luis': L.icon({
+iconUrl: 'iconos/baterias.png',
+iconSize: [32, 32],
+iconAnchor: [16, 32],
+popupAnchor: [0, -32]
+}),
+'Fuerte de San Miguel': L.icon({
+iconUrl: 'iconos/fuerte.png',
+iconSize: [32, 32],
+iconAnchor: [16, 32],
+popupAnchor: [0, -32]
+}),
+'Parque de Lerma': L.icon({
+iconUrl: 'iconos/parque.png',
+iconSize: [32, 32],
+iconAnchor: [16, 32],
+popupAnchor: [0, -32]
+}),
+'Playa Bonita': L.icon({
+iconUrl: 'iconos/playa.png',
+iconSize: [32, 32],
+iconAnchor: [16, 32],
+popupAnchor: [0, -32]
+})
+};
+
+const markers = [];
+sites.forEach(site => {
+const marker = L.marker([site.lat, site.lng], { icon: siteIcons[site.name] }).addTo(map);
+// Al hacer clic en el marcador, mostrar popup con imagen, título y botón
+marker.bindPopup(createSimplePopup(site));
+markers.push({ marker, site });
+});
+
+// Actualizar estado de la interfaz según rutas activas
+function updateRouteUI() {
+const routeStatus = document.getElementById('routeStatus');
+const routeStatusText = document.getElementById('routeStatusText');
+const tourInfo = document.getElementById('tourInfo');
+const tourInfoText = document.getElementById('tourInfoText');
+const viewRouteBtn = document.getElementById('startRouteBtn');
+const goToSiteBtn = document.getElementById('startTourBtn');
+const cancelBtn = document.getElementById('cancelRouteBtn');
+const clearBtn = document.getElementById('clearAllRoutesBtn');
+
+if (selectedSite && selectedRouteLine) {
+// Hay una ruta específica a un sitio
+routeStatus.classList.add('active');
+routeStatusText.textContent = `${translations[currentLang].routeActive}${selectedSite.name}`;
+tourInfoText.textContent = `🎯 Ruta específica creada hacia: ${selectedSite.name}`;
+cancelBtn.style.display = 'inline-block';
+clearBtn.style.display = 'inline-block';
+activeRouteType = 'selected';
+} else if (routeToStartLine) {
+// Hay una ruta al sitio más cercano
+routeStatus.classList.add('active');
+routeStatusText.textContent = translations[currentLang].routeToStart;
+tourInfoText.textContent = translations[currentLang].tourInfoToSite;
+cancelBtn.style.display = 'inline-block';
+clearBtn.style.display = 'inline-block';
+activeRouteType = 'start';
+} else if (blueRouteLine) {
+// Solo hay ruta completa del recorrido
+routeStatus.classList.remove('active');
+tourInfoText.textContent = translations[currentLang].tourInfoComplete;
+clearBtn.style.display = 'inline-block';
+cancelBtn.style.display = 'none';
+activeRouteType = 'complete';
+} else {
+// No hay rutas activas
+routeStatus.classList.remove('active');
+tourInfoText.textContent = translations[currentLang].tourInfoDefault;
+cancelBtn.style.display = 'none';
+clearBtn.style.display = 'none';
+activeRouteType = null;
+}
+
+// Actualizar textos de botones
+viewRouteBtn.textContent = translations[currentLang].viewCompleteRoute;
+goToSiteBtn.textContent = translations[currentLang].goToFirstSite;
+cancelBtn.textContent = translations[currentLang].cancelRoute;
+clearBtn.textContent = translations[currentLang].clearAll;
+}
+
+// Cancelar ruta activa
+function cancelActiveRoute() {
+if (selectedRouteLine) {
+map.removeLayer(selectedRouteLine);
+selectedRouteLine = null;
+}
+
+if (routeToStartLine) {
+map.removeLayer(routeToStartLine);
+routeToStartLine = null;
+}
+
+selectedSite = null;
+localStorage.removeItem('selectedSite');
+document.getElementById('distance').innerText = 'Distancia al destino: -';
+
+if (!blueRouteLine) {
+getOSRMRoute(sites);
+}
+
+updateRouteUI();
+}
+
+// Limpiar todas las rutas
+function clearAllRoutes() {
+if (selectedRouteLine) {
+map.removeLayer(selectedRouteLine);
+selectedRouteLine = null;
+}
+
+if (routeToStartLine) {
+map.removeLayer(routeToStartLine);
+routeToStartLine = null;
+}
+
+if (blueRouteLine) {
+map.removeLayer(blueRouteLine);
+blueRouteLine = null;
+}
+
+selectedSite = null;
+localStorage.removeItem('selectedSite');
+document.getElementById('distance').innerText = 'Distancia al destino: -';
+
+updateRouteUI();
+}
+
+// Abrir panel lateral con información del sitio (SOLO desde botones del menú)
+function openSidebar(siteName) {
+const site = sites.find(s => s.name === siteName);
+if (!site) return;
+const sidebar = document.getElementById('sidebar');
+const sidebarContent = document.getElementById('sidebar-content');
+// Detener carrusel anterior si existe
+if (carouselInterval) {
+clearInterval(carouselInterval);
+}
+// Calcular distancia si hay ubicación del usuario
+let distanceInfo = '';
+if (userMarker) {
+const userPos = userMarker.getLatLng();
+const sitePos = L.latLng([site.lat, site.lng]);
+const distance = userPos.distanceTo(sitePos);
+const distanceText = distance > 1000
+? `${(distance / 1000).toFixed(2)} ${translations[currentLang].kilometers}`
+: `${Math.round(distance)} ${translations[currentLang].meters}`;
+distanceInfo = `
+<div class="distance-info">
+<span class="distance-label">${translations[currentLang].distance}:</span>
+<span class="distance-value">${distanceText}</span>
+</div>
+`;
+}
+const siteData = translations[currentLang][siteName];
+const images = siteData.images || [site.image];
+sidebarContent.innerHTML = `
+<div class="sidebar-header">
+<div class="header-content">
+<h2>${siteName}</h2>
+${distanceInfo}
+</div>
+<button onclick="closeSidebar()" class="close-btn">
+✕ ${translations[currentLang].closeSidebar}
+</button>
+</div>
+<div class="image-carousel">
+<div class="carousel-container">
+<div class="carousel-images" id="carousel-images">
+${images.map((img, index) => `
+<img src="${img}" alt="${siteName}"
+class="carousel-image ${index === 0 ? 'active' : ''}"
+data-index="${index}"
+onerror="this.src='${site.image}'">
+`).join('')}
+</div>
+${images.length > 1 ? `
+<div class="carousel-controls">
+<button onclick="prevImage()" class="carousel-btn prev-btn">
+❮ ${translations[currentLang].prevImage}
+</button>
+<div class="carousel-indicators">
+${images.map((_, index) => `
+<span class="indicator ${index === 0 ? 'active' : ''}"
+onclick="goToImage(${index})" data-index="${index}"></span>
+`).join('')}
+</div>
+<button onclick="nextImage()" class="carousel-btn next-btn">
+${translations[currentLang].nextImage} ❯
+</button>
+</div>
+<div class="carousel-progress">
+<div class="progress-bar" id="progress-bar"></div>
+</div>
+` : ''}
+</div>
+</div>
+<div class="site-description">
+<p>${siteData.description}</p>
+<div class="action-buttons">
+<button onclick="speakDescription('${siteData.description.replace(/'/g, "\\'")}', '${siteName.replace(/'/g, "\\'")}'); return false;" class="speak-btn">
+🔊 ${translations[currentLang].listenDescription}
+</button>
+<button onclick="centerMapOnSite(${site.lat}, ${site.lng})" class="center-btn">
+🎯 ${translations[currentLang].centerMap}
+</button>
+<button onclick="createRouteFromSidebar('${siteName}')" class="route-btn">
+🚗 ${translations[currentLang].createRoute}
+</button>
+</div>
+</div>
+`;
+// Mostrar sidebar
+sidebar.classList.add('active');
+
+// Hacer scroll hacia el mapa en dispositivos móviles
+scrollToMapOnMobile();
+
+// Inicializar carrusel automático solo si hay múltiples imágenes
+if (images.length > 1) {
+currentCarouselIndex = 0;
+startCarousel(images.length);
+updateProgressBar();
+}
+}
+
+// Cerrar panel lateral
+function closeSidebar() {
+const sidebar = document.getElementById('sidebar');
+sidebar.classList.remove('active');
+// Detener carrusel
+if (carouselInterval) {
+clearInterval(carouselInterval);
+}
+}
+
+// Iniciar carrusel automático
+function startCarousel(totalImages) {
+updateProgressBar();
+carouselInterval = setInterval(() => {
+nextImage(totalImages);
+updateProgressBar();
+}, 4000);
+}
+
+// Actualizar barra de progreso del carrusel
+function updateProgressBar() {
+const progressBar = document.getElementById('progress-bar');
+if (progressBar) {
+progressBar.style.width = '0%';
+progressBar.style.transition = 'width 4s linear';
+setTimeout(() => {
+progressBar.style.width = '100%';
+}, 50);
+}
+}
+
+// Navegar a imagen anterior
+function prevImage() {
+const images = document.querySelectorAll('.carousel-image');
+const indicators = document.querySelectorAll('.indicator');
+if (images.length === 0) return;
+images[currentCarouselIndex].classList.remove('active');
+if (indicators[currentCarouselIndex]) indicators[currentCarouselIndex].classList.remove('active');
+currentCarouselIndex = currentCarouselIndex === 0 ? images.length - 1 : currentCarouselIndex - 1;
+images[currentCarouselIndex].classList.add('active');
+if (indicators[currentCarouselIndex]) indicators[currentCarouselIndex].classList.add('active');
+// Reiniciar carrusel automático
+if (carouselInterval) {
+clearInterval(carouselInterval);
+startCarousel(images.length);
+}
+}
+
+// Navegar a imagen siguiente
+function nextImage(totalImages = null) {
+const images = document.querySelectorAll('.carousel-image');
+const indicators = document.querySelectorAll('.indicator');
+if (images.length === 0) return;
+const total = totalImages || images.length;
+images[currentCarouselIndex].classList.remove('active');
+if (indicators[currentCarouselIndex]) indicators[currentCarouselIndex].classList.remove('active');
+currentCarouselIndex = (currentCarouselIndex + 1) % total;
+images[currentCarouselIndex].classList.add('active');
+if (indicators[currentCarouselIndex]) indicators[currentCarouselIndex].classList.add('active');
+}
+
+// Ir a imagen específica
+function goToImage(index) {
+const images = document.querySelectorAll('.carousel-image');
+const indicators = document.querySelectorAll('.indicator');
+if (images.length === 0) return;
+images[currentCarouselIndex].classList.remove('active');
+if (indicators[currentCarouselIndex]) indicators[currentCarouselIndex].classList.remove('active');
+currentCarouselIndex = index;
+images[currentCarouselIndex].classList.add('active');
+if (indicators[currentCarouselIndex]) indicators[currentCarouselIndex].classList.add('active');
+// Reiniciar carrusel automático
+if (carouselInterval) {
+clearInterval(carouselInterval);
+startCarousel(images.length);
+}
+}
+
+// Función para text-to-speech
+function speakDescription(text, title) {
+if ('speechSynthesis' in window) {
+speechSynthesis.cancel();
+const fullText = `${title}. ${text}`;
+const utterance = new SpeechSynthesisUtterance(fullText);
+utterance.lang = currentLang === 'es' ? 'es-MX' : 'en-US';
+utterance.rate = 0.8;
+const speakBtn = document.querySelector('.speak-btn');
+if (speakBtn) {
+const originalText = speakBtn.innerHTML;
+speakBtn.innerHTML = '⏸️ Reproduciendo...';
+speakBtn.disabled = true;
+utterance.onend = () => {
+speakBtn.innerHTML = originalText;
+speakBtn.disabled = false;
+};
+utterance.onerror = () => {
+speakBtn.innerHTML = originalText;
+speakBtn.disabled = false;
+};
+}
+speechSynthesis.speak(utterance);
+}
+}
+
+// Centrar mapa en sitio específico
+function centerMapOnSite(lat, lng) {
+map.setView([lat, lng], 16);
+closeSidebar();
+}
+
+// Geolocalización
+if (navigator.geolocation) {
+navigator.geolocation.watchPosition(onLocationFound, onLocationError, {
+enableHighAccuracy: true,
+timeout: 10000,
+maximumAge: 0
+});
+} else {
+console.log('La geolocalización no está disponible en este dispositivo.');
+}
+
+function onLocationFound(position) {
+const userLocation = L.latLng(position.coords.latitude, position.coords.longitude);
+if (!userMarker) {
+userMarker = L.marker(userLocation).addTo(map).bindPopup('Tu ubicación').openPopup();
+} else {
+userMarker.setLatLng(userLocation);
+}
+if (followUser) {
+map.setView(userLocation, 15);
+}
+if (selectedSite) {
+drawRouteToSite(selectedSite.lat, selectedSite.lng, selectedSite.name);
+}
+}
+
+function onLocationError(e) {
+console.error('Error de geolocalización:', e.message);
+}
+
+// Funciones de rutas (manteniendo la funcionalidad original)
+function getOSRMRoute(sites) {
+const coordinates = sites.map(site => `${site.lng},${site.lat}`).join(';');
+const url = `https://router.project-osrm.org/route/v1/driving/${coordinates}?overview=full&geometries=geojson`;
+fetch(url)
+.then(res => res.json())
+.then(data => {
+const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+if (blueRouteLine) {
+map.removeLayer(blueRouteLine);
+}
+blueRouteLine = L.polyline(coords, { color: 'blue', weight: 4 }).addTo(map);
+updateRouteUI();
+})
+.catch(err => console.error('Error al trazar ruta:', err));
+}
+
+function drawRouteToSite(destLat, destLng, siteName) {
+if (!userMarker) {
+console.log('Ubicación del usuario no disponible.');
+return;
+}
+const userLocation = userMarker.getLatLng();
+const start = `${userLocation.lng},${userLocation.lat}`;
+const end = `${destLng},${destLat}`;
+const url = `https://router.project-osrm.org/route/v1/driving/${start};${end}?overview=full&geometries=geojson`;
+if (blueRouteLine) {
+map.removeLayer(blueRouteLine);
+blueRouteLine = null;
+}
+fetch(url)
+.then(res => res.json())
+.then(data => {
+const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+if (selectedRouteLine) map.removeLayer(selectedRouteLine);
+selectedRouteLine = L.polyline(coords, {
+color: 'red',
+weight: 5
+}).addTo(map);
+map.fitBounds(selectedRouteLine.getBounds());
+const dist = (userLocation.distanceTo([destLat, destLng]) / 1000).toFixed(2);
+document.getElementById('distance').innerText = `${translations[currentLang].distance}: ${dist} km`;
+selectedSite = { lat: destLat, lng: destLng, name: siteName };
+localStorage.setItem('selectedSite', JSON.stringify(selectedSite));
+updateRouteUI();
+})
+.catch(err => {
+console.error('Error al trazar ruta:', err);
+});
+}
+
+// Crear menú de sitios - SOLO ABRE EL PANEL LATERAL (sin afectar el mapa)
+function createSiteMenu() {
+const container = document.getElementById('siteButtons');
+container.innerHTML = '';
+sites.forEach((site, index) => {
+const btn = document.createElement('button');
+btn.className = 'btn-red-vino';
+btn.innerText = site.name;
+btn.onclick = () => {
+// SOLO abrir panel lateral (SIN centrar mapa, SIN mostrar popup, SIN crear ruta)
+openSidebar(site.name);
+};
+container.appendChild(btn);
+});
+}
+
+// Cambio de idioma
+document.getElementById('btnEs').addEventListener('click', () => {
+currentLang = 'es';
+updateUI();
+});
+document.getElementById('btnEn').addEventListener('click', () => {
+currentLang = 'en';
+updateUI();
+});
+
+// Event listeners para botones de control de rutas
+document.getElementById('cancelRouteBtn').addEventListener('click', cancelActiveRoute);
+document.getElementById('clearAllRoutesBtn').addEventListener('click', clearAllRoutes);
+
+function updateUI() {
+document.querySelector('#description p').innerText = translations[currentLang].welcome;
+// Actualizar popups simples de los marcadores
+markers.forEach(({ marker, site }) => {
+marker.setPopupContent(createSimplePopup(site));
+});
+closeSidebar();
+updateRouteUI();
+}
+
+// Botón ver recorrido completo
+document.getElementById('startRouteBtn').addEventListener('click', () => {
+// Limpiar rutas específicas si existen
+if (selectedRouteLine) {
+map.removeLayer(selectedRouteLine);
+selectedRouteLine = null;
+}
+if (routeToStartLine) {
+map.removeLayer(routeToStartLine);
+routeToStartLine = null;
+}
+selectedSite = null;
+localStorage.removeItem('selectedSite');
+document.getElementById('distance').innerText = 'Distancia al destino: -';
+
+// Mostrar ruta completa
+if (!blueRouteLine) {
+getOSRMRoute(sites);
+} else {
+// Si ya existe, ajustar vista del mapa
+map.fitBounds(blueRouteLine.getBounds());
+}
+updateRouteUI();
+});
+
+// Botón ir al primer sitio (sitio más cercano)
+document.getElementById('startTourBtn').addEventListener('click', () => {
+if (!userMarker) {
+console.log('Ubicación del usuario no disponible.');
+return;
+}
+
+const userLocation = userMarker.getLatLng();
+const nearest = sites.reduce((a, b) => {
+const d1 = userLocation.distanceTo([a.lat, a.lng]);
+const d2 = userLocation.distanceTo([b.lat, b.lng]);
+return d1 < d2 ? a : b;
+});
+
+const start = `${userLocation.lng},${userLocation.lat}`;
+const end = `${nearest.lng},${nearest.lat}`;
+const url = `https://router.project-osrm.org/route/v1/driving/${start};${end}?overview=full&geometries=geojson`;
+
+// Limpiar ruta azul si existe
+if (blueRouteLine) {
+map.removeLayer(blueRouteLine);
+blueRouteLine = null;
+}
+
+fetch(url)
+.then(res => res.json())
+.then(data => {
+const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+if (routeToStartLine) map.removeLayer(routeToStartLine);
+routeToStartLine = L.polyline(coords, {
+color: 'green',
+weight: 5,
+dashArray: '10,5'
+}).addTo(map);
+map.fitBounds(routeToStartLine.getBounds());
+
+// Mostrar información del sitio más cercano
+const dist = (userLocation.distanceTo([nearest.lat, nearest.lng]) / 1000).toFixed(2);
+document.getElementById('distance').innerText = `${translations[currentLang].distance}: ${dist} km`;
+
+updateRouteUI();
+})
+.catch(err => {
+console.error('Error al trazar ruta:', err);
+});
+});
+
+// Al cargar la página
+window.addEventListener('load', () => {
+const saved = localStorage.getItem('selectedSite');
+if (saved) {
+const site = JSON.parse(saved);
+selectedSite = site;
+drawRouteToSite(site.lat, site.lng, site.name);
+}
+});
+
+// Inicializar
+getOSRMRoute(sites);
+createSiteMenu();
+
+// Limpiar recursos al cerrar
+window.addEventListener('beforeunload', function() {
+if (carouselInterval) {
+clearInterval(carouselInterval);
+}
+if ('speechSynthesis' in window) {
+speechSynthesis.cancel();
+}
+});
+
+// Manejar cambios de visibilidad de la página
+document.addEventListener('visibilitychange', function() {
+if (document.hidden) {
+if (carouselInterval) {
+clearInterval(carouselInterval);
+}
+} else {
+const images = document.querySelectorAll('.carousel-image');
+if (images.length > 1) {
+startCarousel(images.length);
+}
+}
+});
+</script>
+</body>
+</html>

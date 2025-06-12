@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Página de Inicio - Campeche</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f8f8f8;
+      margin: 0;
+      text-align: center;
+
+
+}
+
+    
+    header {
+      background-color: #702c37;
+      color: white;
+      padding: 10px 20px;
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+        color: rgb(111, 96, 12); 
+    }
+
+    .logo {
+      height: 90px;
+      max-width: 80%;
+      width: auto;
+      transition: all 0.3s ease;
+    }
+
+    #language-selector {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .lang-btn {
+      background-color: white;
+      color: #333;
+      border-radius: 5px;
+      padding: 8px 15px;
+      font-size: 1em;
+      cursor: pointer;
+      border: 2px solid #8B0000;
+      transition: all 0.3s ease;
+    }
+
+    .lang-btn:hover {
+      background-color: #6e0909;
+      color: white;
+    }
+
+    .active {
+      background-color: #6e0909;
+      color: white;
+    }
+
+    #main-content {
+      margin-top: 40px;
+      padding: 20px;
+      margin-bottom: 80px;
+    }
+
+    #carousel {
+      position: relative;
+      width: 80%;
+      margin: 0 auto 20px auto;
+      overflow: hidden;
+      border-radius: 15px;
+    }
+
+    .carousel-img {
+      width: 100%;
+      height: auto;
+      display: none;
+      transition: opacity 1s ease-in-out;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .carousel-img.active {
+      display: block;
+      position: relative;
+    }
+
+    #main-content h2 {
+      font-size: 2em;
+      color: #333;
+    }
+
+    .btn-go-to-index {
+      background-color: #6e0909;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.2em;
+      transition: background-color 0.3s ease;
+      margin-top: 20px;
+      display: inline-block;
+      margin: 10px;
+    }
+
+    .btn-go-to-index:hover {
+      background-color: #a30000;
+    }
+
+footer {
+  background-color: #8B0000;
+  color: rgb(111, 96, 12); /* color dorado */
+  padding: 20px 10px;
+  width: 100%;
+  position: relative; /* Ya no estará fijo */
+  text-align: center;
+}
+
+
+    @media (max-width: 600px) {
+      header {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .logo {
+        height: 70px;
+        margin-bottom: 10px;
+      }
+
+      #language-selector {
+        margin-top: 10px;
+      }
+
+      .lang-btn {
+        font-size: 0.9em;
+        padding: 6px 12px;
+      }
+      
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="img/LogoINAH_Dorado.png" alt="Logo" class="logo">
+    <h1 id="title">Recorido Turistico del Estado de Campeche</h1>
+    <div id="language-selector">
+      <button class="lang-btn" id="btn-es" onclick="changeLanguage('es')">Español</button>
+      <button class="lang-btn" id="btn-en" onclick="changeLanguage('en')">English</button>
+    </div>
+  </header>
+
+  <div id="main-content">
+    <!-- Carrusel de imágenes -->
+    <div id="carousel">
+      <img src="imgPresentacion/atarazanas.png" class="carousel-img active" alt="Campeche 1">
+      <img src="imgPresentacion/edificio.jpg" class="carousel-img" alt="Campeche 2">
+      <img src="imgPresentacion/guadalupe.jpg" class="carousel-img" alt="Campeche 3">
+      <img src="imgPresentacion/guadalupe2.jpg" class="carousel-img" alt="Campeche 3">
+      <img src="imgPresentacion/noviaMar.jpg" class="carousel-img" alt="Campeche 3">
+      <img src="imgPresentacion/sanFrancisco.jpg" class="carousel-img" alt="Campeche 3">
+      <img src="imgPresentacion/sanLucas.jpg" class="carousel-img" alt="Campeche 3">
+      <img src="imgPresentacion/sanMatias.jpg" class="carousel-img" alt="Campeche 3">
+      <img src="imgPresentacion/sanroman.jpg" class="carousel-img" alt="Campeche 3">
+      <img src="imgPresentacion/sanRoman2.jpg" class="carousel-img" alt="Campeche 3">
+
+      <img src="imgPresentacion/barco.jpg" class="carousel-img" alt="Campeche 3">
+      <img src="imgPresentacion/barco2.jpg" class="carousel-img" alt="Campeche 3">
+      <img src="imgPresentacion/parqueLerma.jpg" class="carousel-img" alt="Campeche 3">
+      <img src="imgPresentacion/parqueLerma2.jpg" class="carousel-img" alt="Campeche 3">
+      <img src="imgPresentacion/parqueLerma3.jpg" class="carousel-img" alt="Campeche 3">
+      <img src="imgPresentacion/playa.jpg" class="carousel-img" alt="Campeche 3">
+      <img src="imgPresentacion/sanjose.jpg" class="carousel-img" alt="Campeche 3">
+      <img src="imgPresentacion/sanjose2.jpg" class="carousel-img" alt="Campeche 3">
+      <img src="imgPresentacion/sanMiguel.jpg" class="carousel-img" alt="Campeche 3">
+      <img src="imgPresentacion/sanLuis.jpg" class="carousel-img" alt="Campeche 3">
+    </div>
+
+    <h2 id="subtitle">Explora los lugares más emblemáticos de Campeche</h2>
+    <p id="description">
+      Sumérgete en la historia y belleza de esta maravillosa ciudad, conocida por su arquitectura colonial y hermosos paisajes. La Subdirección de Arqueología Subacuática del Instituto Nacional de Antropología e Historia tiene como objetivo central realizar proyectos de investigación para localizar y ubicar espacial y temporalmente los sitios arqueológicos e históricos sumergidos.
+    </p>
+
+    <!-- Botones de navegación -->
+    <a href="rutaOriente.html">
+      <button class="btn-go-to-index" id="button-text">Ruta Oriente</button>
+    </a>
+
+    <a href="rutaPoniente.html">
+      <button class="btn-go-to-index" id="button-text-west">Ruta Poniente</button>
+    </a>
+  </div>
+<footer style="background-color:#702c37; color:#b38b28; text-align:center; padding:30px 10px; font-family: 'Arial', sans-serif;">
+  <div style="margin-bottom: 20px;">
+    <!-- Logo -->
+    <img src="img/LogoINAH_Dorado2.png" alt="Logo" style="width:90px; margin-bottom:10px;">
+  </div>
+
+  <nav style="margin-bottom: 20px;">
+    <a href="inicio.html" style="color:#b38b28; margin: 0 12px; text-decoration:none;">Inicio</a>
+      <a href="acercaDe.html" style="color:#b38b28; margin: 0 12px; text-decoration:none;">Acerca De</a>
+    <a href="https://www.google.com/maps?q=19.843044,-90.538832" target="_blank" style="color:#b38b28; margin: 0 12px; text-decoration:none;">
+      Dirección
+    </a>
+    <a href="tel:+5211234567890" style="color:#b38b28; margin: 0 12px; text-decoration:none;">
+      Contacto
+    </a>
+  </nav>
+
+  <div style="margin-bottom: 25px;">
+    <!-- Redes sociales -->
+    <a href="https://www.facebook.com/share/1AkUxZpZFM/" target="_blank" style="color:#b38b28; margin: 0 8px; font-size: 18px; text-decoration:none;">
+      <i class="fab fa-facebook-f"></i> 
+    </a>
+    <a href="https://www.instagram.com/inahmx?igsh=MWVyYjY4b2gxODczMw==" target="_blank" style="color:#b38b28; margin: 0 8px; font-size: 18px; text-decoration:none;">
+      <i class="fab fa-instagram"></i> 
+    </a>
+    <a href="https://twitter.com" target="_blank" style="color:#b38b28; margin: 0 8px; font-size: 18px; text-decoration:none;">
+      <i class="fab fa-twitter"></i> 
+    </a>
+    <a href="https://youtube.com/@inahtv?si=dTPfND_makjeZTEm" target="_blank" style="color:#b38b28; margin: 0 8px; font-size: 18px; text-decoration:none;">
+      <i class="fab fa-youtube"></i> 
+    </a>
+  </div>
+
+  <hr style="border-color: #8c5d54; margin-bottom: 15px;">
+
+  <p style="font-size: 14px; margin: 0;">© 2025 Miguiaa_mx. Todos los derechos reservados.</p>
+  <p style="font-weight: 600; font-size: 14px; margin: 5px 0 0 0;">DISEÑADO POR INAH CAMPECHE</p>
+</footer>
+
+<!-- FontAwesome CDN para iconos -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+
+
+
+  <script>
+    // Traducciones
+    const translations = {
+      es: {
+        title: "Bienvenido a Campeche",
+        subtitle: "Explora los lugares más emblemáticos de Campeche",
+        description: "Sumérgete en la historia y belleza de esta maravillosa ciudad, conocida por su arquitectura colonial y hermosos paisajes. La Subdirección de Arqueología Subacuática del Instituto Nacional de Antropología e Historia tiene como objetivo central realizar proyectos de investigación para localizar y ubicar espacial y temporalmente los sitios arqueológicos e históricos sumergidos.",
+        button: "ruta Oriente",
+        buttonWest: " ruta Poniente"
+      },
+      en: {
+        title: "Welcome to Campeche",
+        subtitle: "Explore Campeche’s most iconic landmarks",
+        description: "Immerse yourself in the history and beauty of this wonderful city, known for its colonial architecture and stunning landscapes. The Subdirectorate of Underwater Archaeology of the National Institute of Anthropology and History aims to conduct research projects to spatially and temporally locate submerged archaeological and historical sites.",
+        button: "Eastern route",
+        buttonWest: "Western route"
+      }
+    };
+
+    const langBtns = document.querySelectorAll('.lang-btn');
+    const title = document.getElementById("title");
+    const subtitle = document.getElementById("subtitle");
+    const description = document.getElementById("description");
+    const buttonText = document.getElementById("button-text");
+    const buttonTextWest = document.getElementById("button-text-west");
+
+    function changeLanguage(lang) {
+      title.textContent = translations[lang].title;
+      subtitle.textContent = translations[lang].subtitle;
+      description.textContent = translations[lang].description;
+      buttonText.textContent = translations[lang].button;
+      buttonTextWest.textContent = translations[lang].buttonWest;
+
+      langBtns.forEach(btn => btn.classList.remove('active'));
+      document.getElementById(`btn-${lang}`).classList.add('active');
+    }
+
+    changeLanguage('es'); // idioma por defecto
+
+    // Carrusel automático
+    let currentIndex = 0;
+    const images = document.querySelectorAll(".carousel-img");
+
+    function showSlide(index) {
+      images.forEach((img, i) => {
+        img.classList.remove("active");
+        if (i === index) {
+          img.classList.add("active");
+        }
+      });
+    }
+
+    function nextSlide() {
+      currentIndex = (currentIndex + 1) % images.length;
+      showSlide(currentIndex);
+    }
+
+    showSlide(currentIndex);
+    setInterval(nextSlide, 3000); // cada 4 segundos
+
+
+
+
+    
+  </script>
+</body>
+</html>

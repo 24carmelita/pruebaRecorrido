@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Recorrido en Coche - Campeche</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<style>
+body {
+margin: 0;
+font-family: 'Segoe UI', sans-serif;
+background-color: #f8f8f8;
+}
+header {
+background-color: #4a0303;
+color: white;
+padding: 20px;
+text-align: center;
+position: relative;
+}
+.logo {
+position: absolute;
+top: 35px;
+left: 10px;
+height: 50px;
+width: auto;
+transition: all 0.3s ease;
+}
+@media screen and (max-width: 768px) {
+.logo {
+height: 40px;
+top: 5px;
+left: 5px;
+}
+header h1 {
+font-size: 1.5em;
+padding: 10px 0;
+}
+}
+.container {
+display: flex;
+position: relative;
+height: 500px;
+width: 90%;
+max-width: 1200px;
+margin: 20px auto;
+border-radius: 15px;
+box-shadow: 0 0 15px #00000022;
+overflow: hidden;
+}
+#map {
+flex: 1;
+height: 100%;
+z-index: 1;
+}
+/* Panel lateral */
+#sidebar {
+position: absolute;
+top: 0;
+right: -400px;
+width: 400px;
+height: 100%;
+background: white;
+box-shadow: -4px 0 20px rgba(0,0,0,0.15);
+transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+z-index: 1000;
+overflow-y: auto;
+border-left: 3px solid #8B0000;
+}
+#sidebar.active {
+right: 0;
+}
+.sidebar-header {
+display: flex;
+justify-content: space-between;
+align-items: flex-start;
+padding: 20px;
+border-bottom: 2px solid #e5e7eb;
+background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+position: sticky;
+top: 0;
+z-index: 10;
+}
+.header-content {
+flex: 1;
+}
+.sidebar-header h2 {
+color: #8B0000;
+font-size: 1.4rem;
+margin: 0 0 8px 0;
+font-weight: 700;
+line-height: 1.3;
+}
+.distance-info {
+display: flex;
+align-items: center;
+gap: 8px;
+margin-top: 8px;
+}
+.distance-label {
+font-size: 14px;
+color: #6b7280;
+font-weight: 500;
+}
+.distance-value {
+font-size: 14px;
+color: #059669;
+font-weight: 600;
+background: #d1fae5;
+padding: 2px 8px;
+border-radius: 12px;
+}
+.close-btn {
+background: #8B0000;
+color: white;
+border: none;
+padding: 8px 12px;
+border-radius: 8px;
+cursor: pointer;
+font-size: 14px;
+font-weight: 600;
+transition: all 0.3s ease;
+margin-left: 15px;
+}
+.close-btn:hover {
+background: #a30000;
+}
+/* Carrusel de imágenes */
+.image-carousel {
+padding: 20px;
+}
+.carousel-container {
+position: relative;
+background: #f8fafc;
+border-radius: 12px;
+overflow: hidden;
+box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+border: 1px solid #e5e7eb;
+}
+.carousel-images {
+position: relative;
+height: 250px;
+overflow: hidden;
+}
+.carousel-image {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+object-fit: cover;
+opacity: 0;
+transition: opacity 0.6s ease-in-out;
+border-radius: 12px 12px 0 0;
+}
+.carousel-image.active {
+opacity: 1;
+}
+.carousel-controls {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 15px;
+background: white;
+}
+.carousel-btn {
+background: #8B0000;
+color: white;
+border: none;
+padding: 8px 12px;
+border-radius: 8px;
+cursor: pointer;
+font-size: 12px;
+font-weight: 600;
+transition: all 0.3s ease;
+}
+.carousel-btn:hover {
+background: #a30000;
+}
+.carousel-indicators {
+display: flex;
+gap: 8px;
+align-items: center;
+}
+.indicator {
+width: 10px;
+height: 10px;
+border-radius: 50%;
+background: #d1d5db;
+cursor: pointer;
+transition: all 0.3s ease;
+}
+.indicator.active {
+background: #8B0000;
+transform: scale(1.2);
+}
+.carousel-progress {
+height: 3px;
+background: #e5e7eb;
+position: relative;
+overflow: hidden;
+}
+.progress-bar {
+height: 100%;
+background: #8B0000;
+width: 0%;
+transition: none;
+}
+/* Descripción del sitio */
+.site-description {
+padding: 0 20px 20px;
+}
+.site-description p {
+line-height: 1.6;
+color: #374151;
+margin-bottom: 15px;
+text-align: justify;
+font-size: 14px;
+background: #f9fafb;
+padding: 15px;
+border-radius: 10px;
+border-left: 4px solid #8B0000;
+}
+.action-buttons {
+display: flex;
+gap: 10px;
+flex-direction: column;
+}
+.speak-btn, .center-btn, .route-btn {
+background: #8B0000;
+color: white;
+border: none;
+padding: 10px 15px;
+border-radius: 8px;
+cursor: pointer;
+font-size: 14px;
+font-weight: 600;
+transition: all 0.3s ease;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 8px;
+}
+.speak-btn:hover, .center-btn:hover, .route-btn:hover {
+background: #a30000;
+}
+.speak-btn:disabled {
+background: #9ca3af;
+cursor: not-allowed;
+}
+/* Botón especial para crear ruta en sidebar */
+.route-btn {
+background: linear-gradient(135deg, #059669 0%, #047857 100%);
+}
+.route-btn:hover {
+background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+}
+#distance,
+#description {
+text-align: center;
+margin-top: 10px;
+font-size: 1.2em;
+font-weight: bold;
+}
+#description {
+padding: 10px;
+margin-bottom: 10px;
+}
+.btn-red-vino {
+background-color: #8B0000;
+color: #fff;
+border: none;
+cursor: pointer;
+transition: background 0.3s;
+padding: 6px 12px;
+border-radius: 8px;
+margin: 2px;
+}
+.btn-red-vino:hover {
+background-color: #a30000;
+}
+/* Botón cancelar ruta */
+.btn-cancel {
+background-color: #dc3545;
+color: #fff;
+border: none;
+cursor: pointer;
+transition: background 0.3s;
+padding: 6px 12px;
+border-radius: 8px;
+margin: 2px;
+}
+.btn-cancel:hover {
+background-color: #c82333;
+}
+/* Contenedor de botones de control */
+.route-controls {
+text-align: center;
+margin-top: 10px;
+display: flex;
+justify-content: center;
+gap: 10px;
+flex-wrap: wrap;
+}
+/* Estado de ruta activa */
+.route-status {
+background: #d1fae5;
+color: #065f46;
+padding: 8px 15px;
+border-radius: 8px;
+margin: 10px auto;
+display: none;
+max-width: 300px;
+text-align: center;
+font-weight: 600;
+border: 1px solid #10b981;
+}
+.route-status.active {
+display: block;
+}
+/* Información del recorrido */
+.tour-info {
+background: #e0f2fe;
+color: #0277bd;
+padding: 10px 15px;
+border-radius: 8px;
+margin: 10px auto;
+max-width: 400px;
+text-align: center;
+font-size: 14px;
+border: 1px solid #29b6f6;
+}
+/* Botón ir al recorrido en popup */
+.popup-route-btn {
+background: linear-gradient(135deg, #059669 0%, #047857 100%);
+color: white;
+border: none;
+padding: 8px 16px;
+border-radius: 6px;
+cursor: pointer;
+font-size: 12px;
+font-weight: 600;
+margin-top: 8px;
+width: 100%;
+transition: all 0.3s ease;
+box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2);
+}
+.popup-route-btn:hover {
+background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+transform: translateY(-1px);
+box-shadow: 0 4px 8px rgba(5, 150, 105, 0.3);
+}
+.lang-switch {
+position: absolute;
+top: 10px;
+right: 10px;
+}
+img {
+max-width: 100%;
+height: auto;
+border-radius: 10px;
+margin-bottom: 10px;
+}
+.popup-btn {
+display: inline-block;
+margin-top: 10px;
+width: 100%;
+text-align: center;
+}
+.btn-back {
+background-color: #8B0000;
+color: #fff;
+padding: 10px 20px;
+border: none;
+border-radius: 8px;
+font-size: 1.2em;
+cursor: pointer;
+margin-top: 20px;
+margin-bottom: 40px;
+transition: background-color 0.3s;
+}
+.btn-back:hover {
+background-color: #a30000;
+}
+/* Popup simplificado */
+.simple-popup {
+text-align: center;
+padding: 10px;
+max-width: 200px;
+}
+.simple-popup h3 {
+margin: 0 0 10px 0;
+font-size: 16px;
+font-weight: bold;
+color: #8B0000;
+}
+.simple-popup img {
+width: 100%;
+height: 120px;
+object-fit: cover;
+border-radius: 8px;
+margin: 0;
+}
+/* Responsive */
+@media (max-width: 768px) {
+#sidebar {
+width: 100%;
+right: -100%;
+}
+.carousel-images {
+height: 200px;
+}
+.sidebar-header {
+padding: 15px;
+}
+.sidebar-header h2 {
+font-size: 1.2rem;
+}
+.image-carousel {
+padding: 15px;
+}
+.site-description {
+padding: 0 15px 15px;
+}
+.route-controls {
+flex-direction: column;
+align-items: center;
+}
+.popup-route-btn {
+font-size: 11px;
+padding: 6px 12px;
+}
+}
+/* Scrollbar personalizado */
+#sidebar::-webkit-scrollbar {
+width: 6px;
+}
+#sidebar::-webkit-scrollbar-track {
+background: #f1f5f9;
+}
+#sidebar::-webkit-scrollbar-thumb {
+background: #cbd5e1;
+border-radius: 3px;
+}
+#sidebar::-webkit-scrollbar-thumb:hover {
+background: #94a3b8;
+}
+</style>
+</head>
+<body>
+<header>
+<img src="img/LogoINAH_Dorado.png" alt="Logo" class="logo">
+<h1>Recorrido turistico cultural lado oriente</h1>
+<div class="lang-switch">
+<button id="btnEs" class="btn-red-vino">🇲🇽 Español</button>
+<button id="btnEn" class="btn-red-vino">🇺🇸 English</button>
+</div>
+</header>
+<div id="description">
+<p>Bienvenido al recorrido en coche por la ciudad de Campeche. Explora lugares históricos y hermosos paisajes. Recorrerás sitios emblemáticos de la ciudad y conocerás su rica historia. Asegúrate de disfrutar cada momento mientras avanzas en el recorrido. ¡Comencemos!</p>
+</div>
+<div id="siteMenu" style="text-align: center; margin: 20px;">
+<h2>📍 Sitios del Recorrido</h2>
+<div id="siteButtons" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;"></div>
+</div>
+<div id="distance">Distancia al destino: -</div>
+
+<!-- Información del recorrido -->
+<div id="tourInfo" class="tour-info">
+<span id="tourInfoText">💡 Haz clic en los iconos del mapa para crear rutas, o usa los botones de abajo para ver el recorrido completo</span>
+</div>
+
+<!-- Estado de ruta activa -->
+<div id="routeStatus" class="route-status">
+<span id="routeStatusText">Ruta activa a: </span>
+</div>
+
+<!-- Controles de ruta -->
+<div class="route-controls">
+<button id="startRouteBtn" class="btn-red-vino">🗺️ Ver Recorrido Completo</button>
+<button id="startTourBtn" class="btn-red-vino">🚗 Ir al Primer Sitio</button>
+<button id="cancelRouteBtn" class="btn-cancel" style="display: none;">❌ Cancelar Ruta</button>
+<button id="clearAllRoutesBtn" class="btn-cancel" style="display: none;">🗑️ Limpiar Todo</button>
+</div>
+
+<div class="container" id="mapContainer">
+<div id="map"></div>
+<!-- Panel lateral -->
+<div id="sidebar">
+<div id="sidebar-content">
+<!-- El contenido se genera dinámicamente -->
+</div>
+</div>
+</div>
+<div style="text-align: center;">
+<a href="inicio.html">
+<button class="btn-back">Regresar al Inicio</button>
+</a>
+</div>
+
+<footer style="background-color:#702c37; color:#b38b28; text-align:center; padding:30px 10px; font-family: 'Arial', sans-serif;">
+  <div style="margin-bottom: 20px;">
+    <!-- Logo -->
+    <img src="img/LogoINAH_Dorado2.png" alt="Logo" style="width:90px; margin-bottom:10px;">
+  </div>
+
+  <nav style="margin-bottom: 20px;">
+    <a href="inicio.html" style="color:#b38b28; margin: 0 12px; text-decoration:none;">Inicio</a>
+      <a href="acercaDe.html" style="color:#b38b28; margin: 0 12px; text-decoration:none;">Acerca De</a>
+    <a href="https://www.google.com/maps?q=19.843044,-90.538832" target="_blank" style="color:#b38b28; margin: 0 12px; text-decoration:none;">
+      Dirección
+    </a>
+    <a href="tel:+5211234567890" style="color:#b38b28; margin: 0 12px; text-decoration:none;">
+      Contacto
+    </a>
+  </nav>
+
+  <div style="margin-bottom: 25px;">
+    <!-- Redes sociales -->
+    <a href="https://www.facebook.com/share/1AkUxZpZFM/" target="_blank" style="color:#b38b28; margin: 0 8px; font-size: 18px; text-decoration:none;">
+      <i class="fab fa-facebook-f"></i> 
+    </a>
+    <a href="https://www.instagram.com/inahmx?igsh=MWVyYjY4b2gxODczMw==" target="_blank" style="color:#b38b28; margin: 0 8px; font-size: 18px; text-decoration:none;">
+      <i class="fab fa-instagram"></i> 
+    </a>
+    <a href="https://twitter.com" target="_blank" style="color:#b38b28; margin: 0 8px; font-size: 18px; text-decoration:none;">
+      <i class="fab fa-twitter"></i> 
+    </a>
+    <a href="https://youtube.com/@inahtv?si=dTPfND_makjeZTEm" target="_blank" style="color:#b38b28; margin: 0 8px; font-size: 18px; text-decoration:none;">
+      <i class="fab fa-youtube"></i> 
+    </a>
+  </div>
+
+  <hr style="border-color: #8c5d54; margin-bottom: 15px;">
+
+  <p style="font-size: 14px; margin: 0;">© 2025 Miguiaa_mx. Todos los derechos reservados.</p>
+  <p style="font-weight: 600; font-size: 14px; margin: 5px 0 0 0;">DISEÑADO POR INAH CAMPECHE</p>
+</footer>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+// Variables globales
+let map;
+let userMarker;
+let followUser = true;
+let currentCarouselIndex = 0;
+let carouselInterval;
+let blueRouteLine;
+let selectedRouteLine;
+let selectedSite = null;
+let routeToStartLine;
+let distanceInterval;
+let activeRouteType = null; // 'selected', 'start', 'complete'
+
+// Función para detectar si es dispositivo móvil
+function isMobileDevice() {
+return window.innerWidth <= 768;
+}
+
+// Función para hacer scroll suave hacia el contenedor del mapa en móviles
+function scrollToMapOnMobile() {
+if (isMobileDevice()) {
+const mapContainer = document.getElementById('mapContainer');
+if (mapContainer) {
+// Pequeño delay para que la animación del sidebar se complete
+setTimeout(() => {
+mapContainer.scrollIntoView({
+behavior: 'smooth',
+block: 'start'
+});
+}, 200);
+}
+}
+}
+
+// Inicializar mapa
+const mapInstance = L.map('map').setView([19.845, -90.523], 12);
+map = mapInstance;
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+// Desactiva el seguimiento si el usuario empieza a mover el mapa manualmente
+map.on('movestart', () => {
+followUser = false;
+});
+
+const translations = {
+es: {
+welcome: 'Bienvenido al recorrido en auto por la ciudad de Campeche. Explora lugares históricos y paisajes hermosos. Visitarás sitios emblemáticos de la ciudad y conocerás su rica historia. Asegúrate de disfrutar cada momento mientras avanzas en el recorrido. ¡Comencemos!',
+distance: 'Distancia al destino',
+closeSidebar: 'Cerrar',
+prevImage: 'Anterior',
+nextImage: 'Siguiente',
+listenDescription: 'Escuchar descripción',
+centerMap: 'Centrar en mapa',
+createRoute: 'Crear Ruta a Este Sitio',
+meters: 'metros',
+kilometers: 'kilómetros',
+viewCompleteRoute: '🗺️ Ver Recorrido Completo',
+goToFirstSite: '🚗 Ir al Primer Sitio',
+cancelRoute: '❌ Cancelar Ruta',
+clearAll: '🗑️ Limpiar Todo',
+routeActive: 'Ruta activa a: ',
+routeToStart: 'Ruta al sitio más cercano',
+routeCanceled: 'Ruta cancelada',
+allRoutesCleared: 'Todas las rutas eliminadas',
+tourInfoDefault: '💡 Haz clic en los iconos del mapa para crear rutas, o usa los botones de abajo para ver el recorrido completo',
+tourInfoComplete: '🗺️ Mostrando recorrido completo entre todos los sitios',
+tourInfoToSite: '🚗 Ruta creada desde tu ubicación hasta el sitio más cercano',
+goToRoute: '🚗 Ir al Recorrido',
+routeCreated: 'Ruta creada hacia',
+locationNotAvailable: 'Ubicación no disponible',
+'puerta de mar': {
+            description: 'Es un ejemplo de transformación de barcos durante la Revolución Industrial (siglo XIX). Este barco de vapor fue utilizado para el comercio y transporte en la región, convirtiéndose en un ícono de la ingeniería naval local. Hoy en día, sigue siendo un símbolo de la historia marítima de Campeche.',
+            images: ['imgOriente/VaporLola1.jpg', 'imgOriente/VaporLola2.jpg', 'imgOriente/VaporLola3.jpg']
+          },
+          'cañon Guardacantón': {
+            description: 'Antiguo fuerte utilizado en la defensa de la ciudad. Ubicado estratégicamente, protegía la entrada al puerto y participó en múltiples acciones militares durante la época colonial.',
+            images: ['imgOriente/VaporLola1.jpg', 'imgOriente/VaporLola2.jpg', 'imgOriente/VaporLola3.jpg']
+          },
+          'baluarte San Carlos': {
+            description: 'Fuerte histórico que protegía la bahía de Campeche. Servía como punto de vigilancia y defensa contra los ataques de piratas en los siglos XVII y XVIII. En su interior actualmente se encuentra un museo arqueológico.',
+            images: ['imgOriente/VaporLola1.jpg', 'imgOriente/VaporLola2.jpg', 'imgOriente/VaporLola3.jpg']
+          },
+          'Ex templo y colegio San Jose': {
+            description: 'Parque natural con vistas panorámicas de la ciudad. Ofrece áreas verdes, zonas de descanso y senderos para caminar ideales para pasar el rato en familia o con amigos.',
+            images: ['imgOriente/VaporLola1.jpg', 'imgOriente/VaporLola2.jpg', 'imgOriente/VaporLola3.jpg']
+      
+          },
+          'Ex escuela nautica': {
+            description: 'Playa tranquila ideal para descansar y reflexionar. Sus aguas calmadas y arena limpia la hacen un destino favorito para locales y turistas.',
+            images: ['imgOriente/VaporLola1.jpg', 'imgOriente/VaporLola2.jpg', 'imgOriente/VaporLola3.jpg']
+          },
+          'puerta de tierra': {
+            description: 'Playa tranquila ideal para descansar y reflexionar. Sus aguas calmadas y arena limpia la hacen un destino favorito para locales y turistas.',
+            images: ['imgOriente/VaporLola1.jpg', 'imgOriente/VaporLola2.jpg', 'imgOriente/VaporLola3.jpg']
+          },
+        
+          'canon de bronce': {
+            description: 'Playa tranquila ideal para descansar y reflexionar. Sus aguas calmadas y arena limpia la hacen un destino favorito para locales y turistas.',
+            images: ['imgOriente/VaporLola1.jpg', 'imgOriente/VaporLola2.jpg', 'imgOriente/VaporLola3.jpg']
+          },
+        
+          'Baluarte de san pedro': {
+            description: 'Playa tranquila ideal para descansar y reflexionar. Sus aguas calmadas y arena limpia la hacen un destino favorito para locales y turistas.',
+            images: ['imgOriente/VaporLola1.jpg', 'imgOriente/VaporLola2.jpg', 'imgOriente/VaporLola3.jpg']
+          },
+          'Ex hospital san juan de dios': {
+            description: 'Playa tranquila ideal para descansar y reflexionar. Sus aguas calmadas y arena limpia la hacen un destino favorito para locales y turistas.',
+            images: ['imgOriente/VaporLola1.jpg', 'imgOriente/VaporLola2.jpg', 'imgOriente/VaporLola3.jpg']
+          },
+          'Ex aduana maritima': {
+            description: 'Playa tranquila ideal para descansar y reflexionar. Sus aguas calmadas y arena limpia la hacen un destino favorito para locales y turistas.',
+            images: ['imgOriente/VaporLola1.jpg', 'imgOriente/VaporLola2.jpg', 'imgOriente/VaporLola3.jpg']
+          }
+          
+        
+    
+      },
+'en': {
+welcome: 'Welcome to the car tour through the city of Campeche. Explore historical places and beautiful landscapes. You will visit emblematic sites of the city and learn about its rich history. Be sure to enjoy every moment as you progress through the tour. Let\'s get started!',
+distance: 'Distance to destination',
+closeSidebar: 'Close',
+prevImage: 'Previous',
+nextImage: 'Next',
+listenDescription: 'Listen to description',
+centerMap: 'Center on map',
+createRoute: 'Create Route to This Site',
+meters: 'meters',
+kilometers: 'kilometers',
+viewCompleteRoute: '🗺️ View Complete Route',
+goToFirstSite: '🚗 Go to First Site',
+cancelRoute: '❌ Cancel Route',
+clearAll: '🗑️ Clear All',
+routeActive: 'Active route to: ',
+routeToStart: 'Route to nearest site',
+routeCanceled: 'Route canceled',
+allRoutesCleared: 'All routes cleared',
+tourInfoDefault: '💡 Click on map icons to create routes, or use the buttons below to view the complete tour',
+tourInfoComplete: '🗺️ Showing complete route between all sites',
+tourInfoToSite: '🚗 Route created from your location to the nearest site',
+goToRoute: '🚗 Go to Route',
+routeCreated: 'Route created to',
+locationNotAvailable: 'Location not available',
+'puerta de mar': {
+    description: 'It is an example of ship transformation during the Industrial Revolution (19th century). This steamship was used for trade and transport in the region, becoming an icon of local naval engineering. Today it remains a symbol of Campeche\'s maritime history.',
+    images: ['imgOriente/VaporLola1.jpg', 'imgOriente/VaporLola2.jpg', 'imgOriente/VaporLola3.jpg']
+  },
+  'cañon Guardacantón': {
+    description: 'Old fort used in the defense of the city. Located strategically, it protected the entrance to the port and participated in multiple military actions during the colonial era.',
+    images: ['imgOriente/VaporLola1.jpg', 'imgOriente/VaporLola2.jpg', 'imgOriente/VaporLola3.jpg']
+  },
+  'baluarte San Carlos': {
+    description: 'Historic fort that protected the bay of Campeche. It served as a lookout and defense point against pirate attacks in the 17th and 18th centuries. Inside, it currently houses an archaeological museum.',
+    images: ['imgOriente/VaporLola1.jpg', 'imgOriente/VaporLola2.jpg', 'imgOriente/VaporLola3.jpg']
+  },
+  'Ex templo y colegio San Jose': {
+    description: 'A natural park with panoramic views of the city. It offers green areas, rest zones, and walking trails ideal for spending time with family or friends.',
+    images: ['imgOriente/VaporLola1.jpg', 'imgOriente/VaporLola2.jpg', 'imgOriente/VaporLola3.jpg']
+  },
+  'Ex escuela nautica': {
+    description: 'A quiet beach ideal for rest and reflection. Its calm waters and clean sand make it a favorite destination for locals and tourists alike.',
+    images: ['imgOriente/VaporLola1.jpg', 'imgOriente/VaporLola2.jpg', 'imgOriente/VaporLola3.jpg']
+  },
+  'puerta de tierra': {
+    description: 'A quiet beach ideal for rest and reflection. Its calm waters and clean sand make it a favorite destination for locals and tourists alike.',
+    images: ['imgOriente/VaporLola1.jpg', 'imgOriente/VaporLola2.jpg', 'imgOriente/VaporLola3.jpg']
+  },
+  'cañon de bronce': {
+    description: 'A quiet beach ideal for rest and reflection. Its calm waters and clean sand make it a favorite destination for locals and tourists alike.',
+    images: ['imgOriente/VaporLola1.jpg', 'imgOriente/VaporLola2.jpg', 'imgOriente/VaporLola3.jpg']
+  },
+  'Baluarte de san pedro': {
+    description: 'A quiet beach ideal for rest and reflection. Its calm waters and clean sand make it a favorite destination for locals and tourists alike.',
+    images: ['imgOriente/VaporLola1.jpg', 'imgOriente/VaporLola2.jpg', 'imgOriente/VaporLola3.jpg']
+  },
+
+  'Ex hospital san juan de dios': {
+    description: 'A quiet beach ideal for rest and reflection. Its calm waters and clean sand make it a favorite destination for locals and tourists alike.',
+    images: ['imgOriente/VaporLola1.jpg', 'imgOriente/VaporLola2.jpg', 'imgOriente/VaporLola3.jpg']
+  },
+
+  'Ex aduana maritima': {
+    description: 'A quiet beach ideal for rest and reflection. Its calm waters and clean sand make it a favorite destination for locals and tourists alike.',
+    images: ['imgOriente/VaporLola1.jpg', 'imgOriente/VaporLola2.jpg', 'imgOriente/VaporLola3.jpg']
+  }
+}
+
+    };
+
+let currentLang = 'es';
+const sites = [
+{ lat: 19.8458048 , lng: -90.5384558, name: 'puerta de mar', image: 'img/sanRoman.jpg' },
+    { lat: 19.856200, lng: -90.499450, name: 'cañon Guardacantón', image: 'img/sanRoman.jpg' },
+    { lat: 19.844608 , lng: -90.5406304, name: 'baluarte San Carlos', image: 'img/sanRoman.jpg' },
+    { lat: 19.844163 , lng: -90.5398169, name: 'Ex templo y colegio San Jose', image: 'img/sanRoman.jpg' },
+    { lat: 19.849000, lng: -90.515000, name: 'Ex escuela nautica', image: 'img/sanRoman.jpg' },
+    { lat: 19.847000, lng: -90.510000, name: 'puerta de tierra', image: 'img/sanRoman.jpg' },
+    { lat: 19.846000, lng: -90.509000, name: 'canon de bronce', image: 'img/sanRoman.jpg' },
+    { lat: 19.845000, lng: -90.508000, name: 'Baluarte de san pedro', image: 'img/sanRoman.jpg' },
+    { lat: 19.844000, lng: -90.507000, name: 'Ex hospital san juan de dios', image: 'img/sanRoman.jpg' },
+    { lat: 19.843000, lng: -90.506000, name: 'Ex aduana maritima', image: 'img/sanRoman.jpg' },
+    ];
+
+// Crear popup SIMPLE para iconos del mapa (solo imagen, título y botón)
+function createSimplePopup(site) {
+return `
+<div class="simple-popup">
+<h3>${site.name}</h3>
+<img src="${site.image}" alt="${site.name}">
+<button onclick="startRouteToSite('${site.name}', ${site.lat}, ${site.lng})" class="popup-route-btn">
+${translations[currentLang].goToRoute}
+</button>
+</div>
+`;
+}
+
+// Función para iniciar ruta desde popup
+function startRouteToSite(siteName, lat, lng) {
+if (!userMarker) {
+console.log('Ubicación del usuario no disponible');
+return;
+}
+
+// Cancelar cualquier ruta existente automáticamente
+if (selectedRouteLine) {
+map.removeLayer(selectedRouteLine);
+selectedRouteLine = null;
+}
+
+if (routeToStartLine) {
+map.removeLayer(routeToStartLine);
+routeToStartLine = null;
+}
+
+if (blueRouteLine) {
+map.removeLayer(blueRouteLine);
+blueRouteLine = null;
+}
+
+// Crear nueva ruta al sitio seleccionado
+const site = sites.find(s => s.name === siteName);
+if (site) {
+selectedSite = site;
+drawRouteToSite(lat, lng, siteName);
+}
+
+// Cerrar popup
+map.closePopup();
+}
+
+// Función para crear ruta desde el panel lateral
+function createRouteFromSidebar(siteName) {
+const site = sites.find(s => s.name === siteName);
+if (!site) return;
+
+if (!userMarker) {
+console.log('Ubicación del usuario no disponible');
+return;
+}
+
+// Cancelar cualquier ruta existente automáticamente
+if (selectedRouteLine) {
+map.removeLayer(selectedRouteLine);
+selectedRouteLine = null;
+}
+
+if (routeToStartLine) {
+map.removeLayer(routeToStartLine);
+routeToStartLine = null;
+}
+
+if (blueRouteLine) {
+map.removeLayer(blueRouteLine);
+blueRouteLine = null;
+}
+
+// Crear nueva ruta al sitio seleccionado
+selectedSite = site;
+drawRouteToSite(site.lat, site.lng, siteName);
+}
+
+const siteIcons = {
+   'puerta de mar': L.icon({
+        iconUrl: 'iconos/iglesia.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 32],
+        popupAnchor: [0, -32]
+      }),
+      'cañon Guardacantón': L.icon({
+        iconUrl: 'iconos/puerto.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 32],
+        popupAnchor: [0, -32]
+      }),
+      'baluarte San Carlos': L.icon({
+        iconUrl: 'iconos/noviaMar.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 32],
+        popupAnchor: [0, -32]
+      }),
+      'Ex templo y colegio San Jose': L.icon({
+        iconUrl: 'iconos/iglesia.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 32],
+        popupAnchor: [0, -32]
+      }),
+      'Ex escuela nautica': L.icon({
+        iconUrl: 'iconos/inah.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 32],
+        popupAnchor: [0, -32]
+      }),
+      'puerta de tierra': L.icon({
+        iconUrl: 'iconos/iglesia.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 32],
+        popupAnchor: [0, -32]
+      }),
+      'cañon de bronce': L.icon({
+        iconUrl: 'iconos/baterias.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 32],
+        popupAnchor: [0, -32]
+      }),
+      'Baluarte de san pedro': L.icon({
+        iconUrl: 'iconos/baterias.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 32],
+        popupAnchor: [0, -32]
+      }),
+      'Ex hospital san juan de dios': L.icon({
+        iconUrl: 'iconos/baterias.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 32],
+        popupAnchor: [0, -32]
+      }),
+      'Ex aduana maritima': L.icon({
+        iconUrl: 'iconos/baterias.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 32],
+        popupAnchor: [0, -32]
+      })
+    };
+    
+
+
+const markers = [];
+sites.forEach(site => {
+const marker = L.marker([site.lat, site.lng], { icon: siteIcons[site.name] }).addTo(map);
+// Al hacer clic en el marcador, mostrar popup con imagen, título y botón
+marker.bindPopup(createSimplePopup(site));
+markers.push({ marker, site });
+});
+
+// Actualizar estado de la interfaz según rutas activas
+function updateRouteUI() {
+const routeStatus = document.getElementById('routeStatus');
+const routeStatusText = document.getElementById('routeStatusText');
+const tourInfo = document.getElementById('tourInfo');
+const tourInfoText = document.getElementById('tourInfoText');
+const viewRouteBtn = document.getElementById('startRouteBtn');
+const goToSiteBtn = document.getElementById('startTourBtn');
+const cancelBtn = document.getElementById('cancelRouteBtn');
+const clearBtn = document.getElementById('clearAllRoutesBtn');
+
+if (selectedSite && selectedRouteLine) {
+// Hay una ruta específica a un sitio
+routeStatus.classList.add('active');
+routeStatusText.textContent = `${translations[currentLang].routeActive}${selectedSite.name}`;
+tourInfoText.textContent = `🎯 Ruta específica creada hacia: ${selectedSite.name}`;
+cancelBtn.style.display = 'inline-block';
+clearBtn.style.display = 'inline-block';
+activeRouteType = 'selected';
+} else if (routeToStartLine) {
+// Hay una ruta al sitio más cercano
+routeStatus.classList.add('active');
+routeStatusText.textContent = translations[currentLang].routeToStart;
+tourInfoText.textContent = translations[currentLang].tourInfoToSite;
+cancelBtn.style.display = 'inline-block';
+clearBtn.style.display = 'inline-block';
+activeRouteType = 'start';
+} else if (blueRouteLine) {
+// Solo hay ruta completa del recorrido
+routeStatus.classList.remove('active');
+tourInfoText.textContent = translations[currentLang].tourInfoComplete;
+clearBtn.style.display = 'inline-block';
+cancelBtn.style.display = 'none';
+activeRouteType = 'complete';
+} else {
+// No hay rutas activas
+routeStatus.classList.remove('active');
+tourInfoText.textContent = translations[currentLang].tourInfoDefault;
+cancelBtn.style.display = 'none';
+clearBtn.style.display = 'none';
+activeRouteType = null;
+}
+
+// Actualizar textos de botones
+viewRouteBtn.textContent = translations[currentLang].viewCompleteRoute;
+goToSiteBtn.textContent = translations[currentLang].goToFirstSite;
+cancelBtn.textContent = translations[currentLang].cancelRoute;
+clearBtn.textContent = translations[currentLang].clearAll;
+}
+
+// Cancelar ruta activa
+function cancelActiveRoute() {
+if (selectedRouteLine) {
+map.removeLayer(selectedRouteLine);
+selectedRouteLine = null;
+}
+
+if (routeToStartLine) {
+map.removeLayer(routeToStartLine);
+routeToStartLine = null;
+}
+
+selectedSite = null;
+localStorage.removeItem('selectedSite');
+document.getElementById('distance').innerText = 'Distancia al destino: -';
+
+if (!blueRouteLine) {
+getOSRMRoute(sites);
+}
+
+updateRouteUI();
+}
+
+// Limpiar todas las rutas
+function clearAllRoutes() {
+if (selectedRouteLine) {
+map.removeLayer(selectedRouteLine);
+selectedRouteLine = null;
+}
+
+if (routeToStartLine) {
+map.removeLayer(routeToStartLine);
+routeToStartLine = null;
+}
+
+if (blueRouteLine) {
+map.removeLayer(blueRouteLine);
+blueRouteLine = null;
+}
+
+selectedSite = null;
+localStorage.removeItem('selectedSite');
+document.getElementById('distance').innerText = 'Distancia al destino: -';
+
+updateRouteUI();
+}
+
+// Abrir panel lateral con información del sitio (SOLO desde botones del menú)
+function openSidebar(siteName) {
+const site = sites.find(s => s.name === siteName);
+if (!site) return;
+const sidebar = document.getElementById('sidebar');
+const sidebarContent = document.getElementById('sidebar-content');
+// Detener carrusel anterior si existe
+if (carouselInterval) {
+clearInterval(carouselInterval);
+}
+// Calcular distancia si hay ubicación del usuario
+let distanceInfo = '';
+if (userMarker) {
+const userPos = userMarker.getLatLng();
+const sitePos = L.latLng([site.lat, site.lng]);
+const distance = userPos.distanceTo(sitePos);
+const distanceText = distance > 1000
+? `${(distance / 1000).toFixed(2)} ${translations[currentLang].kilometers}`
+: `${Math.round(distance)} ${translations[currentLang].meters}`;
+distanceInfo = `
+<div class="distance-info">
+<span class="distance-label">${translations[currentLang].distance}:</span>
+<span class="distance-value">${distanceText}</span>
+</div>
+`;
+}
+const siteData = translations[currentLang][siteName];
+const images = siteData.images || [site.image];
+sidebarContent.innerHTML = `
+<div class="sidebar-header">
+<div class="header-content">
+<h2>${siteName}</h2>
+${distanceInfo}
+</div>
+<button onclick="closeSidebar()" class="close-btn">
+✕ ${translations[currentLang].closeSidebar}
+</button>
+</div>
+<div class="image-carousel">
+<div class="carousel-container">
+<div class="carousel-images" id="carousel-images">
+${images.map((img, index) => `
+<img src="${img}" alt="${siteName}"
+class="carousel-image ${index === 0 ? 'active' : ''}"
+data-index="${index}"
+onerror="this.src='${site.image}'">
+`).join('')}
+</div>
+${images.length > 1 ? `
+<div class="carousel-controls">
+<button onclick="prevImage()" class="carousel-btn prev-btn">
+❮ ${translations[currentLang].prevImage}
+</button>
+<div class="carousel-indicators">
+${images.map((_, index) => `
+<span class="indicator ${index === 0 ? 'active' : ''}"
+onclick="goToImage(${index})" data-index="${index}"></span>
+`).join('')}
+</div>
+<button onclick="nextImage()" class="carousel-btn next-btn">
+${translations[currentLang].nextImage} ❯
+</button>
+</div>
+<div class="carousel-progress">
+<div class="progress-bar" id="progress-bar"></div>
+</div>
+` : ''}
+</div>
+</div>
+<div class="site-description">
+<p>${siteData.description}</p>
+<div class="action-buttons">
+<button onclick="speakDescription('${siteData.description.replace(/'/g, "\\'")}', '${siteName.replace(/'/g, "\\'")}'); return false;" class="speak-btn">
+🔊 ${translations[currentLang].listenDescription}
+</button>
+<button onclick="centerMapOnSite(${site.lat}, ${site.lng})" class="center-btn">
+🎯 ${translations[currentLang].centerMap}
+</button>
+<button onclick="createRouteFromSidebar('${siteName}')" class="route-btn">
+🚗 ${translations[currentLang].createRoute}
+</button>
+</div>
+</div>
+`;
+// Mostrar sidebar
+sidebar.classList.add('active');
+
+// Hacer scroll hacia el mapa en dispositivos móviles
+scrollToMapOnMobile();
+
+// Inicializar carrusel automático solo si hay múltiples imágenes
+if (images.length > 1) {
+currentCarouselIndex = 0;
+startCarousel(images.length);
+updateProgressBar();
+}
+}
+
+// Cerrar panel lateral
+function closeSidebar() {
+const sidebar = document.getElementById('sidebar');
+sidebar.classList.remove('active');
+// Detener carrusel
+if (carouselInterval) {
+clearInterval(carouselInterval);
+}
+}
+
+// Iniciar carrusel automático
+function startCarousel(totalImages) {
+updateProgressBar();
+carouselInterval = setInterval(() => {
+nextImage(totalImages);
+updateProgressBar();
+}, 4000);
+}
+
+// Actualizar barra de progreso del carrusel
+function updateProgressBar() {
+const progressBar = document.getElementById('progress-bar');
+if (progressBar) {
+progressBar.style.width = '0%';
+progressBar.style.transition = 'width 4s linear';
+setTimeout(() => {
+progressBar.style.width = '100%';
+}, 50);
+}
+}
+
+// Navegar a imagen anterior
+function prevImage() {
+const images = document.querySelectorAll('.carousel-image');
+const indicators = document.querySelectorAll('.indicator');
+if (images.length === 0) return;
+images[currentCarouselIndex].classList.remove('active');
+if (indicators[currentCarouselIndex]) indicators[currentCarouselIndex].classList.remove('active');
+currentCarouselIndex = currentCarouselIndex === 0 ? images.length - 1 : currentCarouselIndex - 1;
+images[currentCarouselIndex].classList.add('active');
+if (indicators[currentCarouselIndex]) indicators[currentCarouselIndex].classList.add('active');
+// Reiniciar carrusel automático
+if (carouselInterval) {
+clearInterval(carouselInterval);
+startCarousel(images.length);
+}
+}
+
+// Navegar a imagen siguiente
+function nextImage(totalImages = null) {
+const images = document.querySelectorAll('.carousel-image');
+const indicators = document.querySelectorAll('.indicator');
+if (images.length === 0) return;
+const total = totalImages || images.length;
+images[currentCarouselIndex].classList.remove('active');
+if (indicators[currentCarouselIndex]) indicators[currentCarouselIndex].classList.remove('active');
+currentCarouselIndex = (currentCarouselIndex + 1) % total;
+images[currentCarouselIndex].classList.add('active');
+if (indicators[currentCarouselIndex]) indicators[currentCarouselIndex].classList.add('active');
+}
+
+// Ir a imagen específica
+function goToImage(index) {
+const images = document.querySelectorAll('.carousel-image');
+const indicators = document.querySelectorAll('.indicator');
+if (images.length === 0) return;
+images[currentCarouselIndex].classList.remove('active');
+if (indicators[currentCarouselIndex]) indicators[currentCarouselIndex].classList.remove('active');
+currentCarouselIndex = index;
+images[currentCarouselIndex].classList.add('active');
+if (indicators[currentCarouselIndex]) indicators[currentCarouselIndex].classList.add('active');
+// Reiniciar carrusel automático
+if (carouselInterval) {
+clearInterval(carouselInterval);
+startCarousel(images.length);
+}
+}
+
+// Función para text-to-speech
+function speakDescription(text, title) {
+if ('speechSynthesis' in window) {
+speechSynthesis.cancel();
+const fullText = `${title}. ${text}`;
+const utterance = new SpeechSynthesisUtterance(fullText);
+utterance.lang = currentLang === 'es' ? 'es-MX' : 'en-US';
+utterance.rate = 0.8;
+const speakBtn = document.querySelector('.speak-btn');
+if (speakBtn) {
+const originalText = speakBtn.innerHTML;
+speakBtn.innerHTML = '⏸️ Reproduciendo...';
+speakBtn.disabled = true;
+utterance.onend = () => {
+speakBtn.innerHTML = originalText;
+speakBtn.disabled = false;
+};
+utterance.onerror = () => {
+speakBtn.innerHTML = originalText;
+speakBtn.disabled = false;
+};
+}
+speechSynthesis.speak(utterance);
+}
+}
+
+// Centrar mapa en sitio específico
+function centerMapOnSite(lat, lng) {
+map.setView([lat, lng], 16);
+closeSidebar();
+}
+
+// Geolocalización
+if (navigator.geolocation) {
+navigator.geolocation.watchPosition(onLocationFound, onLocationError, {
+enableHighAccuracy: true,
+timeout: 10000,
+maximumAge: 0
+});
+} else {
+console.log('La geolocalización no está disponible en este dispositivo.');
+}
+
+function onLocationFound(position) {
+const userLocation = L.latLng(position.coords.latitude, position.coords.longitude);
+if (!userMarker) {
+userMarker = L.marker(userLocation).addTo(map).bindPopup('Tu ubicación').openPopup();
+} else {
+userMarker.setLatLng(userLocation);
+}
+if (followUser) {
+map.setView(userLocation, 15);
+}
+if (selectedSite) {
+drawRouteToSite(selectedSite.lat, selectedSite.lng, selectedSite.name);
+}
+}
+
+function onLocationError(e) {
+console.error('Error de geolocalización:', e.message);
+}
+
+// Funciones de rutas (manteniendo la funcionalidad original)
+function getOSRMRoute(sites) {
+const coordinates = sites.map(site => `${site.lng},${site.lat}`).join(';');
+const url = `https://router.project-osrm.org/route/v1/driving/${coordinates}?overview=full&geometries=geojson`;
+fetch(url)
+.then(res => res.json())
+.then(data => {
+const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+if (blueRouteLine) {
+map.removeLayer(blueRouteLine);
+}
+blueRouteLine = L.polyline(coords, { color: 'blue', weight: 4 }).addTo(map);
+updateRouteUI();
+})
+.catch(err => console.error('Error al trazar ruta:', err));
+}
+
+function drawRouteToSite(destLat, destLng, siteName) {
+if (!userMarker) {
+console.log('Ubicación del usuario no disponible.');
+return;
+}
+const userLocation = userMarker.getLatLng();
+const start = `${userLocation.lng},${userLocation.lat}`;
+const end = `${destLng},${destLat}`;
+const url = `https://router.project-osrm.org/route/v1/driving/${start};${end}?overview=full&geometries=geojson`;
+if (blueRouteLine) {
+map.removeLayer(blueRouteLine);
+blueRouteLine = null;
+}
+fetch(url)
+.then(res => res.json())
+.then(data => {
+const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+if (selectedRouteLine) map.removeLayer(selectedRouteLine);
+selectedRouteLine = L.polyline(coords, {
+color: 'red',
+weight: 5
+}).addTo(map);
+map.fitBounds(selectedRouteLine.getBounds());
+const dist = (userLocation.distanceTo([destLat, destLng]) / 1000).toFixed(2);
+document.getElementById('distance').innerText = `${translations[currentLang].distance}: ${dist} km`;
+selectedSite = { lat: destLat, lng: destLng, name: siteName };
+localStorage.setItem('selectedSite', JSON.stringify(selectedSite));
+updateRouteUI();
+})
+.catch(err => {
+console.error('Error al trazar ruta:', err);
+});
+}
+
+// Crear menú de sitios - SOLO ABRE EL PANEL LATERAL (sin afectar el mapa)
+function createSiteMenu() {
+const container = document.getElementById('siteButtons');
+container.innerHTML = '';
+sites.forEach((site, index) => {
+const btn = document.createElement('button');
+btn.className = 'btn-red-vino';
+btn.innerText = site.name;
+btn.onclick = () => {
+// SOLO abrir panel lateral (SIN centrar mapa, SIN mostrar popup, SIN crear ruta)
+openSidebar(site.name);
+};
+container.appendChild(btn);
+});
+}
+
+// Cambio de idioma
+document.getElementById('btnEs').addEventListener('click', () => {
+currentLang = 'es';
+updateUI();
+});
+document.getElementById('btnEn').addEventListener('click', () => {
+currentLang = 'en';
+updateUI();
+});
+
+// Event listeners para botones de control de rutas
+document.getElementById('cancelRouteBtn').addEventListener('click', cancelActiveRoute);
+document.getElementById('clearAllRoutesBtn').addEventListener('click', clearAllRoutes);
+
+function updateUI() {
+document.querySelector('#description p').innerText = translations[currentLang].welcome;
+// Actualizar popups simples de los marcadores
+markers.forEach(({ marker, site }) => {
+marker.setPopupContent(createSimplePopup(site));
+});
+closeSidebar();
+updateRouteUI();
+}
+
+// Botón ver recorrido completo
+document.getElementById('startRouteBtn').addEventListener('click', () => {
+// Limpiar rutas específicas si existen
+if (selectedRouteLine) {
+map.removeLayer(selectedRouteLine);
+selectedRouteLine = null;
+}
+if (routeToStartLine) {
+map.removeLayer(routeToStartLine);
+routeToStartLine = null;
+}
+selectedSite = null;
+localStorage.removeItem('selectedSite');
+document.getElementById('distance').innerText = 'Distancia al destino: -';
+
+// Mostrar ruta completa
+if (!blueRouteLine) {
+getOSRMRoute(sites);
+} else {
+// Si ya existe, ajustar vista del mapa
+map.fitBounds(blueRouteLine.getBounds());
+}
+updateRouteUI();
+});
+
+// Botón ir al primer sitio (sitio más cercano)
+document.getElementById('startTourBtn').addEventListener('click', () => {
+if (!userMarker) {
+console.log('Ubicación del usuario no disponible.');
+return;
+}
+
+const userLocation = userMarker.getLatLng();
+const nearest = sites.reduce((a, b) => {
+const d1 = userLocation.distanceTo([a.lat, a.lng]);
+const d2 = userLocation.distanceTo([b.lat, b.lng]);
+return d1 < d2 ? a : b;
+});
+
+const start = `${userLocation.lng},${userLocation.lat}`;
+const end = `${nearest.lng},${nearest.lat}`;
+const url = `https://router.project-osrm.org/route/v1/driving/${start};${end}?overview=full&geometries=geojson`;
+
+// Limpiar ruta azul si existe
+if (blueRouteLine) {
+map.removeLayer(blueRouteLine);
+blueRouteLine = null;
+}
+
+fetch(url)
+.then(res => res.json())
+.then(data => {
+const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+if (routeToStartLine) map.removeLayer(routeToStartLine);
+routeToStartLine = L.polyline(coords, {
+color: 'green',
+weight: 5,
+dashArray: '10,5'
+}).addTo(map);
+map.fitBounds(routeToStartLine.getBounds());
+
+// Mostrar información del sitio más cercano
+const dist = (userLocation.distanceTo([nearest.lat, nearest.lng]) / 1000).toFixed(2);
+document.getElementById('distance').innerText = `${translations[currentLang].distance}: ${dist} km`;
+
+updateRouteUI();
+})
+.catch(err => {
+console.error('Error al trazar ruta:', err);
+});
+});
+
+// Al cargar la página
+window.addEventListener('load', () => {
+const saved = localStorage.getItem('selectedSite');
+if (saved) {
+const site = JSON.parse(saved);
+selectedSite = site;
+drawRouteToSite(site.lat, site.lng, site.name);
+}
+});
+
+// Inicializar
+getOSRMRoute(sites);
+createSiteMenu();
+
+// Limpiar recursos al cerrar
+window.addEventListener('beforeunload', function() {
+if (carouselInterval) {
+clearInterval(carouselInterval);
+}
+if ('speechSynthesis' in window) {
+speechSynthesis.cancel();
+}
+});
+
+// Manejar cambios de visibilidad de la página
+document.addEventListener('visibilitychange', function() {
+if (document.hidden) {
+if (carouselInterval) {
+clearInterval(carouselInterval);
+}
+} else {
+const images = document.querySelectorAll('.carousel-image');
+if (images.length > 1) {
+startCarousel(images.length);
+}
+}
+});
+</script>
+</body>
+</html>
