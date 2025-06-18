@@ -243,6 +243,7 @@ align-items: center;
 justify-content: center;
 gap: 8px;
 }
+
 #pauseBtn {
   background: #6b7280; /* gris oscuro */
   color: white;
@@ -464,12 +465,25 @@ border-radius: 3px;
 #sidebar::-webkit-scrollbar-thumb:hover {
 background: #94a3b8;
 }
+@media (max-width: 768px) {
+  #siteButtons button {
+    flex: 1 1 100%;
+    max-width: 100%;
+    font-size: 16px;
+    padding: 12px;
+  }
+
+  #siteMenu h2 {
+    font-size: 1.2rem;
+  }
+}
+
 </style>
 </head>
 <body>
 <header>
 <img src="img/LogoINAH_Dorado.png" alt="Logo" class="logo">
-<h1>Patrimonio Cultural Subacuatico Poniente</h1>
+<h1>Recorrido turistico cultural lado oriente</h1>
 <div class="lang-switch">
 <button id="btnEs" class="btn-red-vino">🇲🇽 Español</button>
 <button id="btnEn" class="btn-red-vino">🇺🇸 English</button>
@@ -482,7 +496,6 @@ background: #94a3b8;
 <h2>📍 Sitios del Recorrido</h2>
 <div id="siteButtons" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;"></div>
 </div>
-
 <div id="distance">Distancia al destino: -</div>
 
 <!-- Información del recorrido -->
@@ -537,7 +550,7 @@ background: #94a3b8;
 
   <div style="margin-bottom: 25px;">
     <!-- Redes sociales -->
-    <a href="https://www.facebook.com/share/19GQgXUWKJ/?mibextid=wwXIfr" target="_blank" style="color:#b38b28; margin: 0 8px; font-size: 18px; text-decoration:none;">
+      <a href="https://www.facebook.com/share/19GQgXUWKJ/?mibextid=wwXIfr" target="_blank" style="color:#b38b28; margin: 0 8px; font-size: 18px; text-decoration:none;">
       <i class="fab fa-facebook-f"></i> 
     </a>
     <a href="https://www.instagram.com/inahsasyuc?igsh=MTczMDg1NGxmYzRyNw==" target="_blank" style="color:#b38b28; margin: 0 8px; font-size: 18px; text-decoration:none;">
@@ -592,7 +605,6 @@ block: 'start'
 }
 }
 }
-
 // Inicializar mapa
 const mapInstance = L.map('map').setView([19.845, -90.523], 12);
 map = mapInstance;
@@ -602,6 +614,20 @@ attribution: '&copy; OpenStreetMap contributors'
 // Desactiva el seguimiento si el usuario empieza a mover el mapa manualmente
 map.on('movestart', () => {
 followUser = false;
+});
+map.on('zoomend', () => {
+  const zoom = map.getZoom();
+  let size = 32;
+
+  if (zoom >= 17) size = 64;
+  else if (zoom >= 15) size = 48;
+  else if (zoom >= 13) size = 36;
+  else size = 28;
+
+  siteIcons = createIcon(size);
+  markers.forEach(({ marker, site }) => {
+    marker.setIcon(siteIcons[site.name]);
+  });
 });
 
 const translations = {
@@ -661,6 +687,10 @@ images: ['imgPoniente/sanMatias1.jpg', 'imgPoniente/sanMatias2.jpg']
 'Bateria de San Lucas': {
 description: 'Su función era la de apoyar junto a la batería de San Matías la defensa del Reducto de San José el Alto, evitando posibles desembarcos hacia la costa de barlovento Fue diseña por el ingeniero militar Agustín Crame de forma semicircular e irregular, con una explanada que tenía capacidad para 8 cañones, una rampa adosada al centro y dos cuartos. Su construcción duró 6 meses y se concluyó en 1792. En períodos de marea alta solía quedar rodeada por el mar.',
 images: ['imgPoniente/sanLucas1.jpg', 'imgPoniente/sanLucas2.jpg', 'imgPoniente/sanLucas3.jpg']
+},
+'Museo de Arqueología Subacuática': {
+description: 'Esta construcción militar, ubicada sobre el “Cerro de las Tres Piedras”, se construyó a finales del siglo XVIII bajo las órdenes de José Sabido de Vargas, quien ejerció como teniente de rey entre los años 1784 y 1793. Cuenta con un foso, bóvedas de cañón corrido, aljibe y garitones que servían para la vigilancia del exterior. El camino sinuoso que lleva a la entrada servía para la defensa de ésta, pues imposibilitaba que pudiera ser destruida mediante un ataque de cañón, o bien, con troncos de madera u objetos metálicos.Actualmente alberga al Museo de Arqueología Subacuática, con una colección inigualable compuesta por más de 900 piezas procedentes de contextos arqueológicos sumergidos en aguas marinas del Golfo de México, Caribe Mexicano y aguas continentales de la península de Yucatán.La colección subacuática se ha realizado mediante el desarrollo de diversos proyectos en la región por parte de la Subdirección de Arqueología Subacuática del INAH a lo largo de cuatro décadas. Además, el recinto cuenta con la Declaratoria como Buena Práctica de la Convención UNESCO 2001 sobre la Protección del Patrimonio Cultural Subacuático, la cual tiene como objetivo fomentar la protección de este Patrimonio mediante la apropiación y visibilidad del mismo.',
+images: ['imgPoniente/sanLucas1.jpg', 'imgPoniente/sanLucas2.jpg', 'imgPoniente/sanLucas3.jpg']
 }
 },
 'en': {
@@ -719,6 +749,10 @@ images: ['imgPoniente/sanMatias1.jpg', 'imgPoniente/sanMatias2.jpg']
 'Bateria de San Lucas': {
 description: 'Its function was to support, together with the San Matías battery, the defense of the San José el Alto Redoubt, preventing possible landings towards the windward coast. It was designed by the military engineer Agustín Crame in a semicircular and irregular shape, with an esplanade that had capacity for 8 cannons, a ramp attached to the center and two rooms. Its construction lasted 6 months and was completed in 1792. During periods of high tide, it was usually surrounded by the sea.',
 images: ['imgPoniente/sanLucas1.jpg', 'imgPoniente/sanLucas2.jpg', 'imgPoniente/sanLucas3.jpg']
+},
+'Museo de Arqueología Subacuática': {
+description: 'This military construction, located on the “Cerro de las Tres Piedras” (Hill of the Three Stones), was built at the end of the 18th century under the orders of José Sabido de Vargas, who served as lieutenant of the king between 1784 and 1793. It features a moat, barrel vaults, a cistern, and sentry boxes that were used to monitor the exterior. The winding path leading to the entrance served as a defense mechanism, making it impossible to be destroyed by cannon fire or by wooden logs or metal objects.It currently houses the Museum of Underwater Archaeology, with an unparalleled collection of over 900 artifacts recovered from underwater archaeological contexts in the marine waters of the Gulf of Mexico, the Mexican Caribbean, and inland waters of the Yucatán Peninsula.This underwater collection has been assembled through various projects carried out in the region by the Subdirectorate of Underwater Archaeology of the INAH over the past four decades. Furthermore, the site has been granted recognition as a Good Practice under the 2001 UNESCO Convention on the Protection of the Underwater Cultural Heritage, which aims to promote the protection of this heritage through its visibility and public engagement.',
+images: ['imgPoniente/sanLucas1.jpg', 'imgPoniente/sanLucas2.jpg', 'imgPoniente/sanLucas3.jpg']
 }
 }
 };
@@ -732,7 +766,8 @@ const sites = [
       { lat:19.848529, lng: -90.5303969, name: 'Edificio INAH Arquiologia Subacuatica', image: 'img/edificioInah.jpg' },
       { lat:19.852794, lng: -90.5245912, name: 'Iglesia de San Francisco', image: 'img/iglesiaSanFrancisco.jpg' },
       { lat:19.8544538, lng: -90.5224778, name: 'Bateria de San Matias', image: 'img/sanMatias.jpg' },
-      { lat:19.862693, lng: -90.511714, name: 'Bateria de San Lucas', image: 'img/sanLucas.jpg' }
+      { lat:19.862693, lng: -90.511714, name: 'Bateria de San Lucas', image: 'img/sanLucas.jpg' },
+      { lat:19.860503, lng: -90.510402, name: 'Museo de Arqueología Subacuática', image: 'img/sanLucas.jpg' }
     ];
 // Crear popup SIMPLE para iconos del mapa (solo imagen, título y botón)
 function createSimplePopup(site) {
@@ -779,6 +814,8 @@ drawRouteToSite(lat, lng, siteName);
 
 // Cerrar popup
 map.closePopup();
+closeSidebar();
+
 }
 
 // Función para crear ruta desde el panel lateral
@@ -810,67 +847,79 @@ blueRouteLine = null;
 // Crear nueva ruta al sitio seleccionado
 selectedSite = site;
 drawRouteToSite(site.lat, site.lng, siteName);
+closeSidebar();
+
 }
 
-
-    const siteIcons = {
+function createIcon(size = 48) {
+  return {
       'Barrio de San Román': L.icon({
         iconUrl: 'iconos/iglesia.png',
-        iconSize: [32, 32],
-        iconAnchor: [16, 32],
-        popupAnchor: [0, -32]
+       iconSize: [size, size],
+      iconAnchor: [size / 2, size],
+      popupAnchor: [0, -size]
       }),
       'Atarazanas Playa San Román': L.icon({
         iconUrl: 'iconos/puerto.png',
-        iconSize: [32, 32],
-        iconAnchor: [16, 32],
-        popupAnchor: [0, -32]
+       iconSize: [size, size],
+      iconAnchor: [size / 2, size],
+      popupAnchor: [0, -size]
       }),
       'Novia del Mar': L.icon({
         iconUrl: 'iconos/noviaMar.png',
-        iconSize: [32, 32],
-        iconAnchor: [16, 32],
-        popupAnchor: [0, -32]
+      iconSize: [size, size],
+      iconAnchor: [size / 2, size],
+      popupAnchor: [0, -size]
       }),
       'Iglesia de Guadalupe': L.icon({
         iconUrl: 'iconos/iglesia.png',
-        iconSize: [32, 32],
-        iconAnchor: [16, 32],
-        popupAnchor: [0, -32]
+       iconSize: [size, size],
+      iconAnchor: [size / 2, size],
+      popupAnchor: [0, -size]
       }),
       'Edificio INAH Arquiologia Subacuatica': L.icon({
         iconUrl: 'iconos/inah.png',
-        iconSize: [32, 32],
-        iconAnchor: [16, 32],
-        popupAnchor: [0, -32]
+       iconSize: [size, size],
+      iconAnchor: [size / 2, size],
+      popupAnchor: [0, -size]
       }),
       'Iglesia de San Francisco': L.icon({
         iconUrl: 'iconos/iglesia.png',
-        iconSize: [32, 32],
-        iconAnchor: [16, 32],
-        popupAnchor: [0, -32]
+       iconSize: [size, size],
+      iconAnchor: [size / 2, size],
+      popupAnchor: [0, -size]
       }),
       'Bateria de San Matias': L.icon({
         iconUrl: 'iconos/baterias.png',
-        iconSize: [32, 32],
-        iconAnchor: [16, 32],
-        popupAnchor: [0, -32]
+       iconSize: [size, size],
+      iconAnchor: [size / 2, size],
+      popupAnchor: [0, -size]
       }),
       'Bateria de San Lucas': L.icon({
         iconUrl: 'iconos/baterias.png',
-        iconSize: [32, 32],
-        iconAnchor: [16, 32],
-        popupAnchor: [0, -32]
+       iconSize: [size, size],
+      iconAnchor: [size / 2, size],
+      popupAnchor: [0, -size]
+      }),
+      'Museo de Arqueología Subacuática': L.icon({
+        iconUrl: 'iconos/baterias.png',
+       iconSize: [size, size],
+      iconAnchor: [size / 2, size],
+      popupAnchor: [0, -size]
       })
     };
     
-
+  }
 const markers = [];
+sites.forEach(site => {let siteIcons = createIcon(); // tamaño inicial
+const markers = [];
+
 sites.forEach(site => {
-const marker = L.marker([site.lat, site.lng], { icon: siteIcons[site.name] }).addTo(map);
-// Al hacer clic en el marcador, mostrar popup con imagen, título y botón
-marker.bindPopup(createSimplePopup(site));
-markers.push({ marker, site });
+  const marker = L.marker([site.lat, site.lng], { icon: siteIcons[site.name] }).addTo(map);
+  marker.bindPopup(createSimplePopup(site));
+  markers.push({ marker, site });
+});
+
 });
 
 // Actualizar estado de la interfaz según rutas activas
@@ -925,50 +974,56 @@ clearBtn.textContent = translations[currentLang].clearAll;
 
 // Cancelar ruta activa
 function cancelActiveRoute() {
-if (selectedRouteLine) {
-map.removeLayer(selectedRouteLine);
-selectedRouteLine = null;
-}
+  try {
+    if (selectedRouteLine && map.hasLayer(selectedRouteLine)) {
+      map.removeLayer(selectedRouteLine);
+      selectedRouteLine = null;
+    }
 
-if (routeToStartLine) {
-map.removeLayer(routeToStartLine);
-routeToStartLine = null;
-}
+    if (routeToStartLine && map.hasLayer(routeToStartLine)) {
+      map.removeLayer(routeToStartLine);
+      routeToStartLine = null;
+    }
 
-selectedSite = null;
-localStorage.removeItem('selectedSite');
-document.getElementById('distance').innerText = 'Distancia al destino: -';
+    selectedSite = null;
+    localStorage.removeItem('selectedSite');
+    document.getElementById('distance').innerText = 'Distancia al destino: -';
 
-if (!blueRouteLine) {
-getOSRMRoute(sites);
-}
-
-updateRouteUI();
+    updateRouteUI();
+  } catch (error) {
+    console.error('Error al cancelar ruta:', error);
+  }
 }
 
 // Limpiar todas las rutas
 function clearAllRoutes() {
-if (selectedRouteLine) {
-map.removeLayer(selectedRouteLine);
-selectedRouteLine = null;
+  try {
+    if (selectedRouteLine && map.hasLayer(selectedRouteLine)) {
+      map.removeLayer(selectedRouteLine);
+      selectedRouteLine = null;
+    }
+
+    if (routeToStartLine && map.hasLayer(routeToStartLine)) {
+      map.removeLayer(routeToStartLine);
+      routeToStartLine = null;
+    }
+
+    if (blueRouteLine && map.hasLayer(blueRouteLine)) {
+      map.removeLayer(blueRouteLine);
+      blueRouteLine = null;
+    }
+
+    selectedSite = null;
+    localStorage.removeItem('selectedSite');
+    document.getElementById('distance').innerText = 'Distancia al destino: -';
+
+    updateRouteUI();
+  } catch (error) {
+    console.error('Error al limpiar rutas:', error);
+  }
 }
 
-if (routeToStartLine) {
-map.removeLayer(routeToStartLine);
-routeToStartLine = null;
-}
 
-if (blueRouteLine) {
-map.removeLayer(blueRouteLine);
-blueRouteLine = null;
-}
-
-selectedSite = null;
-localStorage.removeItem('selectedSite');
-document.getElementById('distance').innerText = 'Distancia al destino: -';
-
-updateRouteUI();
-}
 
 // Abrir panel lateral con información del sitio (SOLO desde botones del menú)
 function openSidebar(siteName) {
@@ -1045,7 +1100,6 @@ ${translations[currentLang].nextImage} ❯
 <button onclick="speakDescription('${siteData.description.replace(/'/g, "\\'")}', '${siteName.replace(/'/g, "\\'")}'); return false;" class="speak-btn">
 🔊 ${translations[currentLang].listenDescription}
 </button>
-
 <button onclick="toggleSpeech();" id="pauseBtn" class="speak-btn" style="display: none;">
   ⏸️ Pausar
 </button>
@@ -1083,17 +1137,14 @@ function closeSidebar() {
     clearInterval(carouselInterval);
   }
 
-  // Pausar la voz en lugar de cancelar
-  if ('speechSynthesis' in window) {
-    if (speechSynthesis.speaking && !speechSynthesis.paused) {
-      speechSynthesis.pause();
-      isPaused = true;
-      const pauseBtn = document.getElementById('pauseBtn');
-      if (pauseBtn) pauseBtn.innerText = '▶️ Reanudar';
-    }
+  // SOLO PAUSAR (NO CANCELAR)
+  if ('speechSynthesis' in window && speechSynthesis.speaking && !speechSynthesis.paused) {
+    speechSynthesis.pause();
+    isPaused = true;
+    const pauseBtn = document.getElementById('pauseBtn');
+    if (pauseBtn) pauseBtn.innerText = '▶️ Reanudar';
   }
 }
-
 
 
 // Iniciar carrusel automático
@@ -1164,6 +1215,7 @@ startCarousel(images.length);
 }
 }
 
+// Función para text-to-speech
 let isPaused = false;
 
 function speakDescription(text, title) {
@@ -1211,7 +1263,6 @@ function speakDescription(text, title) {
   }
 }
 
-
 function toggleSpeech() {
   const pauseBtn = document.getElementById('pauseBtn');
   if ('speechSynthesis' in window && speechSynthesis.speaking) {
@@ -1226,9 +1277,6 @@ function toggleSpeech() {
     }
   }
 }
-
-
-
 
 
 
@@ -1257,9 +1305,7 @@ userMarker = L.marker(userLocation).addTo(map).bindPopup('Tu ubicación').openPo
 } else {
 userMarker.setLatLng(userLocation);
 }
-if (followUser) {
-map.setView(userLocation, 15);
-}
+
 if (selectedSite) {
 drawRouteToSite(selectedSite.lat, selectedSite.lng, selectedSite.name);
 }

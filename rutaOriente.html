@@ -465,6 +465,19 @@ border-radius: 3px;
 #sidebar::-webkit-scrollbar-thumb:hover {
 background: #94a3b8;
 }
+@media (max-width: 768px) {
+  #siteButtons button {
+    flex: 1 1 100%;
+    max-width: 100%;
+    font-size: 16px;
+    padding: 12px;
+  }
+
+  #siteMenu h2 {
+    font-size: 1.2rem;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -769,6 +782,8 @@ drawRouteToSite(lat, lng, siteName);
 
 // Cerrar popup
 map.closePopup();
+closeSidebar();
+
 }
 
 // Función para crear ruta desde el panel lateral
@@ -800,6 +815,8 @@ blueRouteLine = null;
 // Crear nueva ruta al sitio seleccionado
 selectedSite = site;
 drawRouteToSite(site.lat, site.lng, siteName);
+closeSidebar();
+
 }
 function createIcon(size = 48) {
   return {
