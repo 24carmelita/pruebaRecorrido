@@ -530,20 +530,20 @@ background: #94a3b8;
     <a href="https://www.google.com/maps?q=19.843044,-90.538832" target="_blank" style="color:#b38b28; margin: 0 12px; text-decoration:none;">
       Dirección
     </a>
-    <a href="tel:+5211234567890" style="color:#b38b28; margin: 0 12px; text-decoration:none;">
+    <a href="tel:+529818115510" style="color:#b38b28; margin: 0 12px; text-decoration:none;">
       Contacto
     </a>
   </nav>
 
   <div style="margin-bottom: 25px;">
     <!-- Redes sociales -->
-    <a href="https://www.facebook.com/share/1AkUxZpZFM/" target="_blank" style="color:#b38b28; margin: 0 8px; font-size: 18px; text-decoration:none;">
+      <a href="https://www.facebook.com/share/19GQgXUWKJ/?mibextid=wwXIfr" target="_blank" style="color:#b38b28; margin: 0 8px; font-size: 18px; text-decoration:none;">
       <i class="fab fa-facebook-f"></i> 
     </a>
-    <a href="https://www.instagram.com/inahmx?igsh=MWVyYjY4b2gxODczMw==" target="_blank" style="color:#b38b28; margin: 0 8px; font-size: 18px; text-decoration:none;">
+    <a href="https://www.instagram.com/inahsasyuc?igsh=MTczMDg1NGxmYzRyNw==" target="_blank" style="color:#b38b28; margin: 0 8px; font-size: 18px; text-decoration:none;">
       <i class="fab fa-instagram"></i> 
     </a>
-    <a href="https://twitter.com" target="_blank" style="color:#b38b28; margin: 0 8px; font-size: 18px; text-decoration:none;">
+    <a href="https://x.com/inahsas_yuc" target="_blank" style="color:#b38b28; margin: 0 8px; font-size: 18px; text-decoration:none;">
       <i class="fab fa-twitter"></i> 
     </a>
     <a href="https://youtube.com/@inahtv?si=dTPfND_makjeZTEm" target="_blank" style="color:#b38b28; margin: 0 8px; font-size: 18px; text-decoration:none;">
@@ -603,6 +603,21 @@ attribution: '&copy; OpenStreetMap contributors'
 map.on('movestart', () => {
 followUser = false;
 });
+map.on('zoomend', () => {
+  const zoom = map.getZoom();
+  let size = 32;
+
+  if (zoom >= 17) size = 64;
+  else if (zoom >= 15) size = 48;
+  else if (zoom >= 13) size = 36;
+  else size = 28;
+
+  siteIcons = createIcon(size);
+  markers.forEach(({ marker, site }) => {
+    marker.setIcon(siteIcons[site.name]);
+  });
+});
+
 
 const translations = {
 es: {
@@ -786,46 +801,52 @@ blueRouteLine = null;
 selectedSite = site;
 drawRouteToSite(site.lat, site.lng, siteName);
 }
+function createIcon(size = 48) {
+  return {
+    'Vapor Lolá': L.icon({
+      iconUrl: 'iconos/barco.png',
+      iconSize: [size, size],
+      iconAnchor: [size / 2, size],
+      popupAnchor: [0, -size]
+    }),
+    'Batería de San Luis': L.icon({
+      iconUrl: 'iconos/baterias.png',
+      iconSize: [size, size],
+      iconAnchor: [size / 2, size],
+      popupAnchor: [0, -size]
+    }),
+    'Fuerte de San Miguel': L.icon({
+      iconUrl: 'iconos/fuerte.png',
+      iconSize: [size, size],
+      iconAnchor: [size / 2, size],
+      popupAnchor: [0, -size]
+    }),
+    'Parque de Lerma': L.icon({
+      iconUrl: 'iconos/parque.png',
+      iconSize: [size, size],
+      iconAnchor: [size / 2, size],
+      popupAnchor: [0, -size]
+    }),
+    'Playa Bonita': L.icon({
+      iconUrl: 'iconos/playa.png',
+      iconSize: [size, size],
+      iconAnchor: [size / 2, size],
+      popupAnchor: [0, -size]
+    })
+  };
+}
 
-const siteIcons = {
-'Vapor Lolá': L.icon({
-iconUrl: 'iconos/barco.png',
-iconSize: [32, 32],
-iconAnchor: [16, 32],
-popupAnchor: [0, -32]
-}),
-'Batería de San Luis': L.icon({
-iconUrl: 'iconos/baterias.png',
-iconSize: [32, 32],
-iconAnchor: [16, 32],
-popupAnchor: [0, -32]
-}),
-'Fuerte de San Miguel': L.icon({
-iconUrl: 'iconos/fuerte.png',
-iconSize: [32, 32],
-iconAnchor: [16, 32],
-popupAnchor: [0, -32]
-}),
-'Parque de Lerma': L.icon({
-iconUrl: 'iconos/parque.png',
-iconSize: [32, 32],
-iconAnchor: [16, 32],
-popupAnchor: [0, -32]
-}),
-'Playa Bonita': L.icon({
-iconUrl: 'iconos/playa.png',
-iconSize: [32, 32],
-iconAnchor: [16, 32],
-popupAnchor: [0, -32]
-})
-};
 
 const markers = [];
+sites.forEach(site => {let siteIcons = createIcon(); // tamaño inicial
+const markers = [];
+
 sites.forEach(site => {
-const marker = L.marker([site.lat, site.lng], { icon: siteIcons[site.name] }).addTo(map);
-// Al hacer clic en el marcador, mostrar popup con imagen, título y botón
-marker.bindPopup(createSimplePopup(site));
-markers.push({ marker, site });
+  const marker = L.marker([site.lat, site.lng], { icon: siteIcons[site.name] }).addTo(map);
+  marker.bindPopup(createSimplePopup(site));
+  markers.push({ marker, site });
+});
+
 });
 
 // Actualizar estado de la interfaz según rutas activas
@@ -880,50 +901,56 @@ clearBtn.textContent = translations[currentLang].clearAll;
 
 // Cancelar ruta activa
 function cancelActiveRoute() {
-if (selectedRouteLine) {
-map.removeLayer(selectedRouteLine);
-selectedRouteLine = null;
-}
+  try {
+    if (selectedRouteLine && map.hasLayer(selectedRouteLine)) {
+      map.removeLayer(selectedRouteLine);
+      selectedRouteLine = null;
+    }
 
-if (routeToStartLine) {
-map.removeLayer(routeToStartLine);
-routeToStartLine = null;
-}
+    if (routeToStartLine && map.hasLayer(routeToStartLine)) {
+      map.removeLayer(routeToStartLine);
+      routeToStartLine = null;
+    }
 
-selectedSite = null;
-localStorage.removeItem('selectedSite');
-document.getElementById('distance').innerText = 'Distancia al destino: -';
+    selectedSite = null;
+    localStorage.removeItem('selectedSite');
+    document.getElementById('distance').innerText = 'Distancia al destino: -';
 
-if (!blueRouteLine) {
-getOSRMRoute(sites);
-}
-
-updateRouteUI();
+    updateRouteUI();
+  } catch (error) {
+    console.error('Error al cancelar ruta:', error);
+  }
 }
 
 // Limpiar todas las rutas
 function clearAllRoutes() {
-if (selectedRouteLine) {
-map.removeLayer(selectedRouteLine);
-selectedRouteLine = null;
+  try {
+    if (selectedRouteLine && map.hasLayer(selectedRouteLine)) {
+      map.removeLayer(selectedRouteLine);
+      selectedRouteLine = null;
+    }
+
+    if (routeToStartLine && map.hasLayer(routeToStartLine)) {
+      map.removeLayer(routeToStartLine);
+      routeToStartLine = null;
+    }
+
+    if (blueRouteLine && map.hasLayer(blueRouteLine)) {
+      map.removeLayer(blueRouteLine);
+      blueRouteLine = null;
+    }
+
+    selectedSite = null;
+    localStorage.removeItem('selectedSite');
+    document.getElementById('distance').innerText = 'Distancia al destino: -';
+
+    updateRouteUI();
+  } catch (error) {
+    console.error('Error al limpiar rutas:', error);
+  }
 }
 
-if (routeToStartLine) {
-map.removeLayer(routeToStartLine);
-routeToStartLine = null;
-}
 
-if (blueRouteLine) {
-map.removeLayer(blueRouteLine);
-blueRouteLine = null;
-}
-
-selectedSite = null;
-localStorage.removeItem('selectedSite');
-document.getElementById('distance').innerText = 'Distancia al destino: -';
-
-updateRouteUI();
-}
 
 // Abrir panel lateral con información del sitio (SOLO desde botones del menú)
 function openSidebar(siteName) {
@@ -1205,9 +1232,7 @@ userMarker = L.marker(userLocation).addTo(map).bindPopup('Tu ubicación').openPo
 } else {
 userMarker.setLatLng(userLocation);
 }
-if (followUser) {
-map.setView(userLocation, 15);
-}
+
 if (selectedSite) {
 drawRouteToSite(selectedSite.lat, selectedSite.lng, selectedSite.name);
 }
