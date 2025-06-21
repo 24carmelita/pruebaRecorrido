@@ -477,6 +477,24 @@ background: #94a3b8;
     font-size: 1.2rem;
   }
 }
+.number-icon {
+  pointer-events: none; /* Para que no bloquee clics en el ícono */
+}
+
+.number-label {
+  background-color: #8B0000;
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 4px rgba(0,0,0,0.3);
+}
+
 
 </style>
 </head>
@@ -490,7 +508,7 @@ background: #94a3b8;
 </div>
 </header>
 <div id="description">
-<p>Bienvenido al recorrido en coche por la ciudad de Campeche. Explora lugares históricos y hermosos paisajes. Recorrerás sitios emblemáticos de la ciudad y conocerás su rica historia. Asegúrate de disfrutar cada momento mientras avanzas en el recorrido. ¡Comencemos!</p>
+<p>Bienvenido a la ruta en automóvil por la ciudad de Campeche. Visita lugares históricos y emblemáticos que forman parte de su patrimonio cultural. Asegúrate de disfrutar cada momento mientras avanzas en el recorrido. ¡Comencemos!</p>
 </div>
 <div id="siteMenu" style="text-align: center; margin: 20px;">
 <h2>📍 Sitios del Recorrido</h2>
@@ -584,6 +602,8 @@ let selectedSite = null;
 let routeToStartLine;
 let distanceInterval;
 let activeRouteType = null; // 'selected', 'start', 'complete'
+let userMovedMap = false;
+
 
 // Función para detectar si es dispositivo móvil
 function isMobileDevice() {
@@ -605,9 +625,17 @@ block: 'start'
 }
 }
 }
+
 // Inicializar mapa
 const mapInstance = L.map('map').setView([19.845, -90.523], 12);
 map = mapInstance;
+
+map.on('movestart', () => {
+  followUser = false;
+  userMovedMap = true;
+});
+
+
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
@@ -632,7 +660,7 @@ map.on('zoomend', () => {
 
 const translations = {
 es: {
-welcome: 'Bienvenido al recorrido en auto por la ciudad de Campeche. Explora lugares históricos y paisajes hermosos. Visitarás sitios emblemáticos de la ciudad y conocerás su rica historia. Asegúrate de disfrutar cada momento mientras avanzas en el recorrido. ¡Comencemos!',
+welcome: 'Bienvenido a la ruta en automóvil por la ciudad de Campeche. Visita lugares históricos y emblemáticos que forman parte de su patrimonio cultural. Asegúrate de disfrutar cada momento mientras avanzas en el recorrido. ¡Comencemos!',
 distance: 'Distancia al destino',
 closeSidebar: 'Cerrar',
 prevImage: 'Anterior',
@@ -694,7 +722,7 @@ images: ['imgPoniente/sanLucas1.jpg', 'imgPoniente/sanLucas2.jpg', 'imgPoniente/
 }
 },
 'en': {
-welcome: 'Welcome to the car tour through the city of Campeche. Explore historical places and beautiful landscapes. You will visit emblematic sites of the city and learn about its rich history. Be sure to enjoy every moment as you progress through the tour. Let\'s get started!',
+welcome: 'Welcome to the Campeche City Driving Tour. Visit historic and iconic sites that are part of its cultural heritage. Make sure you enjoy every moment as you travel. Let\'s get started!',
 distance: 'Distance to destination',
 closeSidebar: 'Close',
 prevImage: 'Previous',
@@ -769,6 +797,7 @@ const sites = [
       { lat:19.862693, lng: -90.511714, name: 'Bateria de San Lucas', image: 'img/sanLucas.jpg' },
       { lat:19.860503, lng: -90.510402, name: 'Museo de Arqueología Subacuática', image: 'img/sanLucas.jpg' }
     ];
+
 // Crear popup SIMPLE para iconos del mapa (solo imagen, título y botón)
 function createSimplePopup(site) {
 return `
@@ -850,7 +879,6 @@ drawRouteToSite(site.lat, site.lng, siteName);
 closeSidebar();
 
 }
-
 function createIcon(size = 48) {
   return {
       'Barrio de San Román': L.icon({
@@ -910,13 +938,30 @@ function createIcon(size = 48) {
     };
     
   }
+
+  
 const markers = [];
 sites.forEach(site => {let siteIcons = createIcon(); // tamaño inicial
 const markers = [];
 
-sites.forEach(site => {
-  const marker = L.marker([site.lat, site.lng], { icon: siteIcons[site.name] }).addTo(map);
+sites.forEach((site, index) => {
+  const icon = siteIcons[site.name];
+
+  // Agregar el marcador con el icono personalizado
+  const marker = L.marker([site.lat, site.lng], { icon }).addTo(map);
   marker.bindPopup(createSimplePopup(site));
+
+  // Crear un marcador de número (DivIcon)
+  const numberIcon = L.divIcon({
+    className: 'number-icon',
+    html: `<div class="number-label">${index + 1}</div>`,
+    iconSize: [24, 24],
+    iconAnchor: [12, 12]
+  });
+
+  // Añadir el número encima del icono
+  const numberMarker = L.marker([site.lat, site.lng], { icon: numberIcon }).addTo(map);
+
   markers.push({ marker, site });
 });
 
@@ -975,6 +1020,11 @@ clearBtn.textContent = translations[currentLang].clearAll;
 // Cancelar ruta activa
 function cancelActiveRoute() {
   try {
+    // Esto es lo nuevo (debe ir antes que todo)
+    selectedSite = null;
+    localStorage.removeItem('selectedSite');
+    document.getElementById('distance').innerText = 'Distancia al destino: -';
+
     if (selectedRouteLine && map.hasLayer(selectedRouteLine)) {
       map.removeLayer(selectedRouteLine);
       selectedRouteLine = null;
@@ -985,19 +1035,20 @@ function cancelActiveRoute() {
       routeToStartLine = null;
     }
 
-    selectedSite = null;
-    localStorage.removeItem('selectedSite');
-    document.getElementById('distance').innerText = 'Distancia al destino: -';
-
     updateRouteUI();
   } catch (error) {
     console.error('Error al cancelar ruta:', error);
   }
 }
 
+
 // Limpiar todas las rutas
 function clearAllRoutes() {
   try {
+    selectedSite = null;
+    localStorage.removeItem('selectedSite');
+    document.getElementById('distance').innerText = 'Distancia al destino: -';
+
     if (selectedRouteLine && map.hasLayer(selectedRouteLine)) {
       map.removeLayer(selectedRouteLine);
       selectedRouteLine = null;
@@ -1012,10 +1063,6 @@ function clearAllRoutes() {
       map.removeLayer(blueRouteLine);
       blueRouteLine = null;
     }
-
-    selectedSite = null;
-    localStorage.removeItem('selectedSite');
-    document.getElementById('distance').innerText = 'Distancia al destino: -';
 
     updateRouteUI();
   } catch (error) {
@@ -1278,9 +1325,14 @@ function toggleSpeech() {
   }
 }
 
-// Centrar mapa en sitio específico 
-function centerMapOnSite(lat, lng) {map.setView([lat, lng], 16);closeSidebar();}
 
+
+
+// Centrar mapa en sitio específico
+function centerMapOnSite(lat, lng) {
+map.setView([lat, lng], 16);
+closeSidebar();
+}
 
 // Geolocalización
 if (navigator.geolocation) {
@@ -1301,9 +1353,10 @@ userMarker = L.marker(userLocation).addTo(map).bindPopup('Tu ubicación').openPo
 userMarker.setLatLng(userLocation);
 }
 
-if (selectedSite) {
-drawRouteToSite(selectedSite.lat, selectedSite.lng, selectedSite.name);
+if (selectedSite && activeRouteType === 'selected') {
+  drawRouteToSite(selectedSite.lat, selectedSite.lng, selectedSite.name);
 }
+
 }
 
 function onLocationError(e) {
@@ -1349,7 +1402,10 @@ selectedRouteLine = L.polyline(coords, {
 color: 'red',
 weight: 5
 }).addTo(map);
-map.fitBounds(selectedRouteLine.getBounds());
+if (!userMovedMap) {
+  map.fitBounds(selectedRouteLine.getBounds());
+}
+
 const dist = (userLocation.distanceTo([destLat, destLng]) / 1000).toFixed(2);
 document.getElementById('distance').innerText = `${translations[currentLang].distance}: ${dist} km`;
 selectedSite = { lat: destLat, lng: destLng, name: siteName };
@@ -1368,7 +1424,8 @@ container.innerHTML = '';
 sites.forEach((site, index) => {
 const btn = document.createElement('button');
 btn.className = 'btn-red-vino';
-btn.innerText = site.name;
+btn.innerText = `${index + 1}. ${site.name}`;
+
 btn.onclick = () => {
 // SOLO abrir panel lateral (SIN centrar mapa, SIN mostrar popup, SIN crear ruta)
 openSidebar(site.name);
@@ -1475,13 +1532,14 @@ console.error('Error al trazar ruta:', err);
 
 // Al cargar la página
 window.addEventListener('load', () => {
-const saved = localStorage.getItem('selectedSite');
-if (saved) {
-const site = JSON.parse(saved);
-selectedSite = site;
-drawRouteToSite(site.lat, site.lng, site.name);
-}
+  const saved = localStorage.getItem('selectedSite');
+  if (saved && activeRouteType === 'selected') {
+    const site = JSON.parse(saved);
+    selectedSite = site;
+    drawRouteToSite(site.lat, site.lng, site.name);
+  }
 });
+
 
 // Inicializar
 getOSRMRoute(sites);

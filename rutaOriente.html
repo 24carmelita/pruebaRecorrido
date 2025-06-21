@@ -661,7 +661,7 @@ map.on('zoomend', () => {
 
 const translations = {
 es: {
-welcome: 'Bienvenido al recorrido en auto por la ciudad de Campeche. Explora lugares históricos y paisajes hermosos. Visitarás sitios emblemáticos de la ciudad y conocerás su rica historia. Asegúrate de disfrutar cada momento mientras avanzas en el recorrido. ¡Comencemos!',
+welcome: 'Bienvenido a la ruta en automóvil por la ciudad de Campeche. Visita lugares históricos y emblemáticos que forman parte de su patrimonio cultural. Asegúrate de disfrutar cada momento mientras avanzas en el recorrido. ¡Comencemos!',
 distance: 'Distancia al destino',
 closeSidebar: 'Cerrar',
 prevImage: 'Anterior',
@@ -707,7 +707,7 @@ images: ['imgOriente/playaBonita1.jpg', 'imgOriente/playaBonita2.jpg',  'imgOrie
 }
 },
 'en': {
-welcome: 'Welcome to the car tour through the city of Campeche. Explore historical places and beautiful landscapes. You will visit emblematic sites of the city and learn about its rich history. Be sure to enjoy every moment as you progress through the tour. Let\'s get started!',
+welcome: 'Welcome to the Campeche City Driving Tour. Visit historic and iconic sites that are part of its cultural heritage. Make sure you enjoy every moment as you travel. Let\'s get started!',
 distance: 'Distance to destination',
 closeSidebar: 'Close',
 prevImage: 'Previous',
@@ -1294,9 +1294,14 @@ userMarker = L.marker(userLocation).addTo(map).bindPopup('Tu ubicación').openPo
 userMarker.setLatLng(userLocation);
 }
 
-if (selectedSite && activeRouteType === 'selected') {
+if (
+  selectedSite &&
+  activeRouteType === 'selected' &&
+  !map.hasLayer(selectedRouteLine)
+) {
   drawRouteToSite(selectedSite.lat, selectedSite.lng, selectedSite.name);
 }
+
 
 }
 
@@ -1472,14 +1477,7 @@ console.error('Error al trazar ruta:', err);
 });
 
 // Al cargar la página
-window.addEventListener('load', () => {
-  const saved = localStorage.getItem('selectedSite');
-  if (saved && activeRouteType === 'selected') {
-    const site = JSON.parse(saved);
-    selectedSite = site;
-    drawRouteToSite(site.lat, site.lng, site.name);
-  }
-});
+
 
 
 // Inicializar
