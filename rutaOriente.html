@@ -584,6 +584,8 @@ let selectedSite = null;
 let routeToStartLine;
 let distanceInterval;
 let activeRouteType = null; // 'selected', 'start', 'complete'
+let userMovedMap = false;
+
 
 // Función para detectar si es dispositivo móvil
 function isMobileDevice() {
@@ -609,6 +611,13 @@ block: 'start'
 // Inicializar mapa
 const mapInstance = L.map('map').setView([19.845, -90.523], 12);
 map = mapInstance;
+
+map.on('movestart', () => {
+  followUser = false;
+  userMovedMap = true;
+});
+
+
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
@@ -1298,7 +1307,10 @@ selectedRouteLine = L.polyline(coords, {
 color: 'red',
 weight: 5
 }).addTo(map);
-map.fitBounds(selectedRouteLine.getBounds());
+if (!userMovedMap) {
+  map.fitBounds(selectedRouteLine.getBounds());
+}
+
 const dist = (userLocation.distanceTo([destLat, destLng]) / 1000).toFixed(2);
 document.getElementById('distance').innerText = `${translations[currentLang].distance}: ${dist} km`;
 selectedSite = { lat: destLat, lng: destLng, name: siteName };
