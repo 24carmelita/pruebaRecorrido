@@ -2197,13 +2197,10 @@ ${translations[currentLang].nextImage} ❯
         userMarker.setLatLng(userLocation);
       }
 
-      if (selectedSite && activeRouteType === "selected") {
-        drawRouteToSite(
-          selectedSite.lat,
-          selectedSite.lng,
-          selectedSite.name
-        );
-      }
+    if (selectedSite && selectedRouteLine) {
+  drawRouteToSite(selectedSite.lat, selectedSite.lng, selectedSite.name);
+}
+
     }
 
     function onLocationError(e) {
