@@ -1504,1039 +1504,634 @@ ${translations[currentLang].goToRoute}
         }),
       };
     }
+const markers = [];
+sites.forEach(site => {let siteIcons = createIcon(); // tamaño inicial
+const markers = [];
 
-    const markers = [];
+sites.forEach((site, index) => {
+  const icon = siteIcons[site.name];
 
-    sites.forEach((site) => {
-      let siteIcons = createIcon(); // tamaño inicial
+  // Agregar el marcador con el icono personalizado
+  const marker = L.marker([site.lat, site.lng], { icon }).addTo(map);
+  marker.bindPopup(createSimplePopup(site));
 
-      const markers = [];
+  // Crear un marcador de número (DivIcon)
+  const numberIcon = L.divIcon({
+    className: 'number-icon',
+    html: `<div class="number-label">${index + 1}</div>`,
+    iconSize: [24, 24],
+    iconAnchor: [12, 12]
+  });
 
-      sites.forEach((site, index) => {
-        const icon = siteIcons[site.name];
+  // Añadir el número encima del icono
+  const numberMarker = L.marker([site.lat, site.lng], { icon: numberIcon }).addTo(map);
 
-        // Agregar el marcador con el icono personalizado
+  markers.push({ marker, site });
+});
 
-        const marker = L.marker([site.lat, site.lng], { icon }).addTo(map);
+});
 
-        marker.bindPopup(createSimplePopup(site));
+// Actualizar estado de la interfaz según rutas activas
+function updateRouteUI() {
+const routeStatus = document.getElementById('routeStatus');
+const routeStatusText = document.getElementById('routeStatusText');
+const tourInfo = document.getElementById('tourInfo');
+const tourInfoText = document.getElementById('tourInfoText');
+const viewRouteBtn = document.getElementById('startRouteBtn');
+const goToSiteBtn = document.getElementById('startTourBtn');
+const cancelBtn = document.getElementById('cancelRouteBtn');
+const clearBtn = document.getElementById('clearAllRoutesBtn');
 
-        // Crear un marcador de número (DivIcon)
-
-        const numberIcon = L.divIcon({
-          className: "number-icon",
-
-          html: `<div class="number-label">${index + 1}</div>`,
-
-          iconSize: [24, 24],
-
-          iconAnchor: [12, 12],
-        });
-
-        // Añadir el número encima del icono
-
-        const numberMarker = L.marker([site.lat, site.lng], {
-          icon: numberIcon,
-        }).addTo(map);
-
-        markers.push({ marker, site });
-      });
-    });
-
-    // Actualizar estado de la interfaz según rutas activas
-
-    function updateRouteUI() {
-      const routeStatus = document.getElementById("routeStatus");
-
-      const routeStatusText = document.getElementById("routeStatusText");
-
-      const tourInfo = document.getElementById("tourInfo");
-
-      const tourInfoText = document.getElementById("tourInfoText");
-
-      const viewRouteBtn = document.getElementById("startRouteBtn");
-
-      const goToSiteBtn = document.getElementById("startTourBtn");
-
-      const cancelBtn = document.getElementById("cancelRouteBtn");
-
-      const clearBtn = document.getElementById("clearAllRoutesBtn");
-
-      if (selectedSite && selectedRouteLine) {
-        // Hay una ruta específica a un sitio
-
-        routeStatus.classList.add("active");
-
-        routeStatusText.textContent = `${translations[currentLang].routeActive}${selectedSite.name}`;
-
-        tourInfoText.textContent = `🎯 Ruta específica creada hacia: ${selectedSite.name}`;
-
-        cancelBtn.style.display = "inline-block";
-
-        clearBtn.style.display = "inline-block";
-
-        activeRouteType = "selected";
-      } else if (routeToStartLine) {
-        // Hay una ruta al sitio más cercano
-
-        routeStatus.classList.add("active");
-
-        routeStatusText.textContent = translations[currentLang].routeToStart;
-
-        tourInfoText.textContent = translations[currentLang].tourInfoToSite;
-
-        cancelBtn.style.display = "inline-block";
-
-        clearBtn.style.display = "inline-block";
-
-        activeRouteType = "start";
-      } else if (blueRouteLine) {
-        // Solo hay ruta completa del recorrido
-
-        routeStatus.classList.remove("active");
-
-        tourInfoText.textContent = translations[currentLang].tourInfoComplete;
-
-        clearBtn.style.display = "inline-block";
-
-        cancelBtn.style.display = "none";
-
-        activeRouteType = "complete";
-      } else {
-        // No hay rutas activas
-
-        routeStatus.classList.remove("active");
-
-        tourInfoText.textContent = translations[currentLang].tourInfoDefault;
-
-        cancelBtn.style.display = "none";
-
-        clearBtn.style.display = "none";
-
-        activeRouteType = null;
-      }
-
-      // Actualizar textos de botones
-
-      viewRouteBtn.textContent = translations[currentLang].viewCompleteRoute;
-
-      goToSiteBtn.textContent = translations[currentLang].goToFirstSite;
-
-      cancelBtn.textContent = translations[currentLang].cancelRoute;
-
-      clearBtn.textContent = translations[currentLang].clearAll;
-    }
-
-
-
-function clearExistingRoutes() {
-  if (selectedRouteLine && map.hasLayer(selectedRouteLine)) {
-    map.removeLayer(selectedRouteLine);
-    selectedRouteLine = null;
-  }
-
-  if (routeToStartLine && map.hasLayer(routeToStartLine)) {
-    map.removeLayer(routeToStartLine);
-    routeToStartLine = null;
-  }
-
-  if (blueRouteLine && map.hasLayer(blueRouteLine)) {
-    map.removeLayer(blueRouteLine);
-    blueRouteLine = null;
-  }
-
-  selectedSite = null;
-  localStorage.removeItem("selectedSite");
-  document.getElementById("distance").innerText = "Distancia al destino: -";
+if (selectedSite && selectedRouteLine) {
+// Hay una ruta específica a un sitio
+routeStatus.classList.add('active');
+routeStatusText.textContent = `${translations[currentLang].routeActive}${selectedSite.name}`;
+tourInfoText.textContent = `🎯 Ruta específica creada hacia: ${selectedSite.name}`;
+cancelBtn.style.display = 'inline-block';
+clearBtn.style.display = 'inline-block';
+activeRouteType = 'selected';
+} else if (routeToStartLine) {
+// Hay una ruta al sitio más cercano
+routeStatus.classList.add('active');
+routeStatusText.textContent = translations[currentLang].routeToStart;
+tourInfoText.textContent = translations[currentLang].tourInfoToSite;
+cancelBtn.style.display = 'inline-block';
+clearBtn.style.display = 'inline-block';
+activeRouteType = 'start';
+} else if (blueRouteLine) {
+// Solo hay ruta completa del recorrido
+routeStatus.classList.remove('active');
+tourInfoText.textContent = translations[currentLang].tourInfoComplete;
+clearBtn.style.display = 'inline-block';
+cancelBtn.style.display = 'none';
+activeRouteType = 'complete';
+} else {
+// No hay rutas activas
+routeStatus.classList.remove('active');
+tourInfoText.textContent = translations[currentLang].tourInfoDefault;
+cancelBtn.style.display = 'none';
+clearBtn.style.display = 'none';
+activeRouteType = null;
 }
 
+// Actualizar textos de botones
+viewRouteBtn.textContent = translations[currentLang].viewCompleteRoute;
+goToSiteBtn.textContent = translations[currentLang].goToFirstSite;
+cancelBtn.textContent = translations[currentLang].cancelRoute;
+clearBtn.textContent = translations[currentLang].clearAll;
+}
 
-
-
-
-
-    // Cancelar ruta activa
-
-    function cancelActiveRoute() {
-      try {
-        // Esto es lo nuevo (debe ir antes que todo)
-
-        selectedSite = null;
-
-        localStorage.removeItem("selectedSite");
-
-        document.getElementById("distance").innerText =
-          "Distancia al destino: -";
-
-        if (selectedRouteLine && map.hasLayer(selectedRouteLine)) {
-          map.removeLayer(selectedRouteLine);
-
-          selectedRouteLine = null;
-        }
-
-        if (routeToStartLine && map.hasLayer(routeToStartLine)) {
-          map.removeLayer(routeToStartLine);
-
-          routeToStartLine = null;
-        }
-
-        updateRouteUI();
-      } catch (error) {
-        console.error("Error al cancelar ruta:", error);
-      }
-    }
-
-    // Limpiar todas las rutas
-
-    function clearAllRoutes() {
-      try {
-        selectedSite = null;
-
-        localStorage.removeItem("selectedSite");
-
-        document.getElementById("distance").innerText =
-          "Distancia al destino: -";
-
-        if (selectedRouteLine && map.hasLayer(selectedRouteLine)) {
-          map.removeLayer(selectedRouteLine);
-
-          selectedRouteLine = null;
-        }
-
-        if (routeToStartLine && map.hasLayer(routeToStartLine)) {
-          map.removeLayer(routeToStartLine);
-
-          routeToStartLine = null;
-        }
-
-        if (blueRouteLine && map.hasLayer(blueRouteLine)) {
-          map.removeLayer(blueRouteLine);
-
-          blueRouteLine = null;
-        }
-
-        updateRouteUI();
-      } catch (error) {
-        console.error("Error al limpiar rutas:", error);
-      }
-    }
-
-    // Abrir panel lateral con información del sitio (SOLO desde botones del menú)
-
-  async function openSidebar(siteName) {
-
-      const site = sites.find((s) => s.name === siteName);
-
-      if (!site) return;
-
-      const sidebar = document.getElementById("sidebar");
-
-      const sidebarContent = document.getElementById("sidebar-content");
-
-      // Detener carrusel anterior si existe
-
-      if (carouselInterval) {
-        clearInterval(carouselInterval);
-      }
-
-      // Calcular distancia si hay ubicación del usuario
-
- let distanceInfo = '';
-if (userMarker) {
-  const userPos = userMarker.getLatLng();
-
+// Cancelar ruta activa
+function cancelActiveRoute() {
   try {
-    const { distance, duration } = await getDistanceAndDurationORS(
-      userPos.lat,
-      userPos.lng,
-      site.lat,
-      site.lng
-    );
+    // Esto es lo nuevo (debe ir antes que todo)
+    selectedSite = null;
+    localStorage.removeItem('selectedSite');
+    document.getElementById('distance').innerText = 'Distancia al destino: -';
 
-    distanceInfo = `
-      <div class="distance-info">
-        <span class="distance-label">${translations[currentLang].distance}:</span>
-        <span class="distance-value">${distance} km</span>
-      </div>
-      <div class="distance-info">
-        <span class="distance-label">⏱️ Tiempo estimado:</span>
-        <span class="distance-value">${duration} min</span>
-      </div>
-    `;
+    if (selectedRouteLine && map.hasLayer(selectedRouteLine)) {
+      map.removeLayer(selectedRouteLine);
+      selectedRouteLine = null;
+    }
+
+    if (routeToStartLine && map.hasLayer(routeToStartLine)) {
+      map.removeLayer(routeToStartLine);
+      routeToStartLine = null;
+    }
+
+    updateRouteUI();
   } catch (error) {
-    console.error('Error al calcular distancia/tiempo:', error);
+    console.error('Error al cancelar ruta:', error);
   }
 }
 
 
-      const siteData = translations[currentLang][siteName];
+// Limpiar todas las rutas
+function clearAllRoutes() {
+  try {
+    selectedSite = null;
+    localStorage.removeItem('selectedSite');
+    document.getElementById('distance').innerText = 'Distancia al destino: -';
 
-      const images = siteData.images || [site.image];
+    if (selectedRouteLine && map.hasLayer(selectedRouteLine)) {
+      map.removeLayer(selectedRouteLine);
+      selectedRouteLine = null;
+    }
 
-      sidebarContent.innerHTML = ` 
+    if (routeToStartLine && map.hasLayer(routeToStartLine)) {
+      map.removeLayer(routeToStartLine);
+      routeToStartLine = null;
+    }
 
-<div class="sidebar-header"> 
+    if (blueRouteLine && map.hasLayer(blueRouteLine)) {
+      map.removeLayer(blueRouteLine);
+      blueRouteLine = null;
+    }
 
-<div class="header-content"> 
+    updateRouteUI();
+  } catch (error) {
+    console.error('Error al limpiar rutas:', error);
+  }
+}
 
-<h2>${siteName}</h2> 
 
-${distanceInfo} 
 
-</div> 
-
-<button onclick="closeSidebar()" class="close-btn"> 
-
-✕ ${translations[currentLang].closeSidebar} 
-
-</button> 
-
-</div> 
-
-<div class="image-carousel"> 
-
-<div class="carousel-container"> 
-
-<div class="carousel-images" id="carousel-images"> 
-
-${images
-          .map(
-            (img, index) => ` 
-
-<img src="${img}" alt="${siteName}" 
-
-class="carousel-image ${index === 0 ? "active" : ""}" 
-
-data-index="${index}" 
-
-onerror="this.src='${site.image}'"> 
-
-`
-          )
-          .join("")} 
-
-</div> 
-
-${images.length > 1
-          ? ` 
-
-<div class="carousel-controls"> 
-
-<button onclick="prevImage()" class="carousel-btn prev-btn"> 
-
-❮ ${translations[currentLang].prevImage} 
-
-</button> 
-
-<div class="carousel-indicators"> 
-
-${images
-            .map(
-              (_, index) => ` 
-
-<span class="indicator ${index === 0 ? "active" : ""}" 
-
-onclick="goToImage(${index})" data-index="${index}"></span> 
-
-`
-            )
-            .join("")} 
-
-</div> 
-
-<button onclick="nextImage()" class="carousel-btn next-btn"> 
-
-${translations[currentLang].nextImage} ❯ 
-
-</button> 
-
-</div> 
-
-<div class="carousel-progress"> 
-
-<div class="progress-bar" id="progress-bar"></div> 
-
-</div> 
-
-`
-          : ""
-        } 
-
-</div> 
-
-</div> 
-
-<div class="site-description"> 
-
-<p>${siteData.description}</p> 
-
-<div class="action-buttons"> 
-
-<button onclick="speakDescription('${siteData.description.replace(
-          /'/g,
-          "\\'"
-        )}', '${siteName.replace(
-          /'/g,
-          "\\'"
-        )}'); return false;" class="speak-btn"> 
-
-🔊 ${translations[currentLang].listenDescription} 
-
-</button> 
-
-<button onclick="toggleSpeech();" id="pauseBtn" class="speak-btn" style="display: none;"> 
-
-  ⏸️ Pausar 
-
-</button> 
-
- 
-
-<button onclick="centerMapOnSite(${site.lat}, ${site.lng})" class="center-btn"> 
-
-🎯 ${translations[currentLang].centerMap} 
-
-</button> 
-
-<button onclick="createRouteFromSidebar('${siteName}')" class="route-btn"> 
-
-🚗 ${translations[currentLang].createRoute} 
-
-</button> 
-
-</div> 
-
-</div> 
-
+// Abrir panel lateral con información del sitio (SOLO desde botones del menú)
+function openSidebar(siteName) {
+const site = sites.find(s => s.name === siteName);
+if (!site) return;
+const sidebar = document.getElementById('sidebar');
+const sidebarContent = document.getElementById('sidebar-content');
+// Detener carrusel anterior si existe
+if (carouselInterval) {
+clearInterval(carouselInterval);
+}
+// Calcular distancia si hay ubicación del usuario
+let distanceInfo = '';
+if (userMarker) {
+const userPos = userMarker.getLatLng();
+const sitePos = L.latLng([site.lat, site.lng]);
+const distance = userPos.distanceTo(sitePos);
+const distanceText = distance > 1000
+? `${(distance / 1000).toFixed(2)} ${translations[currentLang].kilometers}`
+: `${Math.round(distance)} ${translations[currentLang].meters}`;
+distanceInfo = `
+<div class="distance-info">
+<span class="distance-label">${translations[currentLang].distance}:</span>
+<span class="distance-value">${distanceText}</span>
+</div>
 `;
+}
+const siteData = translations[currentLang][siteName];
+const images = siteData.images || [site.image];
+sidebarContent.innerHTML = `
+<div class="sidebar-header">
+<div class="header-content">
+<h2>${siteName}</h2>
+${distanceInfo}
+</div>
+<button onclick="closeSidebar()" class="close-btn">
+✕ ${translations[currentLang].closeSidebar}
+</button>
+</div>
+<div class="image-carousel">
+<div class="carousel-container">
+<div class="carousel-images" id="carousel-images">
+${images.map((img, index) => `
+<img src="${img}" alt="${siteName}"
+class="carousel-image ${index === 0 ? 'active' : ''}"
+data-index="${index}"
+onerror="this.src='${site.image}'">
+`).join('')}
+</div>
+${images.length > 1 ? `
+<div class="carousel-controls">
+<button onclick="prevImage()" class="carousel-btn prev-btn">
+❮ ${translations[currentLang].prevImage}
+</button>
+<div class="carousel-indicators">
+${images.map((_, index) => `
+<span class="indicator ${index === 0 ? 'active' : ''}"
+onclick="goToImage(${index})" data-index="${index}"></span>
+`).join('')}
+</div>
+<button onclick="nextImage()" class="carousel-btn next-btn">
+${translations[currentLang].nextImage} ❯
+</button>
+</div>
+<div class="carousel-progress">
+<div class="progress-bar" id="progress-bar"></div>
+</div>
+` : ''}
+</div>
+</div>
+<div class="site-description">
+<p>${siteData.description}</p>
+<div class="action-buttons">
+<button onclick="speakDescription('${siteData.description.replace(/'/g, "\\'")}', '${siteName.replace(/'/g, "\\'")}'); return false;" class="speak-btn">
+🔊 ${translations[currentLang].listenDescription}
+</button>
+<button onclick="toggleSpeech();" id="pauseBtn" class="speak-btn" style="display: none;">
+  ⏸️ Pausar
+</button>
 
-      // Mostrar sidebar
+<button onclick="centerMapOnSite(${site.lat}, ${site.lng})" class="center-btn">
+🎯 ${translations[currentLang].centerMap}
+</button>
+<button onclick="createRouteFromSidebar('${siteName}')" class="route-btn">
+🚗 ${translations[currentLang].createRoute}
+</button>
+</div>
+</div>
+`;
+// Mostrar sidebar
+sidebar.classList.add('active');
 
-      sidebar.classList.add("active");
+// Hacer scroll hacia el mapa en dispositivos móviles
+scrollToMapOnMobile();
 
-      // Hacer scroll hacia el mapa en dispositivos móviles
+// Inicializar carrusel automático solo si hay múltiples imágenes
+if (images.length > 1) {
+currentCarouselIndex = 0;
+startCarousel(images.length);
+updateProgressBar();
+}
+}
 
-      scrollToMapOnMobile();
+// Cerrar panel lateral
+function closeSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  sidebar.classList.remove('active');
 
-      // Inicializar carrusel automático solo si hay múltiples imágenes
+  // Detener carrusel
+  if (carouselInterval) {
+    clearInterval(carouselInterval);
+  }
 
-      if (images.length > 1) {
-        currentCarouselIndex = 0;
+  // SOLO PAUSAR (NO CANCELAR)
+  if ('speechSynthesis' in window && speechSynthesis.speaking && !speechSynthesis.paused) {
+    speechSynthesis.pause();
+    isPaused = true;
+    const pauseBtn = document.getElementById('pauseBtn');
+    if (pauseBtn) pauseBtn.innerText = '▶️ Reanudar';
+  }
+}
 
-        startCarousel(images.length);
 
-        updateProgressBar();
+// Iniciar carrusel automático
+function startCarousel(totalImages) {
+updateProgressBar();
+carouselInterval = setInterval(() => {
+nextImage(totalImages);
+updateProgressBar();
+}, 4000);
+}
+
+// Actualizar barra de progreso del carrusel
+function updateProgressBar() {
+const progressBar = document.getElementById('progress-bar');
+if (progressBar) {
+progressBar.style.width = '0%';
+progressBar.style.transition = 'width 4s linear';
+setTimeout(() => {
+progressBar.style.width = '100%';
+}, 50);
+}
+}
+
+// Navegar a imagen anterior
+function prevImage() {
+const images = document.querySelectorAll('.carousel-image');
+const indicators = document.querySelectorAll('.indicator');
+if (images.length === 0) return;
+images[currentCarouselIndex].classList.remove('active');
+if (indicators[currentCarouselIndex]) indicators[currentCarouselIndex].classList.remove('active');
+currentCarouselIndex = currentCarouselIndex === 0 ? images.length - 1 : currentCarouselIndex - 1;
+images[currentCarouselIndex].classList.add('active');
+if (indicators[currentCarouselIndex]) indicators[currentCarouselIndex].classList.add('active');
+// Reiniciar carrusel automático
+if (carouselInterval) {
+clearInterval(carouselInterval);
+startCarousel(images.length);
+}
+}
+
+// Navegar a imagen siguiente
+function nextImage(totalImages = null) {
+const images = document.querySelectorAll('.carousel-image');
+const indicators = document.querySelectorAll('.indicator');
+if (images.length === 0) return;
+const total = totalImages || images.length;
+images[currentCarouselIndex].classList.remove('active');
+if (indicators[currentCarouselIndex]) indicators[currentCarouselIndex].classList.remove('active');
+currentCarouselIndex = (currentCarouselIndex + 1) % total;
+images[currentCarouselIndex].classList.add('active');
+if (indicators[currentCarouselIndex]) indicators[currentCarouselIndex].classList.add('active');
+}
+
+// Ir a imagen específica
+function goToImage(index) {
+const images = document.querySelectorAll('.carousel-image');
+const indicators = document.querySelectorAll('.indicator');
+if (images.length === 0) return;
+images[currentCarouselIndex].classList.remove('active');
+if (indicators[currentCarouselIndex]) indicators[currentCarouselIndex].classList.remove('active');
+currentCarouselIndex = index;
+images[currentCarouselIndex].classList.add('active');
+if (indicators[currentCarouselIndex]) indicators[currentCarouselIndex].classList.add('active');
+// Reiniciar carrusel automático
+if (carouselInterval) {
+clearInterval(carouselInterval);
+startCarousel(images.length);
+}
+}
+
+// Función para text-to-speech
+let isPaused = false;
+
+function speakDescription(text, title) {
+  if ('speechSynthesis' in window) {
+    speechSynthesis.cancel(); // detener cualquier lectura anterior
+
+    const fullText = `${title}. ${text}`;
+    const utterance = new SpeechSynthesisUtterance(fullText);
+    utterance.lang = currentLang === 'es' ? 'es-MX' : 'en-US';
+    utterance.rate = 0.8;
+
+    const speakBtn = document.querySelector('.speak-btn');
+    const pauseBtn = document.getElementById('pauseBtn');
+
+    if (speakBtn) {
+      const originalText = speakBtn.innerHTML;
+      speakBtn.innerHTML = '⏸️ Reproduciendo...';
+      speakBtn.disabled = true;
+      if (pauseBtn) {
+        pauseBtn.style.display = 'inline-block';
+        pauseBtn.innerText = '⏸️ Pausar';
+        isPaused = false;
       }
-    }
 
-    // Cerrar panel lateral
-
-    function closeSidebar() {
-      const sidebar = document.getElementById("sidebar");
-
-      sidebar.classList.remove("active");
-
-      // Detener carrusel
-
-      if (carouselInterval) {
-        clearInterval(carouselInterval);
-      }
-
-      // SOLO PAUSAR (NO CANCELAR)
-
-      if (
-        "speechSynthesis" in window &&
-        speechSynthesis.speaking &&
-        !speechSynthesis.paused
-      ) {
-        speechSynthesis.pause();
-
-        isPaused = true;
-
-        const pauseBtn = document.getElementById("pauseBtn");
-
-        if (pauseBtn) pauseBtn.innerText = "▶️ Reanudar";
-      }
-    }
-
-    // Iniciar carrusel automático
-
-    function startCarousel(totalImages) {
-      updateProgressBar();
-
-      carouselInterval = setInterval(() => {
-        nextImage(totalImages);
-
-        updateProgressBar();
-      }, 4000);
-    }
-
-    // Actualizar barra de progreso del carrusel
-
-    function updateProgressBar() {
-      const progressBar = document.getElementById("progress-bar");
-
-      if (progressBar) {
-        progressBar.style.width = "0%";
-
-        progressBar.style.transition = "width 4s linear";
-
-        setTimeout(() => {
-          progressBar.style.width = "100%";
-        }, 50);
-      }
-    }
-
-    // Navegar a imagen anterior
-
-    function prevImage() {
-      const images = document.querySelectorAll(".carousel-image");
-
-      const indicators = document.querySelectorAll(".indicator");
-
-      if (images.length === 0) return;
-
-      images[currentCarouselIndex].classList.remove("active");
-
-      if (indicators[currentCarouselIndex])
-        indicators[currentCarouselIndex].classList.remove("active");
-
-      currentCarouselIndex =
-        currentCarouselIndex === 0
-          ? images.length - 1
-          : currentCarouselIndex - 1;
-
-      images[currentCarouselIndex].classList.add("active");
-
-      if (indicators[currentCarouselIndex])
-        indicators[currentCarouselIndex].classList.add("active");
-
-      // Reiniciar carrusel automático
-
-      if (carouselInterval) {
-        clearInterval(carouselInterval);
-
-        startCarousel(images.length);
-      }
-    }
-
-    // Navegar a imagen siguiente
-
-    function nextImage(totalImages = null) {
-      const images = document.querySelectorAll(".carousel-image");
-
-      const indicators = document.querySelectorAll(".indicator");
-
-      if (images.length === 0) return;
-
-      const total = totalImages || images.length;
-
-      images[currentCarouselIndex].classList.remove("active");
-
-      if (indicators[currentCarouselIndex])
-        indicators[currentCarouselIndex].classList.remove("active");
-
-      currentCarouselIndex = (currentCarouselIndex + 1) % total;
-
-      images[currentCarouselIndex].classList.add("active");
-
-      if (indicators[currentCarouselIndex])
-        indicators[currentCarouselIndex].classList.add("active");
-    }
-
-    // Ir a imagen específica
-
-    function goToImage(index) {
-      const images = document.querySelectorAll(".carousel-image");
-
-      const indicators = document.querySelectorAll(".indicator");
-
-      if (images.length === 0) return;
-
-      images[currentCarouselIndex].classList.remove("active");
-
-      if (indicators[currentCarouselIndex])
-        indicators[currentCarouselIndex].classList.remove("active");
-
-      currentCarouselIndex = index;
-
-      images[currentCarouselIndex].classList.add("active");
-
-      if (indicators[currentCarouselIndex])
-        indicators[currentCarouselIndex].classList.add("active");
-
-      // Reiniciar carrusel automático
-
-      if (carouselInterval) {
-        clearInterval(carouselInterval);
-
-        startCarousel(images.length);
-      }
-    }
-
-    // Función para text-to-speech
-
-    let isPaused = false;
-
-    function speakDescription(text, title) {
-      if ("speechSynthesis" in window) {
-        speechSynthesis.cancel(); // detener cualquier lectura anterior
-
-        const fullText = `${title}. ${text}`;
-
-        const utterance = new SpeechSynthesisUtterance(fullText);
-
-        utterance.lang = currentLang === "es" ? "es-MX" : "en-US";
-
-        utterance.rate = 0.8;
-
-        const speakBtn = document.querySelector(".speak-btn");
-
-        const pauseBtn = document.getElementById("pauseBtn");
-
-        if (speakBtn) {
-          const originalText = speakBtn.innerHTML;
-
-          speakBtn.innerHTML = "⏸️ Reproduciendo...";
-
-          speakBtn.disabled = true;
-
-          if (pauseBtn) {
-            pauseBtn.style.display = "inline-block";
-
-            pauseBtn.innerText = "⏸️ Pausar";
-
-            isPaused = false;
-          }
-
-          utterance.onend = () => {
-            speakBtn.innerHTML = originalText;
-
-            speakBtn.disabled = false;
-
-            if (pauseBtn) {
-              pauseBtn.style.display = "none";
-            }
-
-            isPaused = false;
-          };
-
-          utterance.onerror = () => {
-            speakBtn.innerHTML = originalText;
-
-            speakBtn.disabled = false;
-
-            if (pauseBtn) {
-              pauseBtn.style.display = "none";
-            }
-
-            isPaused = false;
-          };
+      utterance.onend = () => {
+        speakBtn.innerHTML = originalText;
+        speakBtn.disabled = false;
+        if (pauseBtn) {
+          pauseBtn.style.display = 'none';
         }
+        isPaused = false;
+      };
 
-        speechSynthesis.speak(utterance);
-      }
-    }
-
-    function toggleSpeech() {
-      const pauseBtn = document.getElementById("pauseBtn");
-
-      if ("speechSynthesis" in window && speechSynthesis.speaking) {
-        if (isPaused) {
-          speechSynthesis.resume();
-
-          pauseBtn.innerText = "⏸️ Pausar";
-
-          isPaused = false;
-        } else {
-          speechSynthesis.pause();
-
-          pauseBtn.innerText = "▶️ Reanudar";
-
-          isPaused = true;
+      utterance.onerror = () => {
+        speakBtn.innerHTML = originalText;
+        speakBtn.disabled = false;
+        if (pauseBtn) {
+          pauseBtn.style.display = 'none';
         }
-      }
+        isPaused = false;
+      };
     }
 
-    // Centrar mapa en sitio específico
+    speechSynthesis.speak(utterance);
+  }
+}
 
-    function centerMapOnSite(lat, lng) {
-      map.setView([lat, lng], 16);
-
-      closeSidebar();
-    }
-
-    // Geolocalización
-
-    if (navigator.geolocation) {
-      navigator.geolocation.watchPosition(onLocationFound, onLocationError, {
-        enableHighAccuracy: true,
-
-        timeout: 10000,
-
-        maximumAge: 0,
-      });
+function toggleSpeech() {
+  const pauseBtn = document.getElementById('pauseBtn');
+  if ('speechSynthesis' in window && speechSynthesis.speaking) {
+    if (isPaused) {
+      speechSynthesis.resume();
+      pauseBtn.innerText = '⏸️ Pausar';
+      isPaused = false;
     } else {
-      console.log(
-        "La geolocalización no está disponible en este dispositivo."
-      );
+      speechSynthesis.pause();
+      pauseBtn.innerText = '▶️ Reanudar';
+      isPaused = true;
     }
+  }
+}
 
-    function onLocationFound(position) {
-      const userLocation = L.latLng(
-        position.coords.latitude,
-        position.coords.longitude
-      );
 
-      if (!userMarker) {
-        userMarker = L.marker(userLocation)
-          .addTo(map)
-          .bindPopup("Tu ubicación")
-          .openPopup();
-      } else {
-        userMarker.setLatLng(userLocation);
-      }
 
-    if (selectedSite && selectedRouteLine) {
+
+// Centrar mapa en sitio específico
+function centerMapOnSite(lat, lng) {
+map.setView([lat, lng], 16);
+closeSidebar();
+}
+
+// Geolocalización
+if (navigator.geolocation) {
+navigator.geolocation.watchPosition(onLocationFound, onLocationError, {
+enableHighAccuracy: true,
+timeout: 10000,
+maximumAge: 0
+});
+} else {
+console.log('La geolocalización no está disponible en este dispositivo.');
+}
+
+function onLocationFound(position) {
+const userLocation = L.latLng(position.coords.latitude, position.coords.longitude);
+if (!userMarker) {
+userMarker = L.marker(userLocation).addTo(map).bindPopup('Tu ubicación').openPopup();
+} else {
+userMarker.setLatLng(userLocation);
+}
+
+if (selectedSite && activeRouteType === 'selected') {
   drawRouteToSite(selectedSite.lat, selectedSite.lng, selectedSite.name);
 }
 
-    }
-
-    function onLocationError(e) {
-      console.error("Error de geolocalización:", e.message);
-    }
-
-    // Funciones de rutas (manteniendo la funcionalidad original)
-
-    function getOSRMRoute(sites) {
-      const coordinates = sites
-        .map((site) => `${site.lng},${site.lat}`)
-        .join(";");
-
-      const url = `https://router.project-osrm.org/route/v1/driving/${coordinates}?overview=full&geometries=geojson`;
-
-      fetch(url)
-        .then((res) => res.json())
-
-        .then((data) => {
-          const coords = data.routes[0].geometry.coordinates.map((c) => [
-            c[1],
-            c[0],
-          ]);
-
-          if (blueRouteLine) {
-            map.removeLayer(blueRouteLine);
-          }
-
-          blueRouteLine = L.polyline(coords, {
-            color: "blue",
-            weight: 4,
-          }).addTo(map);
-
-          updateRouteUI();
-        })
-
-        .catch((err) => console.error("Error al trazar ruta:", err));
-    }
-
-    function drawRouteToSite(destLat, destLng, siteName) {
-      if (!userMarker) {
-        console.log("Ubicación del usuario no disponible.");
-
-        return;
-      }
-
-      const userLocation = userMarker.getLatLng();
-
-      const start = `${userLocation.lng},${userLocation.lat}`;
-
-      const end = `${destLng},${destLat}`;
-
-      const url = `https://router.project-osrm.org/route/v1/driving/${start};${end}?overview=full&geometries=geojson`;
-
-      if (blueRouteLine) {
-        map.removeLayer(blueRouteLine);
-
-        blueRouteLine = null;
-      }
-
-      fetch(url)
-        .then((res) => res.json())
-
-        .then((data) => {
-          const coords = data.routes[0].geometry.coordinates.map((c) => [
-            c[1],
-            c[0],
-          ]);
-
-          if (selectedRouteLine) map.removeLayer(selectedRouteLine);
-
-          selectedRouteLine = L.polyline(coords, {
-            color: "red",
-
-            weight: 5,
-          }).addTo(map);
-
-          if (!userMovedMap) {
-            map.fitBounds(selectedRouteLine.getBounds());
-          }
-
-          const dist = (
-            userLocation.distanceTo([destLat, destLng]) / 1000
-          ).toFixed(2);
-
-          document.getElementById(
-            "distance"
-          ).innerText = `${translations[currentLang].distance}: ${dist} km`;
-
-          selectedSite = { lat: destLat, lng: destLng, name: siteName };
-
-          localStorage.setItem("selectedSite", JSON.stringify(selectedSite));
-
-          updateRouteUI();
-        })
-
-        .catch((err) => {
-          console.error("Error al trazar ruta:", err);
-        });
-    }
-
-    // Crear menú de sitios - SOLO ABRE EL PANEL LATERAL (sin afectar el mapa)
-
-    function createSiteMenu() {
-      const container = document.getElementById("siteButtons");
-
-      container.innerHTML = "";
-
-      sites.forEach((site, index) => {
-        const btn = document.createElement("button");
-
-        btn.className = "btn-red-vino";
-
-        btn.innerText = `${index + 1}. ${site.name}`;
-
-        btn.onclick = () => {
-          // SOLO abrir panel lateral (SIN centrar mapa, SIN mostrar popup, SIN crear ruta)
-
-          openSidebar(site.name);
-        };
-
-        container.appendChild(btn);
-      });
-    }
-
-    // Cambio de idioma
-
-    document.getElementById("btnEs").addEventListener("click", () => {
-      currentLang = "es";
-
-      updateUI();
-    });
-
-    document.getElementById("btnEn").addEventListener("click", () => {
-      currentLang = "en";
-
-      updateUI();
-    });
-
-    // Event listeners para botones de control de rutas
-
-    document
-      .getElementById("cancelRouteBtn")
-      .addEventListener("click", cancelActiveRoute);
-
-    document
-      .getElementById("clearAllRoutesBtn")
-      .addEventListener("click", clearAllRoutes);
-
-    function updateUI() {
-      document.querySelector("#description p").innerText =
-        translations[currentLang].welcome;
-
-      // Actualizar popups simples de los marcadores
-
-      markers.forEach(({ marker, site }) => {
-        marker.setPopupContent(createSimplePopup(site));
-      });
-
-      closeSidebar();
-
-      updateRouteUI();
-    }
-
-    // Botón ver recorrido completo
-
-    document.getElementById("startRouteBtn").addEventListener("click", () => {
-      // Limpiar rutas específicas si existen
-
-      iclearExistingRoutes();
-
-      localStorage.removeItem("selectedSite");
-
-      document.getElementById("distance").innerText =
-        "Distancia al destino: -";
-
-      // Mostrar ruta completa
-
-      if (!blueRouteLine) {
-        getOSRMRoute(sites);
-      } else {
-        // Si ya existe, ajustar vista del mapa
-
-        map.fitBounds(blueRouteLine.getBounds());
-      }
-
-      updateRouteUI();
-    });
-
-    // Botón ir al primer sitio (sitio más cercano)
-
-    document.getElementById("startTourBtn").addEventListener("click", () => {
-      if (!userMarker) {
-        console.log("Ubicación del usuario no disponible.");
-
-        return;
-      }
-
-      const userLocation = userMarker.getLatLng();
-
-      const nearest = sites.reduce((a, b) => {
-        const d1 = userLocation.distanceTo([a.lat, a.lng]);
-
-        const d2 = userLocation.distanceTo([b.lat, b.lng]);
-
-        return d1 < d2 ? a : b;
-      });
-
-      const start = `${userLocation.lng},${userLocation.lat}`;
-
-      const end = `${nearest.lng},${nearest.lat}`;
-
-      const url = `https://router.project-osrm.org/route/v1/driving/${start};${end}?overview=full&geometries=geojson`;
-
-      // Limpiar ruta azul si existe
-
-      if (blueRouteLine) {
-        map.removeLayer(blueRouteLine);
-
-        blueRouteLine = null;
-      }
-
-      fetch(url)
-        .then((res) => res.json())
-
-        .then((data) => {
-          const coords = data.routes[0].geometry.coordinates.map((c) => [
-            c[1],
-            c[0],
-          ]);
-
-          if (routeToStartLine) map.removeLayer(routeToStartLine);
-
-          routeToStartLine = L.polyline(coords, {
-            color: "green",
-
-            weight: 5,
-
-            dashArray: "10,5",
-          }).addTo(map);
-
-          map.fitBounds(routeToStartLine.getBounds());
-
-          // Mostrar información del sitio más cercano
-
-          const dist = (
-            userLocation.distanceTo([nearest.lat, nearest.lng]) / 1000
-          ).toFixed(2);
-
-          document.getElementById(
-            "distance"
-          ).innerText = `${translations[currentLang].distance}: ${dist} km`;
-
-          updateRouteUI();
-        })
-
-        .catch((err) => {
-          console.error("Error al trazar ruta:", err);
-        });
-    });
-
-    // Al cargar la página
-
-    window.addEventListener("load", () => {
-      const saved = localStorage.getItem("selectedSite");
-
-      if (saved && activeRouteType === "selected") {
-        const site = JSON.parse(saved);
-
-        selectedSite = site;
-
-        drawRouteToSite(site.lat, site.lng, site.name);
-      }
-    });
-
-    // Inicializar
-
-    getOSRMRoute(sites);
-
-    createSiteMenu();
-
-    // Limpiar recursos al cerrar
-
-    window.addEventListener("beforeunload", function () {
-      if (carouselInterval) {
-        clearInterval(carouselInterval);
-      }
-
-      if ("speechSynthesis" in window) {
-        speechSynthesis.cancel();
-      }
-    });
-
-    // Manejar cambios de visibilidad de la página
-
-    document.addEventListener("visibilitychange", function () {
-      if (document.hidden) {
-        if (carouselInterval) {
-          clearInterval(carouselInterval);
-        }
-      } else {
-        const images = document.querySelectorAll(".carousel-image");
-
-        if (images.length > 1) {
-          startCarousel(images.length);
-        }
-      }
-    });
-    async function getDistanceAndDurationORS(startLat, startLng, endLat, endLng) {
-  const body = {
-    coordinates: [[startLng, startLat], [endLng, endLat]],
-    format: "json"
-  };
-
-  const response = await fetch("https://api.openrouteservice.org/v2/directions/driving-car", {
-    method: "POST",
-    headers: {
-      "Authorization": "5b3ce3597851110001cf6248bfa609e880e842169522544426e3be9e",
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(body)
-  });
-
-  if (!response.ok) throw new Error("Fallo al obtener ruta desde ORS");
-
-  const data = await response.json();
-  const distance = data.routes[0].summary.distance; // metros
-  const duration = data.routes[0].summary.duration; // segundos
-
-  return {
-    distance: (distance / 1000).toFixed(2), // km
-    duration: Math.ceil(duration / 60)      // minutos
-  };
 }
 
-  </script>
-</body>
+function onLocationError(e) {
+console.error('Error de geolocalización:', e.message);
+}
 
+// Funciones de rutas (manteniendo la funcionalidad original)
+function getOSRMRoute(sites) {
+const coordinates = sites.map(site => `${site.lng},${site.lat}`).join(';');
+const url = `https://router.project-osrm.org/route/v1/driving/${coordinates}?overview=full&geometries=geojson`;
+fetch(url)
+.then(res => res.json())
+.then(data => {
+const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+if (blueRouteLine) {
+map.removeLayer(blueRouteLine);
+}
+blueRouteLine = L.polyline(coords, { color: 'blue', weight: 4 }).addTo(map);
+updateRouteUI();
+})
+.catch(err => console.error('Error al trazar ruta:', err));
+}
+
+function drawRouteToSite(destLat, destLng, siteName) {
+if (!userMarker) {
+console.log('Ubicación del usuario no disponible.');
+return;
+}
+const userLocation = userMarker.getLatLng();
+const start = `${userLocation.lng},${userLocation.lat}`;
+const end = `${destLng},${destLat}`;
+const url = `https://router.project-osrm.org/route/v1/driving/${start};${end}?overview=full&geometries=geojson`;
+if (blueRouteLine) {
+map.removeLayer(blueRouteLine);
+blueRouteLine = null;
+}
+fetch(url)
+.then(res => res.json())
+.then(data => {
+const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+if (selectedRouteLine) map.removeLayer(selectedRouteLine);
+selectedRouteLine = L.polyline(coords, {
+color: 'red',
+weight: 5
+}).addTo(map);
+if (!userMovedMap) {
+  map.fitBounds(selectedRouteLine.getBounds());
+}
+
+const dist = (userLocation.distanceTo([destLat, destLng]) / 1000).toFixed(2);
+document.getElementById('distance').innerText = `${translations[currentLang].distance}: ${dist} km`;
+selectedSite = { lat: destLat, lng: destLng, name: siteName };
+localStorage.setItem('selectedSite', JSON.stringify(selectedSite));
+updateRouteUI();
+})
+.catch(err => {
+console.error('Error al trazar ruta:', err);
+});
+}
+
+// Crear menú de sitios - SOLO ABRE EL PANEL LATERAL (sin afectar el mapa)
+function createSiteMenu() {
+const container = document.getElementById('siteButtons');
+container.innerHTML = '';
+sites.forEach((site, index) => {
+const btn = document.createElement('button');
+btn.className = 'btn-red-vino';
+btn.innerText = `${index + 1}. ${site.name}`;
+
+btn.onclick = () => {
+// SOLO abrir panel lateral (SIN centrar mapa, SIN mostrar popup, SIN crear ruta)
+openSidebar(site.name);
+};
+container.appendChild(btn);
+});
+}
+
+// Cambio de idioma
+document.getElementById('btnEs').addEventListener('click', () => {
+currentLang = 'es';
+updateUI();
+});
+document.getElementById('btnEn').addEventListener('click', () => {
+currentLang = 'en';
+updateUI();
+});
+
+// Event listeners para botones de control de rutas
+document.getElementById('cancelRouteBtn').addEventListener('click', cancelActiveRoute);
+document.getElementById('clearAllRoutesBtn').addEventListener('click', clearAllRoutes);
+
+function updateUI() {
+document.querySelector('#description p').innerText = translations[currentLang].welcome;
+// Actualizar popups simples de los marcadores
+markers.forEach(({ marker, site }) => {
+marker.setPopupContent(createSimplePopup(site));
+});
+closeSidebar();
+updateRouteUI();
+}
+
+// Botón ver recorrido completo
+document.getElementById('startRouteBtn').addEventListener('click', () => {
+// Limpiar rutas específicas si existen
+if (selectedRouteLine) {
+map.removeLayer(selectedRouteLine);
+selectedRouteLine = null;
+}
+if (routeToStartLine) {
+map.removeLayer(routeToStartLine);
+routeToStartLine = null;
+}
+selectedSite = null;
+localStorage.removeItem('selectedSite');
+document.getElementById('distance').innerText = 'Distancia al destino: -';
+
+// Mostrar ruta completa
+if (!blueRouteLine) {
+getOSRMRoute(sites);
+} else {
+// Si ya existe, ajustar vista del mapa
+map.fitBounds(blueRouteLine.getBounds());
+}
+updateRouteUI();
+});
+
+// Botón ir al primer sitio (sitio más cercano)
+document.getElementById('startTourBtn').addEventListener('click', () => {
+if (!userMarker) {
+console.log('Ubicación del usuario no disponible.');
+return;
+}
+
+const userLocation = userMarker.getLatLng();
+const nearest = sites.reduce((a, b) => {
+const d1 = userLocation.distanceTo([a.lat, a.lng]);
+const d2 = userLocation.distanceTo([b.lat, b.lng]);
+return d1 < d2 ? a : b;
+});
+
+const start = `${userLocation.lng},${userLocation.lat}`;
+const end = `${nearest.lng},${nearest.lat}`;
+const url = `https://router.project-osrm.org/route/v1/driving/${start};${end}?overview=full&geometries=geojson`;
+
+// Limpiar ruta azul si existe
+if (blueRouteLine) {
+map.removeLayer(blueRouteLine);
+blueRouteLine = null;
+}
+
+fetch(url)
+.then(res => res.json())
+.then(data => {
+const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+if (routeToStartLine) map.removeLayer(routeToStartLine);
+routeToStartLine = L.polyline(coords, {
+color: 'green',
+weight: 5,
+dashArray: '10,5'
+}).addTo(map);
+map.fitBounds(routeToStartLine.getBounds());
+
+// Mostrar información del sitio más cercano
+const dist = (userLocation.distanceTo([nearest.lat, nearest.lng]) / 1000).toFixed(2);
+document.getElementById('distance').innerText = `${translations[currentLang].distance}: ${dist} km`;
+
+updateRouteUI();
+})
+.catch(err => {
+console.error('Error al trazar ruta:', err);
+});
+});
+
+// Al cargar la página
+window.addEventListener('load', () => {
+const saved = localStorage.getItem('selectedSite');
+  if (saved && activeRouteType === 'selected') {
+    const site = JSON.parse(saved);
+    selectedSite = site;
+    drawRouteToSite(site.lat, site.lng, site.name);
+  }
+});
+
+
+// Inicializar
+getOSRMRoute(sites);
+createSiteMenu();
+
+// Limpiar recursos al cerrar
+window.addEventListener('beforeunload', function() {
+if (carouselInterval) {
+clearInterval(carouselInterval);
+}
+if ('speechSynthesis' in window) {
+speechSynthesis.cancel();
+}
+});
+
+// Manejar cambios de visibilidad de la página
+document.addEventListener('visibilitychange', function() {
+if (document.hidden) {
+if (carouselInterval) {
+clearInterval(carouselInterval);
+}
+} else {
+const images = document.querySelectorAll('.carousel-image');
+if (images.length > 1) {
+startCarousel(images.length);
+}
+}
+});
+</script>
+</body>
 </html>
