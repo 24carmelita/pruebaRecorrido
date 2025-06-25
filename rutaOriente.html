@@ -823,7 +823,7 @@
 <body>
   <header>
     <img src="img/LogoINAH_Dorado.png" alt="Logo" class="logo" />
-    <img src="img/logosubacuatica2.png" alt="Logo" class="logo" />
+
     
 
     <h1>Recorrido turistico cultural lado oriente</h1>
@@ -1627,6 +1627,34 @@ ${translations[currentLang].goToRoute}
       clearBtn.textContent = translations[currentLang].clearAll;
     }
 
+
+
+function clearExistingRoutes() {
+  if (selectedRouteLine && map.hasLayer(selectedRouteLine)) {
+    map.removeLayer(selectedRouteLine);
+    selectedRouteLine = null;
+  }
+
+  if (routeToStartLine && map.hasLayer(routeToStartLine)) {
+    map.removeLayer(routeToStartLine);
+    routeToStartLine = null;
+  }
+
+  if (blueRouteLine && map.hasLayer(blueRouteLine)) {
+    map.removeLayer(blueRouteLine);
+    blueRouteLine = null;
+  }
+
+  selectedSite = null;
+  localStorage.removeItem("selectedSite");
+  document.getElementById("distance").innerText = "Distancia al destino: -";
+}
+
+
+
+
+
+
     // Cancelar ruta activa
 
     function cancelActiveRoute() {
@@ -2345,19 +2373,7 @@ ${translations[currentLang].nextImage} ❯
     document.getElementById("startRouteBtn").addEventListener("click", () => {
       // Limpiar rutas específicas si existen
 
-      if (selectedRouteLine) {
-        map.removeLayer(selectedRouteLine);
-
-        selectedRouteLine = null;
-      }
-
-      if (routeToStartLine) {
-        map.removeLayer(routeToStartLine);
-
-        routeToStartLine = null;
-      }
-
-      selectedSite = null;
+      iclearExistingRoutes();
 
       localStorage.removeItem("selectedSite");
 
