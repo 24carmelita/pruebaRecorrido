@@ -1653,19 +1653,26 @@ clearInterval(carouselInterval);
 // Calcular distancia si hay ubicación del usuario
 let distanceInfo = '';
 if (userMarker) {
-const userPos = userMarker.getLatLng();
-const sitePos = L.latLng([site.lat, site.lng]);
-const distance = userPos.distanceTo(sitePos);
-const distanceText = distance > 1000
-? `${(distance / 1000).toFixed(2)} ${translations[currentLang].kilometers}`
-: `${Math.round(distance)} ${translations[currentLang].meters}`;
-distanceInfo = `
-<div class="distance-info">
-<span class="distance-label">${translations[currentLang].distance}:</span>
-<span class="distance-value">${distanceText}</span>
-</div>
-`;
+  const userPos = userMarker.getLatLng();
+  const sitePos = L.latLng([site.lat, site.lng]);
+  const distance = userPos.distanceTo(sitePos);
+
+  const distanceKm = (distance / 1000).toFixed(2);
+  const averageSpeedKmh = 30; // Asumimos velocidad promedio en coche
+  const estimatedTimeMin = Math.ceil((distanceKm / averageSpeedKmh) * 60);
+
+  const distanceText = distance > 1000
+    ? `${distanceKm} ${translations[currentLang].kilometers}`
+    : `${Math.round(distance)} ${translations[currentLang].meters}`;
+
+  distanceInfo = `
+    <div class="distance-info">
+      <span class="distance-label">${translations[currentLang].distance}:</span>
+      <span class="distance-value">${distanceText} • ${estimatedTimeMin} min</span>
+    </div>
+  `;
 }
+
 const siteData = translations[currentLang][siteName];
 const images = siteData.images || [site.image];
 sidebarContent.innerHTML = `
@@ -1986,24 +1993,35 @@ function drawRouteToSite(destLat, destLng, siteName) {
   fetch(url)
     .then(res => res.json())
     .then(data => {
-      const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
-      selectedRouteLine = L.polyline(coords, {
-        color: 'red',
-        weight: 5
-      }).addTo(map);
+  const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+  selectedRouteLine = L.polyline(coords, {
+    color: 'red',
+    weight: 5
+  }).addTo(map);
 
-      if (!userMovedMap) {
-        map.fitBounds(selectedRouteLine.getBounds());
-      }
+  if (!userMovedMap) {
+    map.fitBounds(selectedRouteLine.getBounds());
+  }
 
-      const dist = (userLocation.distanceTo([destLat, destLng]) / 1000).toFixed(2);
-      document.getElementById('distance').innerText = `${translations[currentLang].distance}: ${dist} km`;
+  // Calcular distancia
+  const dist = (userLocation.distanceTo([destLat, destLng]) / 1000).toFixed(2);
 
-      selectedSite = { lat: destLat, lng: destLng, name: siteName };
-      localStorage.setItem('selectedSite', JSON.stringify(selectedSite));
-      activeRouteType = 'selected';
-      updateRouteUI();
-    })
+  // Calcular tiempo estimado desde la duración que da OSRM
+  const durationSec = data.routes[0].duration;
+  const durationMin = Math.ceil(durationSec / 60); // minutos redondeados hacia arriba
+
+  // Mostrar distancia + tiempo
+document.getElementById('distance').innerText =
+  `${translations[currentLang].distance}: ${dist} km`;
+
+  // Guardar el sitio como seleccionado
+  selectedSite = { lat: destLat, lng: destLng, name: siteName };
+  localStorage.setItem('selectedSite', JSON.stringify(selectedSite));
+
+  updateRouteUI();
+  activeRouteType = 'selected';
+})
+
     .catch(err => {
       console.error('Error al trazar ruta:', err);
     });
