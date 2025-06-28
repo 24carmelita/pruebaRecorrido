@@ -1584,9 +1584,10 @@ clearBtn.textContent = translations[currentLang].clearAll;
 // Cancelar ruta activa
 function cancelActiveRoute() {
   try {
-    // Esto es lo nuevo (debe ir antes que todo)
+    activeRouteType = null; // ← NUEVO
     selectedSite = null;
     localStorage.removeItem('selectedSite');
+
     document.getElementById('distance').innerText = 'Distancia al destino: -';
 
     if (selectedRouteLine && map.hasLayer(selectedRouteLine)) {
@@ -1609,8 +1610,10 @@ function cancelActiveRoute() {
 // Limpiar todas las rutas
 function clearAllRoutes() {
   try {
+    activeRouteType = null; // ← NUEVO
     selectedSite = null;
     localStorage.removeItem('selectedSite');
+
     document.getElementById('distance').innerText = 'Distancia al destino: -';
 
     if (selectedRouteLine && map.hasLayer(selectedRouteLine)) {
@@ -1633,6 +1636,7 @@ function clearAllRoutes() {
     console.error('Error al limpiar rutas:', error);
   }
 }
+
 
 
 
@@ -1910,17 +1914,22 @@ console.log('La geolocalización no está disponible en este dispositivo.');
 }
 
 function onLocationFound(position) {
-const userLocation = L.latLng(position.coords.latitude, position.coords.longitude);
-if (!userMarker) {
-userMarker = L.marker(userLocation).addTo(map).bindPopup('Tu ubicación').openPopup();
-} else {
-userMarker.setLatLng(userLocation);
-}
+  const userLocation = L.latLng(position.coords.latitude, position.coords.longitude);
 
-if (selectedSite && activeRouteType === 'selected') {
-  drawRouteToSite(selectedSite.lat, selectedSite.lng, selectedSite.name);
-}
+  if (!userMarker) {
+    userMarker = L.marker(userLocation).addTo(map).bindPopup('Tu ubicación').openPopup();
+  } else {
+    userMarker.setLatLng(userLocation);
+  }
 
+  if (selectedSite && activeRouteType === 'selected') {
+    drawRouteToSite(selectedSite.lat, selectedSite.lng, selectedSite.name);
+  } else {
+    if (selectedRouteLine && map.hasLayer(selectedRouteLine)) {
+      map.removeLayer(selectedRouteLine);
+      selectedRouteLine = null;
+    }
+  }
 }
 
 function onLocationError(e) {
@@ -1975,6 +1984,8 @@ document.getElementById('distance').innerText = `${translations[currentLang].dis
 selectedSite = { lat: destLat, lng: destLng, name: siteName };
 localStorage.setItem('selectedSite', JSON.stringify(selectedSite));
 updateRouteUI();
+activeRouteType = 'selected'; // ← ¡LÍNEA NUEVA AQUÍ!
+
 })
 .catch(err => {
 console.error('Error al trazar ruta:', err);
