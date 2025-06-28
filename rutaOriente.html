@@ -1584,21 +1584,25 @@ clearBtn.textContent = translations[currentLang].clearAll;
 // Cancelar ruta activa
 function cancelActiveRoute() {
   try {
-    activeRouteType = null; // ← NUEVO
+    activeRouteType = null;
     selectedSite = null;
     localStorage.removeItem('selectedSite');
 
     document.getElementById('distance').innerText = 'Distancia al destino: -';
 
+    // Borrar ruta roja (individual)
     if (selectedRouteLine && map.hasLayer(selectedRouteLine)) {
       map.removeLayer(selectedRouteLine);
       selectedRouteLine = null;
     }
 
+    // Borrar ruta verde (al sitio más cercano)
     if (routeToStartLine && map.hasLayer(routeToStartLine)) {
       map.removeLayer(routeToStartLine);
       routeToStartLine = null;
     }
+
+    // No se borra blueRouteLine aquí porque no es parte de rutas individuales
 
     updateRouteUI();
   } catch (error) {
@@ -1607,25 +1611,29 @@ function cancelActiveRoute() {
 }
 
 
+
 // Limpiar todas las rutas
 function clearAllRoutes() {
   try {
-    activeRouteType = null; // ← NUEVO
+    activeRouteType = null;
     selectedSite = null;
     localStorage.removeItem('selectedSite');
 
     document.getElementById('distance').innerText = 'Distancia al destino: -';
 
+    // Ruta roja
     if (selectedRouteLine && map.hasLayer(selectedRouteLine)) {
       map.removeLayer(selectedRouteLine);
       selectedRouteLine = null;
     }
 
+    // Ruta verde
     if (routeToStartLine && map.hasLayer(routeToStartLine)) {
       map.removeLayer(routeToStartLine);
       routeToStartLine = null;
     }
 
+    // Ruta azul (completa)
     if (blueRouteLine && map.hasLayer(blueRouteLine)) {
       map.removeLayer(blueRouteLine);
       blueRouteLine = null;
@@ -1912,7 +1920,6 @@ maximumAge: 0
 } else {
 console.log('La geolocalización no está disponible en este dispositivo.');
 }
-
 function onLocationFound(position) {
   const userLocation = L.latLng(position.coords.latitude, position.coords.longitude);
 
@@ -1952,45 +1959,53 @@ updateRouteUI();
 })
 .catch(err => console.error('Error al trazar ruta:', err));
 }
-
 function drawRouteToSite(destLat, destLng, siteName) {
-if (!userMarker) {
-console.log('Ubicación del usuario no disponible.');
-return;
-}
-const userLocation = userMarker.getLatLng();
-const start = `${userLocation.lng},${userLocation.lat}`;
-const end = `${destLng},${destLat}`;
-const url = `https://router.project-osrm.org/route/v1/driving/${start};${end}?overview=full&geometries=geojson`;
-if (blueRouteLine) {
-map.removeLayer(blueRouteLine);
-blueRouteLine = null;
-}
-fetch(url)
-.then(res => res.json())
-.then(data => {
-const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
-if (selectedRouteLine) map.removeLayer(selectedRouteLine);
-selectedRouteLine = L.polyline(coords, {
-color: 'red',
-weight: 5
-}).addTo(map);
-if (!userMovedMap) {
-  map.fitBounds(selectedRouteLine.getBounds());
+  if (!userMarker) {
+    console.log('Ubicación del usuario no disponible.');
+    return;
+  }
+
+  const userLocation = userMarker.getLatLng();
+  const start = `${userLocation.lng},${userLocation.lat}`;
+  const end = `${destLng},${destLat}`;
+  const url = `https://router.project-osrm.org/route/v1/driving/${start};${end}?overview=full&geometries=geojson`;
+
+  if (blueRouteLine) {
+    map.removeLayer(blueRouteLine);
+    blueRouteLine = null;
+  }
+
+  if (selectedRouteLine) {
+    map.removeLayer(selectedRouteLine);
+    selectedRouteLine = null; // ← AGREGADO
+  }
+
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+      selectedRouteLine = L.polyline(coords, {
+        color: 'red',
+        weight: 5
+      }).addTo(map);
+
+      if (!userMovedMap) {
+        map.fitBounds(selectedRouteLine.getBounds());
+      }
+
+      const dist = (userLocation.distanceTo([destLat, destLng]) / 1000).toFixed(2);
+      document.getElementById('distance').innerText = `${translations[currentLang].distance}: ${dist} km`;
+
+      selectedSite = { lat: destLat, lng: destLng, name: siteName };
+      localStorage.setItem('selectedSite', JSON.stringify(selectedSite));
+      updateRouteUI();
+      activeRouteType = 'selected'; // ← AGREGADO
+    })
+    .catch(err => {
+      console.error('Error al trazar ruta:', err);
+    });
 }
 
-const dist = (userLocation.distanceTo([destLat, destLng]) / 1000).toFixed(2);
-document.getElementById('distance').innerText = `${translations[currentLang].distance}: ${dist} km`;
-selectedSite = { lat: destLat, lng: destLng, name: siteName };
-localStorage.setItem('selectedSite', JSON.stringify(selectedSite));
-updateRouteUI();
-activeRouteType = 'selected'; // ← ¡LÍNEA NUEVA AQUÍ!
-
-})
-.catch(err => {
-console.error('Error al trazar ruta:', err);
-});
-}
 
 // Crear menú de sitios - SOLO ABRE EL PANEL LATERAL (sin afectar el mapa)
 function createSiteMenu() {
