@@ -2107,10 +2107,11 @@ console.error('Error al trazar ruta:', err);
 
 // Al cargar la página
 window.addEventListener('load', () => {
-const saved = localStorage.getItem('selectedSite');
-  if (saved && activeRouteType === 'selected') {
+  const saved = localStorage.getItem('selectedSite');
+  if (saved) {
     const site = JSON.parse(saved);
     selectedSite = site;
+    activeRouteType = 'selected'; // ← IMPORTANTE
     drawRouteToSite(site.lat, site.lng, site.name);
   }
 });
