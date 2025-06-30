@@ -215,9 +215,13 @@
 
     /* Carrusel de imágenes */
 
-    .image-carousel {
-      padding: 20px;
-    }
+   .image-carousel img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    object-position: center top;
+    border-radius: 8px;
+  }
 
     .carousel-container {
       position: relative;
@@ -864,6 +868,13 @@
 }
 
 }
+.image-carousel img {
+  width: 100%;
+  height: auto;
+  object-fit: cover; /* recorta para llenar el espacio sin deformar */
+  object-position: center top; /* muestra la parte superior (donde está el sitio) */
+}
+
 
   </style>
 </head>
@@ -1188,7 +1199,7 @@ images: ['imgPoniente/sanLucas1.jpg', 'imgPoniente/sanLucas2.jpg', 'imgPoniente/
 },
 'Museo de Arqueología Subacuática': {
 description: 'Esta construcción militar, ubicada sobre el “Cerro de las Tres Piedras”, se construyó a finales del siglo XVIII bajo las órdenes de José Sabido de Vargas, quien ejerció como teniente de rey entre los años 1784 y 1793.\n Cuenta con un foso, bóvedas de cañón corrido, aljibe y garitones que servían para la vigilancia del exterior.\n El camino sinuoso que lleva a la entrada servía para la defensa de ésta, pues imposibilitaba que pudiera ser destruida mediante un ataque de cañón, o bien, con troncos de madera u objetos metálicos.\n Actualmente alberga al Museo de Arqueología Subacuática, con una colección inigualable compuesta por más de 900 piezas procedentes de contextos arqueológicos sumergidos en aguas marinas del Golfo de México, Caribe Mexicano y aguas continentales de la península de Yucatán.\n La colección subacuática se ha realizado mediante el desarrollo de diversos proyectos en la región por parte de la Subdirección de Arqueología Subacuática del INAH a lo largo de cuatro décadas.\n Además, el recinto cuenta con la Declaratoria como Buena Práctica de la Convención UNESCO 2001 sobre la Protección del Patrimonio Cultural Subacuático, la cual tiene como objetivo fomentar la protección de este Patrimonio mediante la apropiación y visibilidad del mismo.',
-images: ['imgPoniente/sanLucas1.jpg', 'imgPoniente/sanLucas2.jpg', 'imgPoniente/sanLucas3.jpg']
+images: ['imgPoniente/museoArquiologia.jpg', 'imgPoniente/museoArquiologia2.jpg', 'imgPoniente/museoArquiologia3.jpg']
 }
 },
 'en': {
@@ -1250,7 +1261,7 @@ images: ['imgPoniente/sanLucas1.jpg', 'imgPoniente/sanLucas2.jpg', 'imgPoniente/
 },
 'Museo de Arqueología Subacuática': {
 description: 'This military construction, located on the “Cerro de las Tres Piedras” (Hill of the Three Stones), was built at the end of the 18th century under the orders of José Sabido de Vargas, who served as lieutenant of the king between 1784 and 1793.\n It features a moat, barrel vaults, a cistern, and sentry boxes that were used to monitor the exterior.\n The winding path leading to the entrance served as a defense mechanism, making it impossible to be destroyed by cannon fire or by wooden logs or metal objects.\n It currently houses the Museum of Underwater Archaeology, with an unparalleled collection of over 900 artifacts recovered from underwater archaeological contexts in the marine waters of the Gulf of Mexico, the Mexican Caribbean, and inland waters of the Yucatán Peninsula.\n This underwater collection has been assembled through various projects carried out in the region by the Subdirectorate of Underwater Archaeology of the INAH over the past four decades.\n Furthermore, the site has been granted recognition as a Good Practice under the 2001 UNESCO Convention on the Protection of the Underwater Cultural Heritage, which aims to promote the protection of this heritage through its visibility and public engagement.',
-images: ['imgPoniente/sanLucas1.jpg', 'imgPoniente/sanLucas2.jpg', 'imgPoniente/sanLucas3.jpg']
+images: ['imgPoniente/museoArquiologia.jpg', 'imgPoniente/museoArquiologia2.jpg', 'imgPoniente/museoArquiologia3.jpg']
 }
 }
 };
