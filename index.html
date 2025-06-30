@@ -33,6 +33,12 @@
       width: auto;
       transition: all 0.3s ease;
     }
+    .logo {
+  max-width: 100%;
+  height: auto;
+  transition: all 0.3s ease;
+}
+
 
     #language-selector {
       display: flex;
@@ -122,39 +128,71 @@ footer {
   text-align: center;
 }
 
+@media (max-width: 600px) {
+  header {
+    flex-direction: column;
+    text-align: center;
+  }
 
-    @media (max-width: 600px) {
-      header {
-        flex-direction: column;
-        text-align: center;
-      }
+  .logo {
+  height: 90px;
+  margin-bottom: 10px;
+}
 
-      .logo {
-        height: 70px;
-        margin-bottom: 10px;
-      }
+  #language-selector {
+    margin-top: 10px;
+  }
 
-      #language-selector {
-        margin-top: 10px;
-      }
+  .lang-btn {
+    font-size: 0.9em;
+    padding: 6px 12px;
+  }
 
-      .lang-btn {
-        font-size: 0.9em;
-        padding: 6px 12px;
-      }
-      
-    }
+  #title {
+    font-size: 1.8em;
+    line-height: 1.3;
+    margin: 10px 0;
+  }
+  .logo {
+    height: 110px;
+    max-width: 90%;
+}
+}
+
+.logos-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 10px;
+}
+
+.logo {
+  height: 60px;
+}
+
+.logo-secondary {
+  height: 55px;
+  opacity: 0.4; /* similar al difuminado de tu imagen */
+}
+
   </style>
 </head>
 <body>
-  <header>
-    <img src="img/LogoINAH_Dorado.png" alt="Logo" class="logo">
-    <h1 id="title">Recorido Turistico del Estado de Campeche</h1>
-    <div id="language-selector">
-      <button class="lang-btn" id="btn-es" onclick="changeLanguage('es')">Español</button>
-      <button class="lang-btn" id="btn-en" onclick="changeLanguage('en')">English</button>
-    </div>
-  </header>
+ <header>
+  <div class="logos-container">
+    <img src="img/LogoINAH_Dorado.png" alt="Logo INAH" class="logo">
+    <img src="img/logoSecundario.png" alt="Logo Secundario" class="logo-secondary">
+  </div>
+
+  <h1 id="title">Recorrido turístico cultural lado oriente</h1>
+
+  <div id="language-selector">
+    <button class="lang-btn" id="btn-es" onclick="changeLanguage('es')">🇲🇽 Español</button>
+    <button class="lang-btn" id="btn-en" onclick="changeLanguage('en')">🇺🇸 English</button>
+  </div>
+</header>
+
 
   <div id="main-content">
     <!-- Carrusel de imágenes -->
@@ -197,16 +235,18 @@ footer {
     </a>
   </div>
 <footer style="background-color:#702c37; color:#b38b28; text-align:center; padding:30px 10px; font-family: 'Arial', sans-serif;">
-  <div style="margin-bottom: 20px;">
-    <!-- Logo -->
-    <img src="img/LogoINAH_Dorado2.png" alt="Logo" style="width:90px; margin-bottom:10px;">
+  <div style="margin-bottom: 20px; display: flex; justify-content: center; align-items: center; gap: 20px;">
+    <!-- Logos -->
+    <img src="img/LogoINAH_Dorado2.png" alt="Logo INAH" style="width: 90px;">
+    <img src="img/logoSecundario.png" alt="Logo Secundario" style="width: 90px;">
   </div>
+
 
   <nav style="margin-bottom: 20px;">
     <a href="index.html" style="color:#b38b28; margin: 0 12px; text-decoration:none;">Inicio</a>
       <a href="acercaDe.html" style="color:#b38b28; margin: 0 12px; text-decoration:none;">Acerca De</a>
-    <a href="https://www.google.com/maps?q=19.843044,-90.538832" target="_blank" style="color:#b38b28; margin: 0 12px; text-decoration:none;">
-      Dirección
+   <a href="https://www.google.com/maps/place/Centro+INAH+Campeche/@19.8436519,-90.5397307,16.75z/data=!4m10!1m2!2m1!1sinah!3m6!1s0x85f833f03beef51f:0xbff37f2dee15b654!8m2!3d19.8427132!4d-90.5369075!15sCgRpbmFoIgOIAQGSARBjb3Jwb3JhdGVfb2ZmaWNlqgFFCg0vZy8xMWNra3l5NXh0EAEqCCIEaW5haCgOMh4QASIayUioQwwO0z0YdKzk3fHeSRetwHlMFJs-DXIyCBACIgRpbmFo4AEA!16s%2Fg%2F1tcwlxzc!5m1!1e4?entry=ttu&g_ep=EgoyMDI1MDYyMi4wIKXMDSoASAFQAw%3D%3D" target="_blank" style="color:#b38b28; margin: 0 12px; text-decoration:none;">
+      C. 59 39, Zona Centro, 24000 San Francisco de Campeche, Camp.
     </a>
     <a href="tel:+5211234567890" style="color:#b38b28; margin: 0 12px; text-decoration:none;">
       Contacto

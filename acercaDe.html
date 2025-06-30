@@ -25,8 +25,8 @@
     }
     .logo {
       height: 90px;
-      max-width: 80%;
       width: auto;
+      max-width: 100%;
       transition: all 0.3s ease;
     }
     #language-selector {
@@ -74,6 +74,20 @@
     a:hover {
       text-decoration: underline;
     }
+    .back-btn {
+      margin-top: 30px;
+      background-color: #702c37;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .back-btn:hover {
+      background-color: #8b2f41;
+    }
     footer {
       background-color: #702c37;
       color: #b38b28;
@@ -112,7 +126,10 @@
 </head>
 <body>
   <header>
-    <img src="img/LogoINAH_Dorado.png" alt="Logo" class="logo" />
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <img src="img/LogoINAH_Dorado.png" alt="Logo INAH" class="logo" />
+      <img src="img/logoSecundario.png" alt="Mi logo" class="logo" />
+    </div>
     <h1 id="title">Acerca de la aplicación</h1>
     <div id="language-selector">
       <button class="lang-btn" id="btn-es" onclick="changeLanguage('es')">Español</button>
@@ -123,16 +140,21 @@
   <div id="main-content">
     <h2 id="subtitle">Conoce más sobre este proyecto</h2>
     <p id="description"></p>
+
+    <button class="back-btn" onclick="window.location.href='index.html'">
+      ⬅ Volver al inicio
+    </button>
   </div>
 
   <footer>
-    <div style="margin-bottom: 20px;">
-      <img src="img/LogoINAH_Dorado2.png" alt="Logo" style="width:90px; margin-bottom:10px;" />
+    <div style="margin-bottom: 20px; display: flex; gap: 20px; align-items: center; justify-content: center;">
+      <img src="img/LogoINAH_Dorado2.png" alt="Logo INAH" style="width:90px;" />
+      <img src="img/logoSecundario.png" alt="Mi logo" style="width:90px;" />
     </div>
 
     <nav style="margin-bottom: 20px;">
       <a href="index.html">Inicio</a>
-      <a href="https://www.google.com/maps/place/Centro+INAH+Campeche/@19.8436519,-90.5397307,16.75z/data=!4m10!1m2!2m1!1sinah!3m6!1s0x85f833f03beef51f:0xbff37f2dee15b654!8m2!3d19.8427132!4d-90.5369075!15sCgRpbmFoIgOIAQGSARBjb3Jwb3JhdGVfb2ZmaWNlqgFFCg0vZy8xMWNra3l5NXh0EAEqCCIEaW5haCgOMh4QASIayUioQwwO0z0YdKzk3fHeSRetwHlMFJs-DXIyCBACIgRpbmFo4AEA!16s%2Fg%2F1tcwlxzc!5m1!1e4?entry=ttu" target="_blank">
+      <a href="https://www.google.com/maps/place/Centro+INAH+Campeche/" target="_blank">
         C. 59 39, Zona Centro, 24000 San Francisco de Campeche, Camp.
       </a>
       <a href="tel:+529818115510">Contacto</a>
@@ -146,28 +168,27 @@
     </div>
 
     <hr style="border-color: #8c5d54; width: 80%; margin-bottom: 15px;" />
-
-    <p style="font-size: 14px; margin: 0;">© 2025 Diana Todos los derechos reservados.</p>
+    <p style="font-size: 14px; margin: 0;">© 2025 Diana. Todos los derechos reservados.</p>
     <p style="font-weight: 600; font-size: 14px; margin: 5px 0 0 0;">DISEÑADO POR INAH CAMPECHE</p>
   </footer>
 
   <script>
- const translations = {
-  es: {
-    title: "Acerca de la aplicación",
-    subtitle: "Conoce más sobre este proyecto",
-    description: `
+    const translations = {
+      es: {
+        title: "Acerca de la aplicación",
+        subtitle: "Conoce más sobre este proyecto",
+        description: `
 La Subdirección de Arqueología Subacuática (SAS) del Instituto Nacional de Antropología e Historia (INAH) se encarga de investigar, conservar, proteger y difundir el Patrimonio Cultural Subacuático de México.
 
-<strong>¿QUÉ ES EL PATRIMONIO CULTURAL SUBACUÁTICO (PCS)?</strong>
+<strong>¿Qué es el Patrimonio Cultural Subacuático (PCS)?</strong>
 
 De acuerdo con la Convención de la UNESCO de 2001 sobre la Protección del Patrimonio Cultural Subacuático, el PCS está conformado por:
 
 “Todos los rastros de existencia humana que tengan un carácter cultural, histórico o arqueológico, que hayan estado bajo el agua, parcial o totalmente, de forma periódica o continua, por lo menos durante 100 años.”
 
-Esto incluye: sitios, estructuras, edificios, objetos y restos humanos, junto con su contexto arqueológico y natural; buques, aeronaves, otros medios de transporte o cualquier parte de ellos, su cargamento u otros contenidos, así como objetos de carácter prehistórico.
+Esto incluye sitios, estructuras, edificios, objetos y restos humanos, junto con su contexto arqueológico y natural; buques, aeronaves y otros medios de transporte o cualquier parte de ellos, su cargamento u otros contenidos, así como objetos de carácter prehistórico.
 
-<strong>¿QUÉ HAGO SI ENCUENTRO PATRIMONIO CULTURAL EN AGUAS MEXICANAS?</strong>
+<strong>¿Qué hago si encuentro patrimonio cultural en aguas mexicanas?</strong>
 
 Dado que el PCS es muy delicado y puede dañarse al cambiar de ambiente, es fundamental que te comuniques con el INAH para contribuir a su protección y evitar su destrucción o saqueo.
 
@@ -178,22 +199,22 @@ Ponte en contacto con la Oficina Regional de la Subdirección de Arqueología Su
 
 Con gusto recibiremos y atenderemos tu reporte.
 `
-  },
-  en: {
-    title: "About the App",
-    subtitle: "Learn more about this project",
-    description: `
+      },
+      en: {
+        title: "About the App",
+        subtitle: "Learn more about this project",
+        description: `
 The Underwater Archaeology Subdirectorate (SAS) of the National Institute of Anthropology and History (INAH) is responsible for researching, conserving, protecting, and promoting Mexico’s Underwater Cultural Heritage.
 
-<strong>WHAT IS UNDERWATER CULTURAL HERITAGE (UCH)?</strong>
+<strong>What is Underwater Cultural Heritage (UCH)?</strong>
 
 According to the 2001 UNESCO Convention on the Protection of Underwater Cultural Heritage, UCH is defined as:
 
 “All traces of human existence having a cultural, historical, or archaeological character which have been partially or totally underwater, periodically or continuously, for at least 100 years.”
 
-This includes: sites, structures, buildings, objects, and human remains, together with their archaeological and natural context; vessels, aircraft, and other vehicles or any part thereof, their cargo or other contents, and prehistoric items.
+This includes sites, structures, buildings, objects, and human remains, together with their archaeological and natural context; vessels, aircraft, and other vehicles or any part thereof, their cargo or other contents, and prehistoric items.
 
-<strong>WHAT SHOULD I DO IF I FIND CULTURAL HERITAGE IN MEXICAN WATERS?</strong>
+<strong>What should I do if I find cultural heritage in Mexican waters?</strong>
 
 Because UCH is very fragile and can be damaged when removed from its environment, it is essential to contact INAH to help protect it and prevent its destruction or looting.
 
@@ -204,9 +225,8 @@ Contact the Regional Office of the Underwater Archaeology Subdirectorate (SAS) i
 
 We will gladly receive and handle your report.
 `
-  }
-};
-
+      }
+    };
 
     function changeLanguage(lang) {
       document.getElementById('title').textContent = translations[lang].title;

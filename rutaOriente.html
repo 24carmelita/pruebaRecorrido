@@ -29,7 +29,8 @@
     }
 
     .logo {
-      position: absolute;
+      
+      
 
       top: 35px;
 
@@ -51,11 +52,13 @@
         left: 5px;
       }
 
-      header h1 {
-        font-size: 1.5em;
+     header h1 {
+  font-size: 1.6em;
+  text-align: center;
+  margin: 10px 0;
+  line-height: 1.3;
+}
 
-        padding: 10px 0;
-      }
     }
 
     .container {
@@ -351,26 +354,22 @@
     .site-description {
       padding: 0 20px 20px;
     }
+.site-description p {
+  line-height: 1.8; /* Mejora lectura */
+  letter-spacing: 0.3px; /* Espacio entre letras */
+  color: #374151;
+  margin: 0 auto 15px;
+  text-align: justify;
+  font-size: 14px;
+  background: #f9fafb;
+  padding: 15px;
+  border-radius: 10px;
+  border-left: 4px solid #8b0000;
+  white-space: pre-line; /* Respeta saltos de línea */
+  max-width: 95%; /* No ocupa todo el ancho */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08); /* Sombra suave */
+}
 
-    .site-description p {
-      line-height: 1.6;
-
-      color: #374151;
-
-      margin-bottom: 15px;
-
-      text-align: justify;
-
-      font-size: 14px;
-
-      background: #f9fafb;
-
-      padding: 15px;
-
-      border-radius: 10px;
-
-      border-left: 4px solid #8b0000;
-    }
 
     .action-buttons {
       display: flex;
@@ -714,31 +713,43 @@
     /* Responsive */
 
     @media (max-width: 768px) {
-      #sidebar {
-        width: 100%;
+  #sidebar {
+    width: 100%;
+    right: -100%;
+  }
 
-        right: -100%;
-      }
+  .carousel-images {
+    height: 200px;
+  }
 
-      .carousel-images {
-        height: 200px;
-      }
+  .sidebar-header {
+    padding: 15px;
+  }
 
-      .sidebar-header {
-        padding: 15px;
-      }
+  .sidebar-header h2 {
+    font-size: 1.2rem;
+  }
 
-      .sidebar-header h2 {
-        font-size: 1.2rem;
-      }
+  .image-carousel {
+    padding: 15px;
+  }
 
-      .image-carousel {
-        padding: 15px;
-      }
+  .site-description {
+    padding: 0 15px 15px;
+  }
 
-      .site-description {
-        padding: 0 15px 15px;
-      }
+  .site-description p {
+  font-size: 15px;
+  padding: 12px;
+  line-height: 1.8;
+  letter-spacing: 0.3px;
+  white-space: pre-line;
+  max-width: 95%;
+  margin: 0 auto 15px;
+}
+
+
+
 
       .route-controls {
         flex-direction: column;
@@ -772,6 +783,8 @@
     #sidebar::-webkit-scrollbar-thumb:hover {
       background: #94a3b8;
     }
+
+    
 
     @media (max-width: 768px) {
       #siteButtons button {
@@ -817,23 +830,58 @@
 
       box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
     }
+
+    @media screen and (max-width: 768px) {
+  header {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .lang-switch {
+    position: static;
+    margin-top: 10px;
+  }
+
+  header h1 {
+    font-size: 1.2em;
+    text-align: center;
+    margin: 10px 0;
+  }
+
+  header .logo {
+    height: 40px;
+  }
+
+  header img {
+    height: 40px;
+  }
+  header h1 {
+  font-size: 1.6em;
+  text-align: center;
+  margin: 10px 0;
+  line-height: 1.3;
+}
+
+}
+
   </style>
 </head>
 
 <body>
-  <header>
-    <img src="img/LogoINAH_Dorado.png" alt="Logo" class="logo" />
+<header style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 15px; padding: 10px 20px;">
+  <div style="display: flex; align-items: center; gap: 15px;">
+    <img src="img/LogoINAH_Dorado.png" alt="Logo INAH" class="logo" />
+    <img src="img/logoSecundario.png" alt="Mi logo" style="height: 50px;" />
+  </div>
 
-    
+  <h1 style="flex: 1 1 100%; text-align: center;">Recorrido turístico cultural lado oriente</h1>
 
-    <h1>Recorrido turistico cultural lado oriente</h1>
-
-    <div class="lang-switch">
-      <button id="btnEs" class="btn-red-vino">🇲🇽 Español</button>
-
-      <button id="btnEn" class="btn-red-vino">🇺🇸 English</button>
-    </div>
-  </header>
+  <div class="lang-switch">
+    <button id="btnEs" class="btn-red-vino">🇲🇽 Español</button>
+    <button id="btnEn" class="btn-red-vino">🇺🇸 English</button>
+  </div>
+</header>
 
   <div id="description">
     <p>
@@ -915,12 +963,11 @@
         padding: 30px 10px;
         font-family: 'Arial', sans-serif;
       ">
-    <div style="margin-bottom: 20px">
-      <!-- Logo -->
+   <div style="margin-bottom: 20px; display: flex; gap: 20px; justify-content: center; align-items: center;">
+  <img src="img/LogoINAH_Dorado2.png" alt="Logo INAH" style="width: 90px;" />
+  <img src="img/logoSecundario.png" alt="Mi logo" style="width: 90px;" />
+</div>
 
-      <img src="img/LogoINAH_Dorado2.png" alt="Logo" style="width: 90px; margin-bottom: 10px" />
-     
-    </div>
 
     <nav style="margin-bottom: 20px">
       <a href="index.html" style="color: #b38b28; margin: 0 12px; text-decoration: none">Inicio</a>
@@ -1139,7 +1186,7 @@
 
         "Vapor Lolá": {
           description:
-            "El Vapor Lolá es un emblemático buque de vapor de la marina mercante francesa que encalló frente a las costas de Campeche en 1864 debido a una maniobra errónea de su capitán, según una crónica que data del siglo XX. Con una eslora de 65 metros y una manga de 9.35 metros, esta embarcación representa un hito en la evolución de la tecnología marítima de la Revolución Industrial. Sus restos, visibles desde el malecón Justo Sierra Méndez, han sido reconocidos como Patrimonio Cultural Subacuático por el INAH desde 2007.",
+            "El Vapor Lolá es un emblemático buque de vapor de la marina mercante francesa que encalló frente a las costas de Campeche en 1864 debido a una maniobra errónea de su capitán, según una crónica que data del siglo XX.\nCon una eslora de 65 metros y una manga de 9.35 metros, esta embarcación representa un hito en la evolución de la tecnología marítima de la Revolución Industrial.\n Sus restos, visibles desde el malecón Justo Sierra Méndez, han sido reconocidos como Patrimonio Cultural Subacuático por el INAH desde 2007.",
 
           images: [
             "imgOriente/VaporLola1.jpg",
@@ -1150,7 +1197,7 @@
 
         "Batería de San Luis": {
           description:
-            "Construida en 1791 al pie del Fuerte de San Miguel, la Batería de San Luis es una fortificación costera clave en la defensa de Campeche durante el siglo XVIII. Diseñada para disparar fuego rasante y evitar desembarcos enemigos, esta estructura rectangular cuenta con un foso, garitas y espacios como cuarteles y almacenes de pólvora. En 1862, protagonizó un enfrentamiento con la cañonera francesa L’Eclair durante la Segunda Intervención Francesa en México. ",
+            "Construida en 1791 al pie del Fuerte de San Miguel, la Batería de San Luis es una fortificación costera clave en la defensa de Campeche durante el siglo XVIII.\n Diseñada para disparar fuego rasante y evitar desembarcos enemigos, esta estructura rectangular cuenta con un foso, garitas y espacios como cuarteles y almacenes de pólvora.\n En 1862, protagonizó un enfrentamiento con la cañonera francesa L’Eclair durante la Segunda Intervención Francesa en México. ",
 
           images: [
             "imgOriente/sanLuis1.jpg",
@@ -1161,7 +1208,7 @@
 
         "Fuerte de San Miguel": {
           description:
-            "El Reducto o Fuerte de San Miguel, diseñado por el ingeniero militar Agustín Crame y construido en el siglo XVIII, es una de las estructuras defensivas más importantes del puerto de Campeche. Se ubica en una colina al sur de la ciudad conocida como “Cerro de Buenavista”, ofreciendo una vista panorámica de la bahía de Campeche. Su función original fue la de vigilar la costa para evitar el desembarco de enemigos por la costa del poblado de Lerma, aún conserva cañones, un foso y su puente levadizo original. Hoy día, el fuerte alberga el Museo de Arqueología Maya, con una destacada colección de piezas provenientes de sitios arqueológicos como Calakmul, Edzná y Jaina.",
+            "El Reducto o Fuerte de San Miguel, diseñado por el ingeniero militar Agustín Crame y construido en el siglo XVIII, es una de las estructuras defensivas más importantes del puerto de Campeche.\n Se ubica en una colina al sur de la ciudad conocida como “Cerro de Buenavista”, ofreciendo una vista panorámica de la bahía de Campeche.\n Su función original fue la de vigilar la costa para evitar el desembarco de enemigos por la costa del poblado de Lerma, aún conserva cañones, un foso y su puente levadizo original. Hoy día, el fuerte alberga el Museo de Arqueología Maya, con una destacada colección de piezas provenientes de sitios arqueológicos como Calakmul, Edzná y Jaina.",
 
           images: [
             "imgOriente/sanMiguel1.jpg",
@@ -1172,7 +1219,7 @@
 
         "Parque de Lerma": {
           description:
-            "Ubicado en el corazón de la comunidad pesquera de Lerma, a solo 8 km de la ciudad de Campeche. Muy cerca de este parque se encontraba un reducto o fuerte de vigilancia costera que fue demolido a finales del siglo XIX. ¿Sabías que por esta costa desembarcaron piratas como Cristopher Mings, Edward Mansvelt, Laurens de Graaff “Lorencillo” y “Barbillas”? Este último saqueó e incendio el poblado de Lerma y secuestró al gobernador de Yucatán Fernando Meneses y Bravo, pidiendo un rescate para liberarlo. Enfrente se ubica la iglesia en honor a la Virgen de la Asunción construida en 1812, en el interior cerca de la sacristía se encuentra la lápida funeraria del ilustre marino campechano don Pedro Sáenz de Baranda y Quijano quién falleció en Lerma en 1891.",
+            "Ubicado en el corazón de la comunidad pesquera de Lerma, a solo 8 km de la ciudad de Campeche.\n Muy cerca de este parque se encontraba un reducto o fuerte de vigilancia costera que fue demolido a finales del siglo XIX.\n ¿Sabías que por esta costa desembarcaron piratas como Cristopher Mings, Edward Mansvelt, Laurens de Graaff “Lorencillo” y “Barbillas”? Este último saqueó e incendio el poblado de Lerma y secuestró al gobernador de Yucatán Fernando Meneses y Bravo, pidiendo un rescate para liberarlo.\n Enfrente se ubica la iglesia en honor a la Virgen de la Asunción construida en 1812, en el interior cerca de la sacristía se encuentra la lápida funeraria del ilustre marino campechano don Pedro Sáenz de Baranda y Quijano quién falleció en Lerma en 1891.",
 
           images: [
             "imgOriente/parqueLerma1.jpg",
@@ -1183,7 +1230,7 @@
 
         "Playa Bonita": {
           description:
-            "Playa Bonita es una de las playas más visitadas de Campeche, ubicada en el poblado de Lerma, a solo 15 minutos de la ciudad. De aguas tranquilas y arena clara, es ideal para familias y quienes buscan relajarse junto al mar. Cuenta con servicios básicos, restaurantes y áreas recreativas, lo que la convierte en un lugar cómodo y accesible para refrescarse y disfrutar las aguas del Golfo de México.",
+            "Playa Bonita es una de las playas más visitadas de Campeche, ubicada en el poblado de Lerma, a solo 15 minutos de la ciudad.\n De aguas tranquilas y arena clara, es ideal para familias y quienes buscan relajarse junto al mar.\n Cuenta con servicios básicos, restaurantes y áreas recreativas, lo que la convierte en un lugar cómodo y accesible para refrescarse y disfrutar las aguas del Golfo de México.",
 
           images: [
             "imgOriente/playaBonita1.jpg",
@@ -1247,7 +1294,7 @@
 
         "Vapor Lolá": {
           description:
-            "The Vapor Lolá is an iconic French merchant marine steamship that ran aground off the coast of Campeche in 1864 due to an erroneous maneuver by its captain, according to a 20th-century chronicle. Measuring 65 meters in length and 9.35 meters wide, this vessel represents a milestone in the evolution of maritime technology during the Industrial Revolution. Its remains, visible from the Justo Sierra Méndez seawall, have been recognized as Underwater Cultural Heritage by the INAH (National Institute of Natural History) since 2007.",
+            "The Vapor Lolá is an iconic French merchant marine steamship that ran aground off the coast of Campeche in 1864 due to an erroneous maneuver by its captain, according to a 20th-century chronicle.\n Measuring 65 meters in length and 9.35 meters wide, this vessel represents a milestone in the evolution of maritime technology during the Industrial Revolution.\n Its remains, visible from the Justo Sierra Méndez seawall, have been recognized as Underwater Cultural Heritage by the INAH (National Institute of Natural History) since 2007.",
 
           images: [
             "imgOriente/VaporLola1.jpg",
@@ -1258,7 +1305,7 @@
 
         "Batería de San Luis": {
           description:
-            "Built in 1791 at the foot of San Miguel Fort, the San Luis Battery is a key coastal fortification in the defense of Campeche during the 18th century. Designed to fire low and prevent enemy landings, this rectangular structure features a moat, sentry boxes, and spaces for barracks and gunpowder stores. In 1862, it was involved in a clash with the French gunboat  L'Eclair during the Second French Intervention in Mexico.",
+            "Built in 1791 at the foot of San Miguel Fort, the San Luis Battery is a key coastal fortification in the defense of Campeche during the 18th century.\n Designed to fire low and prevent enemy landings, this rectangular structure features a moat, sentry boxes, and spaces for barracks and gunpowder stores.\n In 1862, it was involved in a clash with the French gunboat  L'Eclair during the Second French Intervention in Mexico.",
 
           images: [
             "imgOriente/sanLuis1.jpg",
@@ -1269,7 +1316,7 @@
 
         "Fuerte de San Miguel": {
           description:
-            'The San Miguel Redoubt or Fort, designed by military engineer Agustín Crame and built in the 18th century, is one of the most important defensive structures in the port of Campeche. It is located on a hill south of the city known as "Cerro de Buenavista," offering a panoramic view of the Bay of Campeche. Its original function was to guard the coast to prevent enemy landings along the shore of the town of Lerma. It still preserves cannons, a moat, and its original drawbridge. Today, the fort houses the Museum of Maya Archaeology, with an outstanding collection of artifacts from archaeological sites such as Calakmul, Edzná, and Jaina.',
+            'The San Miguel Redoubt or Fort, designed by military engineer Agustín Crame and built in the 18th century, is one of the most important defensive structures in the port of Campeche.\n It is located on a hill south of the city known as "Cerro de Buenavista," offering a panoramic view of the Bay of Campeche.\n Its original function was to guard the coast to prevent enemy landings along the shore of the town of Lerma.\n It still preserves cannons, a moat, and its original drawbridge.\n Today, the fort houses the Museum of Maya Archaeology, with an outstanding collection of artifacts from archaeological sites such as Calakmul, Edzná, and Jaina.',
 
           images: [
             "imgOriente/sanMiguel1.jpg",
@@ -1280,7 +1327,7 @@
 
         "Parque de Lerma": {
           description:
-            'Located in the heart of the fishing community of Lerma, just 8 km from the city of Campeche. Very close to this park was a coastal redoubt or fort that was demolished at the end of the 19th century. Did you know that pirates such as Christopher Mings, Edward Mansvelt, Laurens de Graaff "Lorencillo," and "Barbillas" landed on this coast? The latter sacked and burned the town of Lerma and kidnapped the governor of Yucatán, Fernando Meneses y Bravo, demanding a ransom for his release. Opposite is the church in honor of the Virgin of the Assumption, built in 1812. Inside, near the sacristy, is the tombstone of the illustrious Campeche sailor Don Pedro Sáenz de Baranda y Quijano, who died in Lerma in 1891.',
+            'Located in the heart of the fishing community of Lerma, just 8 km from the city of Campeche.\n Very close to this park was a coastal redoubt or fort that was demolished at the end of the 19th century.\n Did you know that pirates such as Christopher Mings, Edward Mansvelt, Laurens de Graaff "Lorencillo," and "Barbillas" landed on this coast? The latter sacked and burned the town of Lerma and kidnapped the governor of Yucatán, Fernando Meneses y Bravo, demanding a ransom for his release.\n Opposite is the church in honor of the Virgin of the Assumption, built in 1812. Inside, near the sacristy, is the tombstone of the illustrious Campeche sailor Don Pedro Sáenz de Baranda y Quijano, who died in Lerma in 1891.',
 
           images: [
             "imgOriente/parqueLerma1.jpg",
@@ -1291,7 +1338,7 @@
 
         "Playa Bonita": {
           description:
-            "Playa Bonita is one of Campeche's most visited beaches, located in the town of Lerma, just 15 minutes from the city. With calm waters and clear sand, it's ideal for families and those looking to relax by the sea. It offers basic services, restaurants, and recreational areas, making it a comfortable and accessible place to cool off and enjoy the waters of the Gulf of Mexico.",
+            "Playa Bonita is one of Campeche's most visited beaches, located in the town of Lerma, just 15 minutes from the city. With calm waters and clear sand, it's ideal for families and those looking to relax by the sea.\n It offers basic services, restaurants, and recreational areas, making it a comfortable and accessible place to cool off and enjoy the waters of the Gulf of Mexico.",
 
           images: [
             "imgOriente/playaBonita1.jpg",

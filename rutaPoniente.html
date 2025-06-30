@@ -1,663 +1,1133 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Recorrido en Coche - Campeche</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recorrido en Coche - Campeche</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    body {
+      margin: 0;
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-<style>
-body {
-margin: 0;
-font-family: 'Segoe UI', sans-serif;
-background-color: #f8f8f8;
+      font-family: "Segoe UI", sans-serif;
+
+      background-color: #f8f8f8;
+    }
+
+    header {
+      background-color: #702c37;
+
+      color: #b38b28;
+
+      padding: 20px;
+
+      text-align: center;
+
+      position: relative;
+    }
+
+    .logo {
+      
+      
+
+      top: 35px;
+
+      left: 10px;
+
+      height: 50px;
+
+      width: auto;
+
+      transition: all 0.3s ease;
+    }
+
+    @media screen and (max-width: 768px) {
+      .logo {
+        height: 40px;
+
+        top: 5px;
+
+        left: 5px;
+      }
+
+     header h1 {
+  font-size: 1.6em;
+  text-align: center;
+  margin: 10px 0;
+  line-height: 1.3;
 }
-header {
-background-color: #702c37;
-color: #b38b28;
-padding: 20px;
-text-align: center;
-position: relative;
-}
-.logo {
-position: absolute;
-top: 35px;
-left: 10px;
-height: 50px;
-width: auto;
-transition: all 0.3s ease;
-}
-@media screen and (max-width: 768px) {
-.logo {
-height: 40px;
-top: 5px;
-left: 5px;
-}
-header h1 {
-font-size: 1.5em;
-padding: 10px 0;
-}
-}
-.container {
-display: flex;
-position: relative;
-height: 500px;
-width: 90%;
-max-width: 1200px;
-margin: 20px auto;
-border-radius: 15px;
-box-shadow: 0 0 15px #00000022;
-overflow: hidden;
-}
-#map {
-flex: 1;
-height: 100%;
-z-index: 1;
-}
-/* Panel lateral */
-#sidebar {
-position: absolute;
-top: 0;
-right: -400px;
-width: 400px;
-height: 100%;
-background: white;
-box-shadow: -4px 0 20px rgba(0,0,0,0.15);
-transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-z-index: 1000;
-overflow-y: auto;
-border-left: 3px solid #8B0000;
-}
-#sidebar.active {
-right: 0;
-}
-.sidebar-header {
-display: flex;
-justify-content: space-between;
-align-items: flex-start;
-padding: 20px;
-border-bottom: 2px solid #e5e7eb;
-background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-position: sticky;
-top: 0;
-z-index: 10;
-}
-.header-content {
-flex: 1;
-}
-.sidebar-header h2 {
-color: #8B0000;
-font-size: 1.4rem;
-margin: 0 0 8px 0;
-font-weight: 700;
-line-height: 1.3;
-}
-.distance-info {
-display: flex;
-align-items: center;
-gap: 8px;
-margin-top: 8px;
-}
-.distance-label {
-font-size: 14px;
-color: #6b7280;
-font-weight: 500;
-}
-.distance-value {
-font-size: 14px;
-color: #059669;
-font-weight: 600;
-background: #d1fae5;
-padding: 2px 8px;
-border-radius: 12px;
-}
-.close-btn {
-background: #8B0000;
-color: white;
-border: none;
-padding: 8px 12px;
-border-radius: 8px;
-cursor: pointer;
-font-size: 14px;
-font-weight: 600;
-transition: all 0.3s ease;
-margin-left: 15px;
-}
-.close-btn:hover {
-background: #a30000;
-}
-/* Carrusel de imágenes */
-.image-carousel {
-padding: 20px;
-}
-.carousel-container {
-position: relative;
-background: #f8fafc;
-border-radius: 12px;
-overflow: hidden;
-box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-border: 1px solid #e5e7eb;
-}
-.carousel-images {
-position: relative;
-height: 250px;
-overflow: hidden;
-}
-.carousel-image {
-position: absolute;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-object-fit: cover;
-opacity: 0;
-transition: opacity 0.6s ease-in-out;
-border-radius: 12px 12px 0 0;
-}
-.carousel-image.active {
-opacity: 1;
-}
-.carousel-controls {
-display: flex;
-justify-content: space-between;
-align-items: center;
-padding: 15px;
-background: white;
-}
-.carousel-btn {
-background: #8B0000;
-color: white;
-border: none;
-padding: 8px 12px;
-border-radius: 8px;
-cursor: pointer;
-font-size: 12px;
-font-weight: 600;
-transition: all 0.3s ease;
-}
-.carousel-btn:hover {
-background: #a30000;
-}
-.carousel-indicators {
-display: flex;
-gap: 8px;
-align-items: center;
-}
-.indicator {
-width: 10px;
-height: 10px;
-border-radius: 50%;
-background: #d1d5db;
-cursor: pointer;
-transition: all 0.3s ease;
-}
-.indicator.active {
-background: #8B0000;
-transform: scale(1.2);
-}
-.carousel-progress {
-height: 3px;
-background: #e5e7eb;
-position: relative;
-overflow: hidden;
-}
-.progress-bar {
-height: 100%;
-background: #8B0000;
-width: 0%;
-transition: none;
-}
-/* Descripción del sitio */
-.site-description {
-padding: 0 20px 20px;
-}
+
+    }
+
+    .container {
+      display: flex;
+
+      position: relative;
+
+      height: 500px;
+
+      width: 90%;
+
+      max-width: 1200px;
+
+      margin: 20px auto;
+
+      border-radius: 15px;
+
+      box-shadow: 0 0 15px #00000022;
+
+      overflow: hidden;
+    }
+
+    #map {
+      flex: 1;
+
+      height: 100%;
+
+      z-index: 1;
+    }
+
+    /* Panel lateral */
+
+    #sidebar {
+      position: absolute;
+
+      top: 0;
+
+      right: -400px;
+
+      width: 400px;
+
+      height: 100%;
+
+      background: white;
+
+      box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+
+      transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+      z-index: 1000;
+
+      overflow-y: auto;
+
+      border-left: 3px solid #8b0000;
+    }
+
+    #sidebar.active {
+      right: 0;
+    }
+
+    .sidebar-header {
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: flex-start;
+
+      padding: 20px;
+
+      border-bottom: 2px solid #e5e7eb;
+
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+
+      position: sticky;
+
+      top: 0;
+
+      z-index: 10;
+    }
+
+    .header-content {
+      flex: 1;
+    }
+
+    .sidebar-header h2 {
+      color: #8b0000;
+
+      font-size: 1.4rem;
+
+      margin: 0 0 8px 0;
+
+      font-weight: 700;
+
+      line-height: 1.3;
+    }
+
+    .distance-info {
+      display: flex;
+
+      align-items: center;
+
+      gap: 8px;
+
+      margin-top: 8px;
+    }
+
+    .distance-label {
+      font-size: 14px;
+
+      color: #6b7280;
+
+      font-weight: 500;
+    }
+
+    .distance-value {
+      font-size: 14px;
+
+      color: #059669;
+
+      font-weight: 600;
+
+      background: #d1fae5;
+
+      padding: 2px 8px;
+
+      border-radius: 12px;
+    }
+
+    .close-btn {
+      background: #8b0000;
+
+      color: white;
+
+      border: none;
+
+      padding: 8px 12px;
+
+      border-radius: 8px;
+
+      cursor: pointer;
+
+      font-size: 14px;
+
+      font-weight: 600;
+
+      transition: all 0.3s ease;
+
+      margin-left: 15px;
+    }
+
+    .close-btn:hover {
+      background: #a30000;
+    }
+
+    /* Carrusel de imágenes */
+
+    .image-carousel {
+      padding: 20px;
+    }
+
+    .carousel-container {
+      position: relative;
+
+      background: #f8fafc;
+
+      border-radius: 12px;
+
+      overflow: hidden;
+
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+      border: 1px solid #e5e7eb;
+    }
+
+    .carousel-images {
+      position: relative;
+
+      height: 250px;
+
+      overflow: hidden;
+    }
+
+    .carousel-image {
+      position: absolute;
+
+      top: 0;
+
+      left: 0;
+
+      width: 100%;
+
+      height: 100%;
+
+      object-fit: cover;
+
+      opacity: 0;
+
+      transition: opacity 0.6s ease-in-out;
+
+      border-radius: 12px 12px 0 0;
+    }
+
+    .carousel-image.active {
+      opacity: 1;
+    }
+
+    .carousel-controls {
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      padding: 15px;
+
+      background: white;
+    }
+
+    .carousel-btn {
+      background: #8b0000;
+
+      color: white;
+
+      border: none;
+
+      padding: 8px 12px;
+
+      border-radius: 8px;
+
+      cursor: pointer;
+
+      font-size: 12px;
+
+      font-weight: 600;
+
+      transition: all 0.3s ease;
+    }
+
+    .carousel-btn:hover {
+      background: #a30000;
+    }
+
+    .carousel-indicators {
+      display: flex;
+
+      gap: 8px;
+
+      align-items: center;
+    }
+
+    .indicator {
+      width: 10px;
+
+      height: 10px;
+
+      border-radius: 50%;
+
+      background: #d1d5db;
+
+      cursor: pointer;
+
+      transition: all 0.3s ease;
+    }
+
+    .indicator.active {
+      background: #8b0000;
+
+      transform: scale(1.2);
+    }
+
+    .carousel-progress {
+      height: 3px;
+
+      background: #e5e7eb;
+
+      position: relative;
+
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+
+      background: #8b0000;
+
+      width: 0%;
+
+      transition: none;
+    }
+
+    /* Descripción del sitio */
+
+    .site-description {
+      padding: 0 20px 20px;
+    }
 .site-description p {
-line-height: 1.6;
-color: #374151;
-margin-bottom: 15px;
-text-align: justify;
-font-size: 14px;
-background: #f9fafb;
-padding: 15px;
-border-radius: 10px;
-border-left: 4px solid #8B0000;
-}
-.action-buttons {
-display: flex;
-gap: 10px;
-flex-direction: column;
-}
-.speak-btn, .center-btn, .route-btn {
-background: #8B0000;
-color: white;
-border: none;
-padding: 10px 15px;
-border-radius: 8px;
-cursor: pointer;
-font-size: 14px;
-font-weight: 600;
-transition: all 0.3s ease;
-display: flex;
-align-items: center;
-justify-content: center;
-gap: 8px;
-}
-
-#pauseBtn {
-  background: #6b7280; /* gris oscuro */
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 8px;
-  cursor: pointer;
+  line-height: 1.8; /* Mejora lectura */
+  letter-spacing: 0.3px; /* Espacio entre letras */
+  color: #374151;
+  margin: 0 auto 15px;
+  text-align: justify;
   font-size: 14px;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  display: none; /* para ocultarlo por defecto */
+  background: #f9fafb;
+  padding: 15px;
+  border-radius: 10px;
+  border-left: 4px solid #8b0000;
+  white-space: pre-line; /* Respeta saltos de línea */
+  max-width: 95%; /* No ocupa todo el ancho */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08); /* Sombra suave */
 }
 
-#pauseBtn:hover {
-  background: #4b5563;
-}
 
-.speak-btn:hover, .center-btn:hover, .route-btn:hover {
-background: #a30000;
-}
-.speak-btn:disabled {
-background: #9ca3af;
-cursor: not-allowed;
-}
-/* Botón especial para crear ruta en sidebar */
-.route-btn {
-background: linear-gradient(135deg, #059669 0%, #047857 100%);
-}
-.route-btn:hover {
-background: linear-gradient(135deg, #047857 0%, #065f46 100%);
-}
-#distance,
-#description {
-text-align: center;
-margin-top: 10px;
-font-size: 1.2em;
-font-weight: bold;
-}
-#description {
-padding: 10px;
-margin-bottom: 10px;
-}
-.btn-red-vino {
-background-color: #8B0000;
-color: #fff;
-border: none;
-cursor: pointer;
-transition: background 0.3s;
-padding: 6px 12px;
-border-radius: 8px;
-margin: 2px;
-}
-.btn-red-vino:hover {
-background-color: #a30000;
-}
-/* Botón cancelar ruta */
-.btn-cancel {
-background-color: #dc3545;
-color: #fff;
-border: none;
-cursor: pointer;
-transition: background 0.3s;
-padding: 6px 12px;
-border-radius: 8px;
-margin: 2px;
-}
-.btn-cancel:hover {
-background-color: #c82333;
-}
-/* Contenedor de botones de control */
-.route-controls {
-text-align: center;
-margin-top: 10px;
-display: flex;
-justify-content: center;
-gap: 10px;
-flex-wrap: wrap;
-}
-/* Estado de ruta activa */
-.route-status {
-background: #d1fae5;
-color: #065f46;
-padding: 8px 15px;
-border-radius: 8px;
-margin: 10px auto;
-display: none;
-max-width: 300px;
-text-align: center;
-font-weight: 600;
-border: 1px solid #10b981;
-}
-.route-status.active {
-display: block;
-}
-/* Información del recorrido */
-.tour-info {
-background: #e0f2fe;
-color: #0277bd;
-padding: 10px 15px;
-border-radius: 8px;
-margin: 10px auto;
-max-width: 400px;
-text-align: center;
-font-size: 14px;
-border: 1px solid #29b6f6;
-}
-/* Botón ir al recorrido en popup */
-.popup-route-btn {
-background: linear-gradient(135deg, #059669 0%, #047857 100%);
-color: white;
-border: none;
-padding: 8px 16px;
-border-radius: 6px;
-cursor: pointer;
-font-size: 12px;
-font-weight: 600;
-margin-top: 8px;
-width: 100%;
-transition: all 0.3s ease;
-box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2);
-}
-.popup-route-btn:hover {
-background: linear-gradient(135deg, #047857 0%, #065f46 100%);
-transform: translateY(-1px);
-box-shadow: 0 4px 8px rgba(5, 150, 105, 0.3);
-}
-.lang-switch {
-position: absolute;
-top: 10px;
-right: 10px;
-}
-img {
-max-width: 100%;
-height: auto;
-border-radius: 10px;
-margin-bottom: 10px;
-}
-.popup-btn {
-display: inline-block;
-margin-top: 10px;
-width: 100%;
-text-align: center;
-}
-.btn-back {
-background-color: #8B0000;
-color: #fff;
-padding: 10px 20px;
-border: none;
-border-radius: 8px;
-font-size: 1.2em;
-cursor: pointer;
-margin-top: 20px;
-margin-bottom: 40px;
-transition: background-color 0.3s;
-}
-.btn-back:hover {
-background-color: #a30000;
-}
-/* Popup simplificado */
-.simple-popup {
-text-align: center;
-padding: 10px;
-max-width: 200px;
-}
-.simple-popup h3 {
-margin: 0 0 10px 0;
-font-size: 16px;
-font-weight: bold;
-color: #8B0000;
-}
-.simple-popup img {
-width: 100%;
-height: 120px;
-object-fit: cover;
-border-radius: 8px;
-margin: 0;
-}
-/* Responsive */
-@media (max-width: 768px) {
-#sidebar {
-width: 100%;
-right: -100%;
-}
-.carousel-images {
-height: 200px;
-}
-.sidebar-header {
-padding: 15px;
-}
-.sidebar-header h2 {
-font-size: 1.2rem;
-}
-.image-carousel {
-padding: 15px;
-}
-.site-description {
-padding: 0 15px 15px;
-}
-.route-controls {
-flex-direction: column;
-align-items: center;
-}
-.popup-route-btn {
-font-size: 11px;
-padding: 6px 12px;
-}
-}
-/* Scrollbar personalizado */
-#sidebar::-webkit-scrollbar {
-width: 6px;
-}
-#sidebar::-webkit-scrollbar-track {
-background: #f1f5f9;
-}
-#sidebar::-webkit-scrollbar-thumb {
-background: #cbd5e1;
-border-radius: 3px;
-}
-#sidebar::-webkit-scrollbar-thumb:hover {
-background: #94a3b8;
-}
-@media (max-width: 768px) {
-  #siteButtons button {
-    flex: 1 1 100%;
-    max-width: 100%;
-    font-size: 16px;
-    padding: 12px;
+    .action-buttons {
+      display: flex;
+
+      gap: 10px;
+
+      flex-direction: column;
+    }
+
+    .speak-btn,
+    .center-btn,
+    .route-btn {
+      background: #8b0000;
+
+      color: white;
+
+      border: none;
+
+      padding: 10px 15px;
+
+      border-radius: 8px;
+
+      cursor: pointer;
+
+      font-size: 14px;
+
+      font-weight: 600;
+
+      transition: all 0.3s ease;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      gap: 8px;
+    }
+
+    #pauseBtn {
+      background: #6b7280;
+      /* gris oscuro */
+
+      color: white;
+
+      border: none;
+
+      padding: 10px 15px;
+
+      border-radius: 8px;
+
+      cursor: pointer;
+
+      font-size: 14px;
+
+      font-weight: 600;
+
+      transition: all 0.3s ease;
+
+      display: none;
+      /* para ocultarlo por defecto */
+    }
+
+    #pauseBtn:hover {
+      background: #4b5563;
+    }
+
+    .speak-btn:hover,
+    .center-btn:hover,
+    .route-btn:hover {
+      background: #a30000;
+    }
+
+    .speak-btn:disabled {
+      background: #9ca3af;
+
+      cursor: not-allowed;
+    }
+
+    /* Botón especial para crear ruta en sidebar */
+
+    .route-btn {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    }
+
+    .route-btn:hover {
+      background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+    }
+
+    #distance,
+    #description {
+      text-align: center;
+
+      margin-top: 10px;
+
+      font-size: 1.2em;
+
+      font-weight: bold;
+    }
+
+    #description {
+      padding: 10px;
+
+      margin-bottom: 10px;
+    }
+
+    .btn-red-vino {
+      background-color: #8b0000;
+
+      color: #fff;
+
+      border: none;
+
+      cursor: pointer;
+
+      transition: background 0.3s;
+
+      padding: 6px 12px;
+
+      border-radius: 8px;
+
+      margin: 2px;
+    }
+
+    .btn-red-vino:hover {
+      background-color: #a30000;
+    }
+
+    /* Botón cancelar ruta */
+
+    .btn-cancel {
+      background-color: #dc3545;
+
+      color: #fff;
+
+      border: none;
+
+      cursor: pointer;
+
+      transition: background 0.3s;
+
+      padding: 6px 12px;
+
+      border-radius: 8px;
+
+      margin: 2px;
+    }
+
+    .btn-cancel:hover {
+      background-color: #c82333;
+    }
+
+    /* Contenedor de botones de control */
+
+    .route-controls {
+      text-align: center;
+
+      margin-top: 10px;
+
+      display: flex;
+
+      justify-content: center;
+
+      gap: 10px;
+
+      flex-wrap: wrap;
+    }
+
+    /* Estado de ruta activa */
+
+    .route-status {
+      background: #d1fae5;
+
+      color: #065f46;
+
+      padding: 8px 15px;
+
+      border-radius: 8px;
+
+      margin: 10px auto;
+
+      display: none;
+
+      max-width: 300px;
+
+      text-align: center;
+
+      font-weight: 600;
+
+      border: 1px solid #10b981;
+    }
+
+    .route-status.active {
+      display: block;
+    }
+
+    /* Información del recorrido */
+
+    .tour-info {
+      background: #e0f2fe;
+
+      color: #0277bd;
+
+      padding: 10px 15px;
+
+      border-radius: 8px;
+
+      margin: 10px auto;
+
+      max-width: 400px;
+
+      text-align: center;
+
+      font-size: 14px;
+
+      border: 1px solid #29b6f6;
+    }
+
+    /* Botón ir al recorrido en popup */
+
+    .popup-route-btn {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+
+      color: white;
+
+      border: none;
+
+      padding: 8px 16px;
+
+      border-radius: 6px;
+
+      cursor: pointer;
+
+      font-size: 12px;
+
+      font-weight: 600;
+
+      margin-top: 8px;
+
+      width: 100%;
+
+      transition: all 0.3s ease;
+
+      box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2);
+    }
+
+    .popup-route-btn:hover {
+      background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+
+      transform: translateY(-1px);
+
+      box-shadow: 0 4px 8px rgba(5, 150, 105, 0.3);
+    }
+
+    .lang-switch {
+      position: absolute;
+
+      top: 10px;
+
+      right: 10px;
+    }
+
+    img {
+      max-width: 100%;
+
+      height: auto;
+
+      border-radius: 10px;
+
+      margin-bottom: 10px;
+    }
+
+    .popup-btn {
+      display: inline-block;
+
+      margin-top: 10px;
+
+      width: 100%;
+
+      text-align: center;
+    }
+
+    .btn-back {
+      background-color: #8b0000;
+
+      color: #fff;
+
+      padding: 10px 20px;
+
+      border: none;
+
+      border-radius: 8px;
+
+      font-size: 1.2em;
+
+      cursor: pointer;
+
+      margin-top: 20px;
+
+      margin-bottom: 40px;
+
+      transition: background-color 0.3s;
+    }
+
+    .btn-back:hover {
+      background-color: #a30000;
+    }
+
+    /* Popup simplificado */
+
+    .simple-popup {
+      text-align: center;
+
+      padding: 10px;
+
+      max-width: 200px;
+    }
+
+    .simple-popup h3 {
+      margin: 0 0 10px 0;
+
+      font-size: 16px;
+
+      font-weight: bold;
+
+      color: #8b0000;
+    }
+
+    .simple-popup img {
+      width: 100%;
+
+      height: 120px;
+
+      object-fit: cover;
+
+      border-radius: 8px;
+
+      margin: 0;
+    }
+
+    /* Responsive */
+
+    @media (max-width: 768px) {
+  #sidebar {
+    width: 100%;
+    right: -100%;
   }
 
-  #siteMenu h2 {
+  .carousel-images {
+    height: 200px;
+  }
+
+  .sidebar-header {
+    padding: 15px;
+  }
+
+  .sidebar-header h2 {
     font-size: 1.2rem;
   }
-}
-.number-icon {
-  pointer-events: none; /* Para que no bloquee clics en el ícono */
+
+  .image-carousel {
+    padding: 15px;
+  }
+
+  .site-description {
+    padding: 0 15px 15px;
+  }
+
+  .site-description p {
+  font-size: 15px;
+  padding: 12px;
+  line-height: 1.8;
+  letter-spacing: 0.3px;
+  white-space: pre-line;
+  max-width: 95%;
+  margin: 0 auto 15px;
 }
 
-.number-label {
-  background-color: #8B0000;
-  color: white;
-  font-size: 14px;
-  font-weight: bold;
-  border-radius: 50%;
-  width: 22px;
-  height: 22px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 0 4px rgba(0,0,0,0.3);
+
+
+
+      .route-controls {
+        flex-direction: column;
+
+        align-items: center;
+      }
+
+      .popup-route-btn {
+        font-size: 11px;
+
+        padding: 6px 12px;
+      }
+    }
+
+    /* Scrollbar personalizado */
+
+    #sidebar::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    #sidebar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+
+    #sidebar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+
+      border-radius: 3px;
+    }
+
+    #sidebar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    
+
+    @media (max-width: 768px) {
+      #siteButtons button {
+        flex: 1 1 100%;
+
+        max-width: 100%;
+
+        font-size: 16px;
+
+        padding: 12px;
+      }
+
+      #siteMenu h2 {
+        font-size: 1.2rem;
+      }
+    }
+
+    .number-icon {
+      pointer-events: none;
+      /* Para que no bloquee clics en el ícono */
+    }
+
+    .number-label {
+      background-color: #8b0000;
+
+      color: white;
+
+      font-size: 14px;
+
+      font-weight: bold;
+
+      border-radius: 50%;
+
+      width: 22px;
+
+      height: 22px;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+    }
+
+    @media screen and (max-width: 768px) {
+  header {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .lang-switch {
+    position: static;
+    margin-top: 10px;
+  }
+
+  header h1 {
+    font-size: 1.2em;
+    text-align: center;
+    margin: 10px 0;
+  }
+
+  header .logo {
+    height: 40px;
+  }
+
+  header img {
+    height: 40px;
+  }
+  header h1 {
+  font-size: 1.6em;
+  text-align: center;
+  margin: 10px 0;
+  line-height: 1.3;
 }
 
+}
 
-</style>
+  </style>
 </head>
+
 <body>
-<header>
-<img src="img/LogoINAH_Dorado.png" alt="Logo" class="logo">
-<h1>Recorrido turistico cultural lado oriente</h1>
-<div class="lang-switch">
-<button id="btnEs" class="btn-red-vino">🇲🇽 Español</button>
-<button id="btnEn" class="btn-red-vino">🇺🇸 English</button>
-</div>
-</header>
-<div id="description">
-<p>Bienvenido a la ruta en automóvil por la ciudad de Campeche. Visita lugares históricos y emblemáticos que forman parte de su patrimonio cultural. Asegúrate de disfrutar cada momento mientras avanzas en el recorrido. ¡Comencemos!</p>
-</div>
-<div id="siteMenu" style="text-align: center; margin: 20px;">
-<h2>📍 Sitios del Recorrido</h2>
-<div id="siteButtons" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;"></div>
-</div>
-<div id="distance">Distancia al destino: -</div>
-
-<!-- Información del recorrido -->
-<div id="tourInfo" class="tour-info">
-<span id="tourInfoText">💡 Haz clic en los iconos del mapa para crear rutas, o usa los botones de abajo para ver el recorrido completo</span>
-</div>
-
-<!-- Estado de ruta activa -->
-<div id="routeStatus" class="route-status">
-<span id="routeStatusText">Ruta activa a: </span>
-</div>
-
-<!-- Controles de ruta -->
-<div class="route-controls">
-<button id="startRouteBtn" class="btn-red-vino">🗺️ Ver Recorrido Completo</button>
-<button id="startTourBtn" class="btn-red-vino">🚗 Ir al Primer Sitio</button>
-<button id="cancelRouteBtn" class="btn-cancel" style="display: none;">❌ Cancelar Ruta</button>
-<button id="clearAllRoutesBtn" class="btn-cancel" style="display: none;">🗑️ Limpiar Todo</button>
-</div>
-
-<div class="container" id="mapContainer">
-<div id="map"></div>
-<!-- Panel lateral -->
-<div id="sidebar">
-<div id="sidebar-content">
-<!-- El contenido se genera dinámicamente -->
-</div>
-</div>
-</div>
-<div style="text-align: center;">
-<a href="index.html">
-<button class="btn-back">Regresar al Inicio</button>
-</a>
-</div>
-
-<footer style="background-color:#702c37; color:#b38b28; text-align:center; padding:30px 10px; font-family: 'Arial', sans-serif;">
-  <div style="margin-bottom: 20px;">
-    <!-- Logo -->
-    <img src="img/LogoINAH_Dorado2.png" alt="Logo" style="width:90px; margin-bottom:10px;">
+ <header style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 15px; padding: 10px 20px;">
+  <div style="display: flex; align-items: center; gap: 15px;">
+    <img src="img/LogoINAH_Dorado.png" alt="Logo INAH" class="logo" />
+    <img src="img/logoSecundario.png" alt="Mi logo" style="height: 50px;" />
   </div>
 
-  <nav style="margin-bottom: 20px;">
-    <a href="index.html" style="color:#b38b28; margin: 0 12px; text-decoration:none;">Inicio</a>
-      <a href="acercaDe.html" style="color:#b38b28; margin: 0 12px; text-decoration:none;">Acerca De</a>
-    <a href="https://www.google.com/maps/place/Centro+INAH+Campeche/@19.8436519,-90.5397307,16.75z/data=!4m10!1m2!2m1!1sinah!3m6!1s0x85f833f03beef51f:0xbff37f2dee15b654!8m2!3d19.8427132!4d-90.5369075!15sCgRpbmFoIgOIAQGSARBjb3Jwb3JhdGVfb2ZmaWNlqgFFCg0vZy8xMWNra3l5NXh0EAEqCCIEaW5haCgOMh4QASIayUioQwwO0z0YdKzk3fHeSRetwHlMFJs-DXIyCBACIgRpbmFo4AEA!16s%2Fg%2F1tcwlxzc!5m1!1e4?entry=ttu&g_ep=EgoyMDI1MDYyMi4wIKXMDSoASAFQAw%3D%3D" target="_blank" style="color:#b38b28; margin: 0 12px; text-decoration:none;">
+  <h1 style="flex: 1 1 100%; text-align: center;">Recorrido turístico cultural lado oriente</h1>
+
+  <div class="lang-switch">
+    <button id="btnEs" class="btn-red-vino">🇲🇽 Español</button>
+    <button id="btnEn" class="btn-red-vino">🇺🇸 English</button>
+  </div>
+</header>
+  <div id="description">
+    <p>
+      Bienvenido a la ruta en automóvil por la ciudad de Campeche. Visita
+      lugares históricos y emblemáticos que forman parte de su patrimonio
+      cultural. Asegúrate de disfrutar cada momento mientras avanzas en el
+      recorrido. ¡Comencemos!
+    </p>
+  </div>
+
+  <div id="siteMenu" style="text-align: center; margin: 20px">
+    <h2>📍 Sitios del Recorrido</h2>
+
+    <div id="siteButtons" style="
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 10px;
+        "></div>
+  </div>
+
+  <div id="distance">Distancia al destino: -</div>
+
+  <!-- Información del recorrido -->
+
+  <div id="tourInfo" class="tour-info">
+    <span id="tourInfoText">💡 Haz clic en los iconos del mapa para crear rutas, o usa los botones
+      de abajo para ver el recorrido completo</span>
+  </div>
+
+  <!-- Estado de ruta activa -->
+
+  <div id="routeStatus" class="route-status">
+    <span id="routeStatusText">Ruta activa a: </span>
+  </div>
+
+  <!-- Controles de ruta -->
+
+  <div class="route-controls">
+    <button id="startRouteBtn" class="btn-red-vino">
+      🗺️ Ver Recorrido Completo
+    </button>
+
+    <button id="startTourBtn" class="btn-red-vino">
+      🚗 Ir al Primer Sitio
+    </button>
+
+    <button id="cancelRouteBtn" class="btn-cancel" style="display: none">
+      ❌ Cancelar Ruta
+    </button>
+
+    <button id="clearAllRoutesBtn" class="btn-cancel" style="display: none">
+      🗑️ Limpiar Todo
+    </button>
+  </div>
+
+  <div class="container" id="mapContainer">
+    <div id="map"></div>
+
+    <!-- Panel lateral -->
+
+    <div id="sidebar">
+      <div id="sidebar-content">
+        <!-- El contenido se genera dinámicamente -->
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align: center">
+    <a href="index.html">
+      <button class="btn-back">Regresar al Inicio</button>
+    </a>
+  </div>
+
+  <footer style="
+        background-color: #702c37;
+        color: #b38b28;
+        text-align: center;
+        padding: 30px 10px;
+        font-family: 'Arial', sans-serif;
+      ">
+     <div style="margin-bottom: 20px; display: flex; gap: 20px; justify-content: center; align-items: center;">
+  <img src="img/LogoINAH_Dorado2.png" alt="Logo INAH" style="width: 90px;" />
+  <img src="img/logoSecundario.png" alt="Mi logo" style="width: 90px;" />
+</div>
+
+
+    <nav style="margin-bottom: 20px">
+      <a href="index.html" style="color: #b38b28; margin: 0 12px; text-decoration: none">Inicio</a>
+
+      <a href="acercaDe.html" style="color: #b38b28; margin: 0 12px; text-decoration: none">Acerca De</a>
+
+      <a href="https://www.google.com/maps/place/Centro+INAH+Campeche/@19.8436519,-90.5397307,16.75z/data=!4m10!1m2!2m1!1sinah!3m6!1s0x85f833f03beef51f:0xbff37f2dee15b654!8m2!3d19.8427132!4d-90.5369075!15sCgRpbmFoIgOIAQGSARBjb3Jwb3JhdGVfb2ZmaWNlqgFFCg0vZy8xMWNra3l5NXh0EAEqCCIEaW5haCgOMh4QASIayUioQwwO0z0YdKzk3fHeSRetwHlMFJs-DXIyCBACIgRpbmFo4AEA!16s%2Fg%2F1tcwlxzc!5m1!1e4?entry=ttu&g_ep=EgoyMDI1MDYyMi4wIKXMDSoASAFQAw%3D%3D" target="_blank" style="color:#b38b28; margin: 0 12px; text-decoration:none;">
       C. 59 39, Zona Centro, 24000 San Francisco de Campeche, Camp.
     </a>
-    <a href="tel:+529818115510" style="color:#b38b28; margin: 0 12px; text-decoration:none;">
-      Contacto
-    </a>
-  </nav>
 
-  <div style="margin-bottom: 25px;">
-    <!-- Redes sociales -->
-      <a href="https://www.facebook.com/share/19GQgXUWKJ/?mibextid=wwXIfr" target="_blank" style="color:#b38b28; margin: 0 8px; font-size: 18px; text-decoration:none;">
-      <i class="fab fa-facebook-f"></i> 
-    </a>
-    <a href="https://www.instagram.com/inahsasyuc?igsh=MTczMDg1NGxmYzRyNw==" target="_blank" style="color:#b38b28; margin: 0 8px; font-size: 18px; text-decoration:none;">
-      <i class="fab fa-instagram"></i> 
-    </a>
-    <a href="https://x.com/inahsas_yuc" target="_blank" style="color:#b38b28; margin: 0 8px; font-size: 18px; text-decoration:none;">
-      <i class="fab fa-twitter"></i> 
-    </a>
-    <a href="https://youtube.com/@inahtv?si=dTPfND_makjeZTEm" target="_blank" style="color:#b38b28; margin: 0 8px; font-size: 18px; text-decoration:none;">
-      <i class="fab fa-youtube"></i> 
-    </a>
-  </div>
+      <a href="tel:+529818115510" style="color: #b38b28; margin: 0 12px; text-decoration: none">
+        Contacto
+      </a>
+    </nav>
 
-  <hr style="border-color: #8c5d54; margin-bottom: 15px;">
+    <div style="margin-bottom: 25px">
+      <!-- Redes sociales -->
 
-  <p style="font-size: 14px; margin: 0;">© 2025 Miguiaa_mx. Todos los derechos reservados.</p>
-  <p style="font-weight: 600; font-size: 14px; margin: 5px 0 0 0;">DISEÑADO POR INAH CAMPECHE</p>
-</footer>
+      <a href="https://www.facebook.com/share/19GQgXUWKJ/?mibextid=wwXIfr" target="_blank" style="
+            color: #b38b28;
+            margin: 0 8px;
+            font-size: 18px;
+            text-decoration: none;
+          ">
+        <i class="fab fa-facebook-f"></i>
+      </a>
 
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script>
-// Variables globales
-let map;
-let userMarker;
-let followUser = true;
-let currentCarouselIndex = 0;
-let carouselInterval;
-let blueRouteLine;
-let selectedRouteLine;
-let selectedSite = null;
-let routeToStartLine;
-let distanceInterval;
-let activeRouteType = null; // 'selected', 'start', 'complete'
-let userMovedMap = false;
+      <a href="https://www.instagram.com/inahsasyuc?igsh=MTczMDg1NGxmYzRyNw==" target="_blank" style="
+            color: #b38b28;
+            margin: 0 8px;
+            font-size: 18px;
+            text-decoration: none;
+          ">
+        <i class="fab fa-instagram"></i>
+      </a>
 
+      <a href="https://x.com/inahsas_yuc" target="_blank" style="
+            color: #b38b28;
+            margin: 0 8px;
+            font-size: 18px;
+            text-decoration: none;
+          ">
+        <i class="fab fa-twitter"></i>
+      </a>
 
-// Función para detectar si es dispositivo móvil
-function isMobileDevice() {
-return window.innerWidth <= 768;
-}
+      <a href="https://youtube.com/@inahtv?si=dTPfND_makjeZTEm" target="_blank" style="
+            color: #b38b28;
+            margin: 0 8px;
+            font-size: 18px;
+            text-decoration: none;
+          ">
+        <i class="fab fa-youtube"></i>
+      </a>
+    </div>
 
-// Función para hacer scroll suave hacia el contenedor del mapa en móviles
-function scrollToMapOnMobile() {
-if (isMobileDevice()) {
-const mapContainer = document.getElementById('mapContainer');
-if (mapContainer) {
-// Pequeño delay para que la animación del sidebar se complete
-setTimeout(() => {
-mapContainer.scrollIntoView({
-behavior: 'smooth',
-block: 'start'
-});
-}, 200);
-}
-}
-}
+    <hr style="border-color: #8c5d54; margin-bottom: 15px" />
 
-// Inicializar mapa
-const mapInstance = L.map('map').setView([19.845, -90.523], 12);
-map = mapInstance;
+    <p style="font-size: 14px; margin: 0">
+      © 2025 Miguiaa_mx. Todos los derechos reservados.
+    </p>
 
-map.on('movestart', () => {
-  followUser = false;
-  userMovedMap = true;
-});
+    <p style="font-weight: 600; font-size: 14px; margin: 5px 0 0 0">
+      DISEÑADO POR INAH CAMPECHE
+    </p>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <script>
 
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-attribution: '&copy; OpenStreetMap contributors'
-}).addTo(map);
-// Desactiva el seguimiento si el usuario empieza a mover el mapa manualmente
-map.on('movestart', () => {
-followUser = false;
-});
-map.on('zoomend', () => {
-  const zoom = map.getZoom();
-  let size = 32;
+    // Variables globales
 
-  if (zoom >= 17) size = 64;
-  else if (zoom >= 15) size = 48;
-  else if (zoom >= 13) size = 36;
-  else size = 28;
+    let map;
 
-  siteIcons = createIcon(size);
-  markers.forEach(({ marker, site }) => {
-    marker.setIcon(siteIcons[site.name]);
-  });
-});
+    let userMarker;
 
+    let followUser = true;
+
+    let currentCarouselIndex = 0;
+
+    let carouselInterval;
+
+    let blueRouteLine;
+
+    let selectedRouteLine;
+
+    let selectedSite = null;
+
+    let routeToStartLine;
+
+    let distanceInterval;
+
+    let activeRouteType = null; // 'selected', 'start', 'complete'
+
+    let userMovedMap = false;
+
+    // Función para detectar si es dispositivo móvil
+
+    function isMobileDevice() {
+      return window.innerWidth <= 768;
+    }
+
+    // Función para hacer scroll suave hacia el contenedor del mapa en móviles
+
+    function scrollToMapOnMobile() {
+      if (isMobileDevice()) {
+        const mapContainer = document.getElementById("mapContainer");
+
+        if (mapContainer) {
+          // Pequeño delay para que la animación del sidebar se complete
+
+          setTimeout(() => {
+            mapContainer.scrollIntoView({
+              behavior: "smooth",
+
+              block: "start",
+            });
+          }, 200);
+        }
+      }
+    }
+
+    // Inicializar mapa
+
+    const mapInstance = L.map("map").setView([19.845, -90.523], 12);
+
+    map = mapInstance;
+
+    map.on("movestart", () => {
+      followUser = false;
+
+      userMovedMap = true;
+    });
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "&copy; OpenStreetMap contributors",
+    }).addTo(map);
+
+    // Desactiva el seguimiento si el usuario empieza a mover el mapa manualmente
+
+    map.on("movestart", () => {
+      followUser = false;
+    });
+
+    map.on("zoomend", () => {
+      const zoom = map.getZoom();
+
+      let size = 32;
+
+      if (zoom >= 17) size = 64;
+      else if (zoom >= 15) size = 48;
+      else if (zoom >= 13) size = 36;
+      else size = 28;
+
+      siteIcons = createIcon(size);
+
+      markers.forEach(({ marker, site }) => {
+        marker.setIcon(siteIcons[site.name]);
+      });
+    });
 const translations = {
 es: {
 welcome: 'Bienvenido a la ruta en automóvil por la ciudad de Campeche. Visita lugares históricos y emblemáticos que forman parte de su patrimonio cultural. Asegúrate de disfrutar cada momento mientras avanzas en el recorrido. ¡Comencemos!',
@@ -685,39 +1155,39 @@ goToRoute: '🚗 Ir al Recorrido',
 routeCreated: 'Ruta creada hacia',
 locationNotAvailable: 'Ubicación no disponible',
 'Barrio de San Román': {
-description: 'Bienvenido, te encuentras en el barrio de San Román de la ciudad de San Francisco de Campeche, fundado en el siglo XVI. Este barrio es conocido por su iglesia, que alberga una imagen del Cristo Negro, traída de Veracruz en 1565 y considerada un milagro divino por su portentosa llegada. El barrio de San Román fue habitado por marinos, constructores navales y calafateros al estar cerca de los astilleros donde se construyeron navíos para la defensa y el comercio en América. Fue nombrado el primer Barrio Mágico de Campeche en 2024.',
+description: 'Bienvenido, te encuentras en el barrio de San Román de la ciudad de San Francisco de Campeche, fundado en el siglo XVI.\n Este barrio es conocido por su iglesia, que alberga una imagen del Cristo Negro, traída de Veracruz en 1565 y considerada un milagro divino por su portentosa llegada.\n El barrio de San Román fue habitado por marinos, constructores navales y calafateros al estar cerca de los astilleros donde se construyeron navíos para la defensa y el comercio en América. Fue nombrado el primer Barrio Mágico de Campeche en 2024.',
 images: ['imgPoniente/sanRoman1.jpg', 'imgPoniente/sanRoman2.jpg', 'imgPoniente/sanRoman3.jpg']
 },
 'Atarazanas Playa San Román': {
-description: 'Las Atarazanas o astilleros fueron las instalaciones donde se construían y reparaban embarcaciones de madera y vela. El primer astillero en el puerto de campeche existió desde 1650 en la playa frente al templo de San José y fue destruido por un incendio en 1672 por el pirata “Lorencillo”. Al construirse el baluarte de San Carlos la construcción naval se reubicó hacia la playa del barrio de San Román. ¿Sabías que el corsario español Amaro Felipe Rodríguez conocido como “Amaro Pargo” construyó entre 1720 y 1721 en este astillero el navío “Las Potencias del Santo Cristo de San Román” de 571 toneladas? En la actualidad, el área es conocida como el Muelle de los Pescadores de San Román, un sitio emblemático donde se mezclan la historia y la vida cotidiana de los pescadores locales. El muelle conserva su importancia como punto de encuentro comunitario y es un atractivo turístico que refleja el legado marítimo de Campeche. ',
+description: 'Las Atarazanas o astilleros fueron las instalaciones donde se construían y reparaban embarcaciones de madera y vela.\n El primer astillero en el puerto de campeche existió desde 1650 en la playa frente al templo de San José y fue destruido por un incendio en 1672 por el pirata “Lorencillo”.\n Al construirse el baluarte de San Carlos la construcción naval se reubicó hacia la playa del barrio de San Román.\n ¿Sabías que el corsario español Amaro Felipe Rodríguez conocido como “Amaro Pargo” construyó entre 1720 y 1721 en este astillero el navío “Las Potencias del Santo Cristo de San Román” de 571 toneladas? En la actualidad, el área es conocida como el Muelle de los Pescadores de San Román, un sitio emblemático donde se mezclan la historia y la vida cotidiana de los pescadores locales.\n El muelle conserva su importancia como punto de encuentro comunitario y es un atractivo turístico que refleja el legado marítimo de Campeche. ',
 images: ['imgPoniente/atarazanas1.jpg', 'imgPoniente/atarazanas1.png']
 },
 'Novia del Mar': {
-description: 'Cuenta la leyenda que hace muchos años había una hermosa mujer que vivía en el puerto de Campeche. Ella solía pasear por la costa para contemplar las enormes embarcaciones provenientes de diversas partes del mundo. Le gustaba imaginar cómo eran aquellos países desde donde venían tan exóticas y variadas mercancías. La belleza de aquella joven era tal que hasta el mar quedó cautivado y deseaba tener su atención por siempre. Por ello, procuraba robarle sonrisas con suaves y armoniosos oleajes que reflejaban los destellos dorados del sol. Por las tardes, el mar se pintaba de naranja mientras el astro rey se hundía en sus aguas. Aquel era espectáculo que estremecía de emoción a la doncella. Un día, durante uno de sus paseos por el puerto, la joven conoció a un marinero de quien quedó perdidamente enamorada. Era tan fuerte el sentimiento de ambos que el mar se puso celoso de aquel auténtico cariño. Transcurrieron un par de semanas. El amor entre la campechana y el marinero creció. El mar se sentía olvidado al ya no sentir la suave caricia de los dedos de la mujer durante los atardeceres: ya no había más sonrisas para él. De pronto, el marinero tuvo que zarpar de Campeche junto a su tripulación, pero prometió volver cuanto antes para estrechar al amor entre sus brazos nuevamente. Aquel beso que se dieron para despedirse, sería el último. La envidia del mar se transformó en ira y, al ver la oportunidad de quedarse de nueva cuenta con la mujer para él, de la nada creó una enorme tormenta, con furiosas olas que terminaron por sepultar la embarcación donde viajaba el marinero. De sus tripulantes no se supo algo jamás. Desde entonces, cada tarde aquella hermosa mujer llega hasta a la orilla de la playa para esperar el regreso de su amado. Siempre la verán sentada a la orilla del malecón de Campeche, con la vista fija en el mar, que se regocija con su belleza. ',
+description: 'Cuenta la leyenda que hace muchos años había una hermosa mujer que vivía en el puerto de Campeche.\n Ella solía pasear por la costa para contemplar las enormes embarcaciones provenientes de diversas partes del mundo.\n Le gustaba imaginar cómo eran aquellos países desde donde venían tan exóticas y variadas mercancías.\n La belleza de aquella joven era tal que hasta el mar quedó cautivado y deseaba tener su atención por siempre.\n Por ello, procuraba robarle sonrisas con suaves y armoniosos oleajes que reflejaban los destellos dorados del sol.\n Por las tardes, el mar se pintaba de naranja mientras el astro rey se hundía en sus aguas.\n Aquel era espectáculo que estremecía de emoción a la doncella.\n Un día, durante uno de sus paseos por el puerto, la joven conoció a un marinero de quien quedó perdidamente enamorada.\n Era tan fuerte el sentimiento de ambos que el mar se puso celoso de aquel auténtico cariño.\n Transcurrieron un par de semanas.\n El amor entre la campechana y el marinero creció.\n El mar se sentía olvidado al ya no sentir la suave caricia de los dedos de la mujer durante los atardeceres: ya no había más sonrisas para él.\n De pronto, el marinero tuvo que zarpar de Campeche junto a su tripulación, pero prometió volver cuanto antes para estrechar al amor entre sus brazos nuevamente.\n Aquel beso que se dieron para despedirse, sería el último.\n La envidia del mar se transformó en ira y, al ver la oportunidad de quedarse de nueva cuenta con la mujer para él, de la nada creó una enorme tormenta, con furiosas olas que terminaron por sepultar la embarcación donde viajaba el marinero.\n De sus tripulantes no se supo algo jamás.\n Desde entonces, cada tarde aquella hermosa mujer llega hasta a la orilla de la playa para esperar el regreso de su amado.\n Siempre la verán sentada a la orilla del malecón de Campeche, con la vista fija en el mar, que se regocija con su belleza. ',
 images: ['imgPoniente/noviaMar1.jpg', 'imgPoniente/noviaMar2.jpg']
 },
 'Iglesia de Guadalupe': {
-description: 'El Barrio de Guadalupe es uno de los cinco barrios tradicionales de San Francisco de Campeche, junto con San Román, Santa Ana, San Francisco y Santa Lucía. Su origen se remonta al siglo XVI, cuando en 1575 se financió la construcción de una ermita dedicada a la Virgen de Guadalupe en una zona entonces despoblada. Con el tiempo, esta área se transformó en un barrio habitado principalmente por comerciantes, caracterizado por sus grandes casas y familias de alto nivel económico. El parque tiene un quiosco central y es un lugar de encuentro para la comunidad. El templo tiene una fachada sencilla y en su torre alberga la campana del barco de vapor RMS Tweed que naufragó en el arrecife Alacranes Golfo de México en 1847.',
+description: 'El Barrio de Guadalupe es uno de los cinco barrios tradicionales de San Francisco de Campeche, junto con San Román, Santa Ana, San Francisco y Santa Lucía.\n Su origen se remonta al siglo XVI, cuando en 1575 se financió la construcción de una ermita dedicada a la Virgen de Guadalupe en una zona entonces despoblada.\n Con el tiempo, esta área se transformó en un barrio habitado principalmente por comerciantes, caracterizado por sus grandes casas y familias de alto nivel económico.\n El parque tiene un quiosco central y es un lugar de encuentro para la comunidad.\n El templo tiene una fachada sencilla y en su torre alberga la campana del barco de vapor RMS Tweed que naufragó en el arrecife Alacranes Golfo de México en 1847.',
 images: ['imgPoniente/guadalupe1.jpg', 'imgPoniente/guadalupe2.jpg']
 },
 'Edificio INAH Arquiologia Subacuatica': {
-description: 'La arqueología subacuática es la disciplina del estudio de los vestigios culturales que yacen sumergidos en los cuerpos de agua, relacionados con actividades de las sociedades pasadas como la navegación, el comercio, la guerra, cosmovisiones, etc. En México, el Instituto Nacional de Antropología e Historia (INAH) a través de la Subdirección de Arqueología Subacuática se encarga de estudiar, proteger y conservar este patrimonio. En la ciudad de San Francisco de Campeche el INAH cuenta con una sede en donde diferentes especialistas en arqueología, historia, arquitectura, restauración y conservación. En este edificio marcado con el número 223 puedes observar antiguas anclas, cañones, vasijas, entre otros en proceso de estudio y conservación. ',
+description: 'La arqueología subacuática es la disciplina del estudio de los vestigios culturales que yacen sumergidos en los cuerpos de agua, relacionados con actividades de las sociedades pasadas como la navegación, el comercio, la guerra, cosmovisiones, etc.\n En México, el Instituto Nacional de Antropología e Historia (INAH) a través de la Subdirección de Arqueología Subacuática se encarga de estudiar, proteger y conservar este patrimonio.\n En la ciudad de San Francisco de Campeche el INAH cuenta con una sede en donde diferentes especialistas en arqueología, historia, arquitectura, restauración y conservación.\n En este edificio marcado con el número 223 puedes observar antiguas anclas, cañones, vasijas, entre otros en proceso de estudio y conservación. ',
 images: ['imgPoniente/edificio1.jpg', 'imgPoniente/edificio2.jpg']
 },
 'Iglesia de San Francisco': {
-description: 'El Barrio de San Francisco es uno de los más antiguos y emblemáticos de la ciudad de San Francisco de Campeche, con una historia que se remonta a la época prehispánica. Originalmente, fue un asentamiento maya conocido como Ah Kin Pech, que más tarde se integró a la villa fundada por los españoles en 1540. Durante el virreinato, el barrio se desarrolló como una zona extramuros, es decir, fuera del perímetro amurallado de la ciudad. Esta ubicación permitió que conservara una traza urbana irregular, con calles y callejones bordeados por altas casonas coloniales, reflejo de su origen maya y su evolución durante la colonia. Entre los elementos destacados del barrio se encuentra la iglesia de San Francisco y los restos del convento que fue un importante centro de evangelización durante la época virreinal. En 1653 el navío en donde viajaba don Martín Cortés, hijo del conquistador Hernán Cortés, y su esposa llegó a Campeche desviado por una tormenta, alojándose en el convento de San Francisco. Su esposa dio a luz a su primer hijo que fue bautizado en la iglesia. Puedes visitar el interior y observar la pila bautismal que recuerda este acontecimiento. ',
+description: 'El Barrio de San Francisco es uno de los más antiguos y emblemáticos de la ciudad de San Francisco de Campeche, con una historia que se remonta a la época prehispánica.\n Originalmente, fue un asentamiento maya conocido como Ah Kin Pech, que más tarde se integró a la villa fundada por los españoles en 1540.\n Durante el virreinato, el barrio se desarrolló como una zona extramuros, es decir, fuera del perímetro amurallado de la ciudad.\n Esta ubicación permitió que conservara una traza urbana irregular, con calles y callejones bordeados por altas casonas coloniales, reflejo de su origen maya y su evolución durante la colonia.\n Entre los elementos destacados del barrio se encuentra la iglesia de San Francisco y los restos del convento que fue un importante centro de evangelización durante la época virreinal.\n En 1653 el navío en donde viajaba don Martín Cortés, hijo del conquistador Hernán Cortés, y su esposa llegó a Campeche desviado por una tormenta, alojándose en el convento de San Francisco.\n Su esposa dio a luz a su primer hijo que fue bautizado en la iglesia.\n Puedes visitar el interior y observar la pila bautismal que recuerda este acontecimiento. ',
 images: ['imgPoniente/sanFrancisco1.jpg', 'imgPoniente/sanFrancisco2.jpg', 'imgPoniente/sanFrancisco3.jpg']
 },
 'Bateria de San Matias': {
-description: 'Se encuentra en la desembocadura de la antigua ría de San Francisco, cerca del barrio del mismo nombre. Fue construida en el siglo XVIII como parte de un sistema de defensa para la costa y los reductos de San Miguel y San José el Alto del puerto de San Francisco de Campeche, entre las que se encontraban también las baterías de San Luis y San Lucas. La finalidad de la batería de San Matías era la de retener algún desembarco por la playa de San Francisco y evitar que el enemigo tuviera acceso al Reducto de San José el Alto.',
+description: 'Se encuentra en la desembocadura de la antigua ría de San Francisco, cerca del barrio del mismo nombre.\n Fue construida en el siglo XVIII como parte de un sistema de defensa para la costa y los reductos de San Miguel y San José el Alto del puerto de San Francisco de Campeche, entre las que se encontraban también las baterías de San Luis y San Lucas.\n La finalidad de la batería de San Matías era la de retener algún desembarco por la playa de San Francisco y evitar que el enemigo tuviera acceso al Reducto de San José el Alto.',
 images: ['imgPoniente/sanMatias1.jpg', 'imgPoniente/sanMatias2.jpg']
 },
 'Bateria de San Lucas': {
-description: 'Su función era la de apoyar junto a la batería de San Matías la defensa del Reducto de San José el Alto, evitando posibles desembarcos hacia la costa de barlovento Fue diseña por el ingeniero militar Agustín Crame de forma semicircular e irregular, con una explanada que tenía capacidad para 8 cañones, una rampa adosada al centro y dos cuartos. Su construcción duró 6 meses y se concluyó en 1792. En períodos de marea alta solía quedar rodeada por el mar.',
+description: 'Su función era la de apoyar junto a la batería de San Matías la defensa del Reducto de San José el Alto, evitando posibles desembarcos hacia la costa de barlovento Fue diseña por el ingeniero militar Agustín Crame de forma semicircular e irregular, con una explanada que tenía capacidad para 8 cañones, una rampa adosada al centro y dos cuartos.\n Su construcción duró 6 meses y se concluyó en 1792.\n En períodos de marea alta solía quedar rodeada por el mar.',
 images: ['imgPoniente/sanLucas1.jpg', 'imgPoniente/sanLucas2.jpg', 'imgPoniente/sanLucas3.jpg']
 },
 'Museo de Arqueología Subacuática': {
-description: 'Esta construcción militar, ubicada sobre el “Cerro de las Tres Piedras”, se construyó a finales del siglo XVIII bajo las órdenes de José Sabido de Vargas, quien ejerció como teniente de rey entre los años 1784 y 1793. Cuenta con un foso, bóvedas de cañón corrido, aljibe y garitones que servían para la vigilancia del exterior. El camino sinuoso que lleva a la entrada servía para la defensa de ésta, pues imposibilitaba que pudiera ser destruida mediante un ataque de cañón, o bien, con troncos de madera u objetos metálicos.Actualmente alberga al Museo de Arqueología Subacuática, con una colección inigualable compuesta por más de 900 piezas procedentes de contextos arqueológicos sumergidos en aguas marinas del Golfo de México, Caribe Mexicano y aguas continentales de la península de Yucatán.La colección subacuática se ha realizado mediante el desarrollo de diversos proyectos en la región por parte de la Subdirección de Arqueología Subacuática del INAH a lo largo de cuatro décadas. Además, el recinto cuenta con la Declaratoria como Buena Práctica de la Convención UNESCO 2001 sobre la Protección del Patrimonio Cultural Subacuático, la cual tiene como objetivo fomentar la protección de este Patrimonio mediante la apropiación y visibilidad del mismo.',
+description: 'Esta construcción militar, ubicada sobre el “Cerro de las Tres Piedras”, se construyó a finales del siglo XVIII bajo las órdenes de José Sabido de Vargas, quien ejerció como teniente de rey entre los años 1784 y 1793.\n Cuenta con un foso, bóvedas de cañón corrido, aljibe y garitones que servían para la vigilancia del exterior.\n El camino sinuoso que lleva a la entrada servía para la defensa de ésta, pues imposibilitaba que pudiera ser destruida mediante un ataque de cañón, o bien, con troncos de madera u objetos metálicos.\n Actualmente alberga al Museo de Arqueología Subacuática, con una colección inigualable compuesta por más de 900 piezas procedentes de contextos arqueológicos sumergidos en aguas marinas del Golfo de México, Caribe Mexicano y aguas continentales de la península de Yucatán.\n La colección subacuática se ha realizado mediante el desarrollo de diversos proyectos en la región por parte de la Subdirección de Arqueología Subacuática del INAH a lo largo de cuatro décadas.\n Además, el recinto cuenta con la Declaratoria como Buena Práctica de la Convención UNESCO 2001 sobre la Protección del Patrimonio Cultural Subacuático, la cual tiene como objetivo fomentar la protección de este Patrimonio mediante la apropiación y visibilidad del mismo.',
 images: ['imgPoniente/sanLucas1.jpg', 'imgPoniente/sanLucas2.jpg', 'imgPoniente/sanLucas3.jpg']
 }
 },
@@ -747,39 +1217,39 @@ goToRoute: '🚗 Go to Route',
 routeCreated: 'Route created to',
 locationNotAvailable: 'Location not available',
 'Barrio de San Román': {
-description: 'Welcome, you are in the San Román neighborhood of the city of San Francisco de Campeche, founded in the 16th century. This neighborhood is known for its church, which houses an image of the Black Christ, brought from Veracruz in 1565 and considered a divine miracle due to its portentous arrival. The San Román neighborhood was inhabited by sailors, shipbuilders, and caulkers as it was close to the shipyards where ships were built for defense and trade in the Americas. It was named Campeche\'s first Magical Neighborhood in 2024.',
+description: 'Welcome, you are in the San Román neighborhood of the city of San Francisco de Campeche, founded in the 16th century.\n This neighborhood is known for its church, which houses an image of the Black Christ, brought from Veracruz in 1565 and considered a divine miracle due to its portentous arrival.\n The San Román neighborhood was inhabited by sailors, shipbuilders, and caulkers as it was close to the shipyards where ships were built for defense and trade in the Americas.\n It was named Campeche\'s first Magical Neighborhood in 2024.',
 images: ['imgPoniente/sanRoman1.jpg', 'imgPoniente/sanRoman2.jpg', 'imgPoniente/sanRoman3.jpg']
 },
 'Atarazanas Playa San Román': {
-description: 'The Atarazanas, or shipyards, were the facilities where wooden and sailing vessels were built and repaired. The first shipyard in the port of Campeche existed since 1650 on the beach in front of the San José temple and was destroyed by fire in 1672 by the pirate "Lorencillo." When the San Carlos bastion was built, shipbuilding was relocated to the beach in the San Román neighborhood. Did you know that the Spanish privateer Amaro Felipe Rodríguez, known as "Amaro Pargo," built the 571-ton ship "Las Potencias del Santo Cristo de San Román" in this shipyard between 1720 and 1721? Today, the area is known as the San Román Fishermen\'s Wharf, an emblematic site where history and the daily life of local fishermen blend. The wharf retains its importance as a community meeting point and is a tourist attraction that reflects Campeche\'s maritime heritage.',
+description: 'The Atarazanas, or shipyards, were the facilities where wooden and sailing vessels were built and repaired.\n The first shipyard in the port of Campeche existed since 1650 on the beach in front of the San José temple and was destroyed by fire in 1672 by the pirate "Lorencillo."\n When the San Carlos bastion was built, shipbuilding was relocated to the beach in the San Román neighborhood.\n Did you know that the Spanish privateer Amaro Felipe Rodríguez, known as "Amaro Pargo," built the 571-ton ship "Las Potencias del Santo Cristo de San Román" in this shipyard between 1720 and 1721? Today, the area is known as the San Román Fishermen\'s Wharf, an emblematic site where history and the daily life of local fishermen blend.\n The wharf retains its importance as a community meeting point and is a tourist attraction that reflects Campeche\'s maritime heritage.',
 images: ['imgPoniente/atarazanas1.jpg', 'imgPoniente/atarazanas1.png']
 },
 'Novia del Mar': {
-description: 'Legend has it that many years ago, there was a beautiful woman who lived in the port of Campeche. She used to stroll along the coast to admire the enormous ships arriving from different parts of the world. She enjoyed imagining what those countries were like, the ones where such exotic and varied goods came from. The young woman\’s beauty was so captivating that even the sea fell in love with her and longed for her attention forever. To win her over, it tried to steal her smiles with gentle and harmonious waves that reflected the golden glimmers of the sun. In the afternoons, the sea would turn orange as the sun sank into its waters. That spectacle stirred deep emotions in the maiden. One day, during one of her walks along the port, the young woman met a sailor with whom she fell hopelessly in love.Their feelings were so strong and true that the sea grew jealous of their love.A couple of weeks went by. The love between the woman from Campeche and the sailor blossomed. The sea felt forgotten, no longer touched by the woman\’s gentle fingers during sunset—there were no more smiles for it. Suddenly, the sailor had to set sail from Campeche with his crew, but he promised to return soon to hold his love in his arms once again. That farewell kiss would be their last.The sea\’s envy turned into rage, and seeing a chance to have the woman for itself once more, it suddenly unleashed a massive storm. Furious waves swallowed the ship carrying the sailor, and none of its crew was ever seen again. Since then, every afternoon, the beautiful woman comes to the shore to wait for her beloved\'s return.She is always seen sitting at the edge of the Campeche boardwalk, her gaze fixed on the sea-a sea that rejoices in her beauty.',
+description: 'Legend has it that many years ago, there was a beautiful woman who lived in the port of Campeche.\n She used to stroll along the coast to admire the enormous ships arriving from different parts of the world.\n She enjoyed imagining what those countries were like, the ones where such exotic and varied goods came from.\n The young woman\’s beauty was so captivating that even the sea fell in love with her and longed for her attention forever.\n To win her over, it tried to steal her smiles with gentle and harmonious waves that reflected the golden glimmers of the sun.\n In the afternoons, the sea would turn orange as the sun sank into its waters.\n That spectacle stirred deep emotions in the maiden.\n One day, during one of her walks along the port, the young woman met a sailor with whom she fell hopelessly in love.\n Their feelings were so strong and true that the sea grew jealous of their love.\n A couple of weeks went by.\n The love between the woman from Campeche and the sailor blossomed.\n The sea felt forgotten, no longer touched by the woman\’s gentle fingers during sunset—there were no more smiles for it.\n Suddenly, the sailor had to set sail from Campeche with his crew, but he promised to return soon to hold his love in his arms once again.\n That farewell kiss would be their last.\n The sea\’s envy turned into rage, and seeing a chance to have the woman for itself once more, it suddenly unleashed a massive storm.\n Furious waves swallowed the ship carrying the sailor, and none of its crew was ever seen again.\n Since then, every afternoon, the beautiful woman comes to the shore to wait for her beloved\'s return.\n She is always seen sitting at the edge of the Campeche boardwalk, her gaze fixed on the sea-a sea that rejoices in her beauty.',
 images: ['imgPoniente/noviaMar1.jpg', 'imgPoniente/noviaMar2.jpg']
 },
 'Iglesia de Guadalupe': {
-description: 'A natural park with panoramic views of the city. It offers green areas, rest zones, and walking trails ideal for spending time with family or friendsThe Guadalupe neighborhood is one of the five traditional neighborhoods of San Francisco de Campeche, along with San Román, Santa Ana, San Francisco, and Santa Lucía. Its origins date back to the 16th century, when in 1575 the construction of a chapel dedicated to the Virgin of Guadalupe was funded in a then-unpopulated area. Over time, this area transformed into a neighborhood inhabited primarily by merchants, characterized by its large houses and wealthy families. The park has a central kiosk and is a meeting place for the community. The temple has a simple façade and its tower houses the bell of the steamship RMS Tweed, which sank on the Alacranes Reef in the Gulf of Mexico in 1847.',
+description: 'A natural park with panoramic views of the city.\n It offers green areas, rest zones, and walking trails ideal for spending time with family or friendsThe Guadalupe neighborhood is one of the five traditional neighborhoods of San Francisco de Campeche, along with San Román, Santa Ana, San Francisco, and Santa Lucía.\n Its origins date back to the 16th century, when in 1575 the construction of a chapel dedicated to the Virgin of Guadalupe was funded in a then-unpopulated area.\n Over time, this area transformed into a neighborhood inhabited primarily by merchants, characterized by its large houses and wealthy families.\n The park has a central kiosk and is a meeting place for the community.\n The temple has a simple façade and its tower houses the bell of the steamship RMS Tweed, which sank on the Alacranes Reef in the Gulf of Mexico in 1847.',
 images: ['imgPoniente/guadalupe1.jpg', 'imgPoniente/guadalupe2.jpg']
 },
 'Edificio INAH Arquiologia Subacuatica': {
-description: 'Underwater archaeology is the study of cultural remains found submerged in bodies of water, related to the activities of past societies such as navigation, trade, warfare, worldviews, and more. In Mexico, the National Institute of Anthropology and History (INAH), through its Underwater Archaeology Subdirectorate, is responsible for studying, protecting, and conserving this heritage. In the city of San Francisco de Campeche, the INAH has a headquarters where various specialists in archaeology, history, architecture, restoration, and conservation work. In this building, marked with number 223, you can see ancient anchors, cannons, and pottery vessels, among others, under study and conservation.',
+description: 'Underwater archaeology is the study of cultural remains found submerged in bodies of water, related to the activities of past societies such as navigation, trade, warfare, worldviews, and more.\n In Mexico, the National Institute of Anthropology and History (INAH), through its Underwater Archaeology Subdirectorate, is responsible for studying, protecting, and conserving this heritage.\n In the city of San Francisco de Campeche, the INAH has a headquarters where various specialists in archaeology, history, architecture, restoration, and conservation work.\n In this building, marked with number 223, you can see ancient anchors, cannons, and pottery vessels, among others, under study and conservation.',
 images: ['imgPoniente/edificio1.jpg', 'imgPoniente/edificio2.jpg']
 },
 'Iglesia de San Francisco': {
-description: 'The San Francisco neighborhood is one of the oldest and most emblematic neighborhoods in the city of San Francisco de Campeche, with a history dating back to pre-Hispanic times. Originally a Mayan settlement known as Ah Kin Pech, it was later integrated into the village founded by the Spanish in 1540. During the viceroyalty, the neighborhood developed as an extramuros area, that is, outside the city\'s walled perimeter. This location allowed it to maintain an irregular urban layout, with streets and alleys lined with tall colonial mansions, a reflection of its Mayan origins and its evolution during the colonial period. Among the neighborhood\'s notable features are the San Francisco Church and the remains of the convent, which was an important center of evangelization during the viceregal era. In 1653, the ship carrying Don Martín Cortés, son of the conquistador Hernán Cortés, and his wife arrived in Campeche after being diverted by a storm, and they stayed at the San Francisco convent. His wife gave birth to their first child, who was baptized in the church. You can visit the interior and see the baptismal font commemorating this event. ',
+description: 'The San Francisco neighborhood is one of the oldest and most emblematic neighborhoods in the city of San Francisco de Campeche, with a history dating back to pre-Hispanic times.\n Originally a Mayan settlement known as Ah Kin Pech, it was later integrated into the village founded by the Spanish in 1540.\n During the viceroyalty, the neighborhood developed as an extramuros area, that is, outside the city\'s walled perimeter.\n This location allowed it to maintain an irregular urban layout, with streets and alleys lined with tall colonial mansions, a reflection of its Mayan origins and its evolution during the colonial period.\n Among the neighborhood\'s notable features are the San Francisco Church and the remains of the convent, which was an important center of evangelization during the viceregal era.\n In 1653, the ship carrying Don Martín Cortés, son of the conquistador Hernán Cortés, and his wife arrived in Campeche after being diverted by a storm, and they stayed at the San Francisco convent.\n His wife gave birth to their first child, who was baptized in the church.\n You can visit the interior and see the baptismal font commemorating this event. ',
 images: ['imgPoniente/sanFrancisco1.jpg', 'imgPoniente/sanFrancisco2.jpg', 'imgPoniente/sanFrancisco3.jpg']
 },
 'Bateria de San Matias': {
-description: 'It is located at the mouth of the old San Francisco estuary, near the neighborhood of the same name. It was built in the 18th century as part of a defense system for the coast and the San Miguel and San José el Alto redoubts in the port of San Francisco de Campeche, which also included the San Luis and San Lucas batteries. The purpose of the San Matías battery was to retain any landings on San Francisco beach and prevent the enemy from accessing the San José el Alto redoubt.',
+description: 'It is located at the mouth of the old San Francisco estuary, near the neighborhood of the same name.\n It was built in the 18th century as part of a defense system for the coast and the San Miguel and San José el Alto redoubts in the port of San Francisco de Campeche, which also included the San Luis and San Lucas batteries.\n The purpose of the San Matías battery was to retain any landings on San Francisco beach and prevent the enemy from accessing the San José el Alto redoubt.',
 images: ['imgPoniente/sanMatias1.jpg', 'imgPoniente/sanMatias2.jpg']
 },
 'Bateria de San Lucas': {
-description: 'Its function was to support, together with the San Matías battery, the defense of the San José el Alto Redoubt, preventing possible landings towards the windward coast. It was designed by the military engineer Agustín Crame in a semicircular and irregular shape, with an esplanade that had capacity for 8 cannons, a ramp attached to the center and two rooms. Its construction lasted 6 months and was completed in 1792. During periods of high tide, it was usually surrounded by the sea.',
+description: 'Its function was to support, together with the San Matías battery, the defense of the San José el Alto Redoubt, preventing possible landings towards the windward coast.\n It was designed by the military engineer Agustín Crame in a semicircular and irregular shape, with an esplanade that had capacity for 8 cannons, a ramp attached to the center and two rooms.\n Its construction lasted 6 months and was completed in 1792.\n During periods of high tide, it was usually surrounded by the sea.',
 images: ['imgPoniente/sanLucas1.jpg', 'imgPoniente/sanLucas2.jpg', 'imgPoniente/sanLucas3.jpg']
 },
 'Museo de Arqueología Subacuática': {
-description: 'This military construction, located on the “Cerro de las Tres Piedras” (Hill of the Three Stones), was built at the end of the 18th century under the orders of José Sabido de Vargas, who served as lieutenant of the king between 1784 and 1793. It features a moat, barrel vaults, a cistern, and sentry boxes that were used to monitor the exterior. The winding path leading to the entrance served as a defense mechanism, making it impossible to be destroyed by cannon fire or by wooden logs or metal objects.It currently houses the Museum of Underwater Archaeology, with an unparalleled collection of over 900 artifacts recovered from underwater archaeological contexts in the marine waters of the Gulf of Mexico, the Mexican Caribbean, and inland waters of the Yucatán Peninsula.This underwater collection has been assembled through various projects carried out in the region by the Subdirectorate of Underwater Archaeology of the INAH over the past four decades. Furthermore, the site has been granted recognition as a Good Practice under the 2001 UNESCO Convention on the Protection of the Underwater Cultural Heritage, which aims to promote the protection of this heritage through its visibility and public engagement.',
+description: 'This military construction, located on the “Cerro de las Tres Piedras” (Hill of the Three Stones), was built at the end of the 18th century under the orders of José Sabido de Vargas, who served as lieutenant of the king between 1784 and 1793.\n It features a moat, barrel vaults, a cistern, and sentry boxes that were used to monitor the exterior.\n The winding path leading to the entrance served as a defense mechanism, making it impossible to be destroyed by cannon fire or by wooden logs or metal objects.\n It currently houses the Museum of Underwater Archaeology, with an unparalleled collection of over 900 artifacts recovered from underwater archaeological contexts in the marine waters of the Gulf of Mexico, the Mexican Caribbean, and inland waters of the Yucatán Peninsula.\n This underwater collection has been assembled through various projects carried out in the region by the Subdirectorate of Underwater Archaeology of the INAH over the past four decades.\n Furthermore, the site has been granted recognition as a Good Practice under the 2001 UNESCO Convention on the Protection of the Underwater Cultural Heritage, which aims to promote the protection of this heritage through its visibility and public engagement.',
 images: ['imgPoniente/sanLucas1.jpg', 'imgPoniente/sanLucas2.jpg', 'imgPoniente/sanLucas3.jpg']
 }
 }
@@ -939,7 +1409,6 @@ function createIcon(size = 48) {
     
   }
 
-
 const markers = [];
 sites.forEach(site => {let siteIcons = createIcon(); // tamaño inicial
 const markers = [];
@@ -1020,9 +1489,10 @@ clearBtn.textContent = translations[currentLang].clearAll;
 // Cancelar ruta activa
 function cancelActiveRoute() {
   try {
-    // Esto es lo nuevo (debe ir antes que todo)
+    activeRouteType = null;
     selectedSite = null;
     localStorage.removeItem('selectedSite');
+
     document.getElementById('distance').innerText = 'Distancia al destino: -';
 
     if (selectedRouteLine && map.hasLayer(selectedRouteLine)) {
@@ -1045,8 +1515,10 @@ function cancelActiveRoute() {
 // Limpiar todas las rutas
 function clearAllRoutes() {
   try {
+    activeRouteType = null;
     selectedSite = null;
     localStorage.removeItem('selectedSite');
+
     document.getElementById('distance').innerText = 'Distancia al destino: -';
 
     if (selectedRouteLine && map.hasLayer(selectedRouteLine)) {
@@ -1072,6 +1544,7 @@ function clearAllRoutes() {
 
 
 
+
 // Abrir panel lateral con información del sitio (SOLO desde botones del menú)
 function openSidebar(siteName) {
 const site = sites.find(s => s.name === siteName);
@@ -1085,19 +1558,26 @@ clearInterval(carouselInterval);
 // Calcular distancia si hay ubicación del usuario
 let distanceInfo = '';
 if (userMarker) {
-const userPos = userMarker.getLatLng();
-const sitePos = L.latLng([site.lat, site.lng]);
-const distance = userPos.distanceTo(sitePos);
-const distanceText = distance > 1000
-? `${(distance / 1000).toFixed(2)} ${translations[currentLang].kilometers}`
-: `${Math.round(distance)} ${translations[currentLang].meters}`;
-distanceInfo = `
-<div class="distance-info">
-<span class="distance-label">${translations[currentLang].distance}:</span>
-<span class="distance-value">${distanceText}</span>
-</div>
-`;
+  const userPos = userMarker.getLatLng();
+  const sitePos = L.latLng([site.lat, site.lng]);
+  const distance = userPos.distanceTo(sitePos);
+
+  const distanceKm = (distance / 1000).toFixed(2);
+  const averageSpeedKmh = 30; // Asumimos velocidad promedio en coche
+  const estimatedTimeMin = Math.ceil((distanceKm / averageSpeedKmh) * 60);
+
+  const distanceText = distance > 1000
+    ? `${distanceKm} ${translations[currentLang].kilometers}`
+    : `${Math.round(distance)} ${translations[currentLang].meters}`;
+
+  distanceInfo = `
+    <div class="distance-info">
+      <span class="distance-label">${translations[currentLang].distance}:</span>
+      <span class="distance-value">${distanceText} • ${estimatedTimeMin} min</span>
+    </div>
+  `;
 }
+
 const siteData = translations[currentLang][siteName];
 const images = siteData.images || [site.image];
 sidebarContent.innerHTML = `
@@ -1344,20 +1824,29 @@ maximumAge: 0
 } else {
 console.log('La geolocalización no está disponible en este dispositivo.');
 }
-
 function onLocationFound(position) {
-const userLocation = L.latLng(position.coords.latitude, position.coords.longitude);
-if (!userMarker) {
-userMarker = L.marker(userLocation).addTo(map).bindPopup('Tu ubicación').openPopup();
-} else {
-userMarker.setLatLng(userLocation);
+  const userLocation = L.latLng(position.coords.latitude, position.coords.longitude);
+
+  if (!userMarker) {
+    userMarker = L.marker(userLocation).addTo(map).bindPopup('Tu ubicación').openPopup();
+  } else {
+    userMarker.setLatLng(userLocation);
+  }
+
+  // Verifica si debe redibujar ruta seleccionada
+  if (selectedSite && activeRouteType === 'selected') {
+    if (!selectedRouteLine || !map.hasLayer(selectedRouteLine)) {
+      drawRouteToSite(selectedSite.lat, selectedSite.lng, selectedSite.name);
+    }
+  } else {
+    // Si no hay ruta activa, eliminar cualquier línea que esté presente
+    if (selectedRouteLine && map.hasLayer(selectedRouteLine)) {
+      map.removeLayer(selectedRouteLine);
+      selectedRouteLine = null;
+    }
+  }
 }
 
-if (selectedSite && activeRouteType === 'selected') {
-  drawRouteToSite(selectedSite.lat, selectedSite.lng, selectedSite.name);
-}
-
-}
 
 function onLocationError(e) {
 console.error('Error de geolocalización:', e.message);
@@ -1379,42 +1868,68 @@ updateRouteUI();
 })
 .catch(err => console.error('Error al trazar ruta:', err));
 }
-
 function drawRouteToSite(destLat, destLng, siteName) {
-if (!userMarker) {
-console.log('Ubicación del usuario no disponible.');
-return;
-}
-const userLocation = userMarker.getLatLng();
-const start = `${userLocation.lng},${userLocation.lat}`;
-const end = `${destLng},${destLat}`;
-const url = `https://router.project-osrm.org/route/v1/driving/${start};${end}?overview=full&geometries=geojson`;
-if (blueRouteLine) {
-map.removeLayer(blueRouteLine);
-blueRouteLine = null;
-}
-fetch(url)
-.then(res => res.json())
-.then(data => {
-const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
-if (selectedRouteLine) map.removeLayer(selectedRouteLine);
-selectedRouteLine = L.polyline(coords, {
-color: 'red',
-weight: 5
-}).addTo(map);
-if (!userMovedMap) {
-  map.fitBounds(selectedRouteLine.getBounds());
-}
+  if (!userMarker) {
+    console.log('Ubicación del usuario no disponible.');
+    return;
+  }
 
-const dist = (userLocation.distanceTo([destLat, destLng]) / 1000).toFixed(2);
-document.getElementById('distance').innerText = `${translations[currentLang].distance}: ${dist} km`;
-selectedSite = { lat: destLat, lng: destLng, name: siteName };
-localStorage.setItem('selectedSite', JSON.stringify(selectedSite));
-updateRouteUI();
+  const userLocation = userMarker.getLatLng();
+  const start = `${userLocation.lng},${userLocation.lat}`;
+  const end = `${destLng},${destLat}`;
+  const url = `https://router.project-osrm.org/route/v1/driving/${start};${end}?overview=full&geometries=geojson`;
+
+  // Eliminar todas las rutas anteriores
+  if (blueRouteLine) {
+    map.removeLayer(blueRouteLine);
+    blueRouteLine = null;
+  }
+
+  if (selectedRouteLine) {
+    map.removeLayer(selectedRouteLine);
+    selectedRouteLine = null;
+  }
+
+  if (routeToStartLine) {
+    map.removeLayer(routeToStartLine);
+    routeToStartLine = null;
+  }
+
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+  const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+  selectedRouteLine = L.polyline(coords, {
+    color: 'red',
+    weight: 5
+  }).addTo(map);
+
+  if (!userMovedMap) {
+    map.fitBounds(selectedRouteLine.getBounds());
+  }
+
+  // Calcular distancia
+  const dist = (userLocation.distanceTo([destLat, destLng]) / 1000).toFixed(2);
+
+  // Calcular tiempo estimado desde la duración que da OSRM
+  const durationSec = data.routes[0].duration;
+  const durationMin = Math.ceil(durationSec / 60); // minutos redondeados hacia arriba
+
+  // Mostrar distancia + tiempo
+document.getElementById('distance').innerText =
+  `${translations[currentLang].distance}: ${dist} km`;
+
+  // Guardar el sitio como seleccionado
+  selectedSite = { lat: destLat, lng: destLng, name: siteName };
+  localStorage.setItem('selectedSite', JSON.stringify(selectedSite));
+
+  updateRouteUI();
+  activeRouteType = 'selected';
 })
-.catch(err => {
-console.error('Error al trazar ruta:', err);
-});
+
+    .catch(err => {
+      console.error('Error al trazar ruta:', err);
+    });
 }
 
 // Crear menú de sitios - SOLO ABRE EL PANEL LATERAL (sin afectar el mapa)
@@ -1533,9 +2048,10 @@ console.error('Error al trazar ruta:', err);
 // Al cargar la página
 window.addEventListener('load', () => {
   const saved = localStorage.getItem('selectedSite');
-  if (saved && activeRouteType === 'selected') {
+  if (saved) {
     const site = JSON.parse(saved);
     selectedSite = site;
+    activeRouteType = 'selected'; // ← IMPORTANTE
     drawRouteToSite(site.lat, site.lng, site.name);
   }
 });
