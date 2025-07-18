@@ -7,456 +7,879 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-<style>
-body {
-margin: 0;
-font-family: 'Segoe UI', sans-serif;
-background-color: #f8f8f8;
+  <style>
+    body {
+      margin: 0;
+
+      font-family: "Segoe UI", sans-serif;
+
+      background-color: #f8f8f8;
+    }
+
+    header {
+      background-color: #702c37;
+
+      color: #b38b28;
+
+      padding: 20px;
+
+      text-align: center;
+
+      position: relative;
+    }
+
+    .logo {
+      
+      
+
+      top: 35px;
+
+      left: 10px;
+
+      height: 50px;
+
+      width: auto;
+
+      transition: all 0.3s ease;
+    }
+
+    @media screen and (max-width: 768px) {
+      .logo {
+        height: 40px;
+
+        top: 5px;
+
+        left: 5px;
+      }
+
+     header h1 {
+  font-size: 1.6em;
+  text-align: center;
+  margin: 10px 0;
+  line-height: 1.3;
 }
-header {
-background-color: #4a0303;
-color: white;
-padding: 20px;
-text-align: center;
-position: relative;
-}
-.logo {
-position: absolute;
-top: 35px;
-left: 10px;
-height: 50px;
-width: auto;
-transition: all 0.3s ease;
-}
-@media screen and (max-width: 768px) {
-.logo {
-height: 40px;
-top: 5px;
-left: 5px;
-}
-header h1 {
-font-size: 1.5em;
-padding: 10px 0;
-}
-}
-.container {
-display: flex;
-position: relative;
-height: 500px;
-width: 90%;
-max-width: 1200px;
-margin: 20px auto;
-border-radius: 15px;
-box-shadow: 0 0 15px #00000022;
-overflow: hidden;
-}
-#map {
-flex: 1;
-height: 100%;
-z-index: 1;
-}
-/* Panel lateral */
-#sidebar {
-position: absolute;
-top: 0;
-right: -400px;
-width: 400px;
-height: 100%;
-background: white;
-box-shadow: -4px 0 20px rgba(0,0,0,0.15);
-transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-z-index: 1000;
-overflow-y: auto;
-border-left: 3px solid #8B0000;
-}
-#sidebar.active {
-right: 0;
-}
-.sidebar-header {
-display: flex;
-justify-content: space-between;
-align-items: flex-start;
-padding: 20px;
-border-bottom: 2px solid #e5e7eb;
-background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-position: sticky;
-top: 0;
-z-index: 10;
-}
-.header-content {
-flex: 1;
-}
-.sidebar-header h2 {
-color: #8B0000;
-font-size: 1.4rem;
-margin: 0 0 8px 0;
-font-weight: 700;
-line-height: 1.3;
-}
-.distance-info {
-display: flex;
-align-items: center;
-gap: 8px;
-margin-top: 8px;
-}
-.distance-label {
-font-size: 14px;
-color: #6b7280;
-font-weight: 500;
-}
-.distance-value {
-font-size: 14px;
-color: #059669;
-font-weight: 600;
-background: #d1fae5;
-padding: 2px 8px;
-border-radius: 12px;
-}
-.close-btn {
-background: #8B0000;
-color: white;
-border: none;
-padding: 8px 12px;
-border-radius: 8px;
-cursor: pointer;
-font-size: 14px;
-font-weight: 600;
-transition: all 0.3s ease;
-margin-left: 15px;
-}
-.close-btn:hover {
-background: #a30000;
-}
-/* Carrusel de imágenes */
-.image-carousel {
-padding: 20px;
-}
-.carousel-container {
-position: relative;
-background: #f8fafc;
-border-radius: 12px;
-overflow: hidden;
-box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-border: 1px solid #e5e7eb;
-}
-.carousel-images {
-position: relative;
-height: 250px;
-overflow: hidden;
-}
-.carousel-image {
-position: absolute;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-object-fit: cover;
-opacity: 0;
-transition: opacity 0.6s ease-in-out;
-border-radius: 12px 12px 0 0;
-}
-.carousel-image.active {
-opacity: 1;
-}
-.carousel-controls {
-display: flex;
-justify-content: space-between;
-align-items: center;
-padding: 15px;
-background: white;
-}
-.carousel-btn {
-background: #8B0000;
-color: white;
-border: none;
-padding: 8px 12px;
-border-radius: 8px;
-cursor: pointer;
-font-size: 12px;
-font-weight: 600;
-transition: all 0.3s ease;
-}
-.carousel-btn:hover {
-background: #a30000;
-}
-.carousel-indicators {
-display: flex;
-gap: 8px;
-align-items: center;
-}
-.indicator {
-width: 10px;
-height: 10px;
-border-radius: 50%;
-background: #d1d5db;
-cursor: pointer;
-transition: all 0.3s ease;
-}
-.indicator.active {
-background: #8B0000;
-transform: scale(1.2);
-}
-.carousel-progress {
-height: 3px;
-background: #e5e7eb;
-position: relative;
-overflow: hidden;
-}
-.progress-bar {
-height: 100%;
-background: #8B0000;
-width: 0%;
-transition: none;
-}
-/* Descripción del sitio */
-.site-description {
-padding: 0 20px 20px;
-}
+
+    }
+
+    .container {
+      display: flex;
+
+      position: relative;
+
+      height: 500px;
+
+      width: 90%;
+
+      max-width: 1200px;
+
+      margin: 20px auto;
+
+      border-radius: 15px;
+
+      box-shadow: 0 0 15px #00000022;
+
+      overflow: hidden;
+    }
+
+    #map {
+      flex: 1;
+
+      height: 100%;
+
+      z-index: 1;
+    }
+
+    /* Panel lateral */
+
+    #sidebar {
+      position: absolute;
+
+      top: 0;
+
+      right: -400px;
+
+      width: 400px;
+
+      height: 100%;
+
+      background: white;
+
+      box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+
+      transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+      z-index: 1000;
+
+      overflow-y: auto;
+
+      border-left: 3px solid #8b0000;
+    }
+
+    #sidebar.active {
+      right: 0;
+    }
+
+    .sidebar-header {
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: flex-start;
+
+      padding: 20px;
+
+      border-bottom: 2px solid #e5e7eb;
+
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+
+      position: sticky;
+
+      top: 0;
+
+      z-index: 10;
+    }
+
+    .header-content {
+      flex: 1;
+    }
+
+    .sidebar-header h2 {
+      color: #8b0000;
+
+      font-size: 1.4rem;
+
+      margin: 0 0 8px 0;
+
+      font-weight: 700;
+
+      line-height: 1.3;
+    }
+
+    .distance-info {
+      display: flex;
+
+      align-items: center;
+
+      gap: 8px;
+
+      margin-top: 8px;
+    }
+
+    .distance-label {
+      font-size: 14px;
+
+      color: #6b7280;
+
+      font-weight: 500;
+    }
+
+    .distance-value {
+      font-size: 14px;
+
+      color: #059669;
+
+      font-weight: 600;
+
+      background: #d1fae5;
+
+      padding: 2px 8px;
+
+      border-radius: 12px;
+    }
+
+    .close-btn {
+      background: #8b0000;
+
+      color: white;
+
+      border: none;
+
+      padding: 8px 12px;
+
+      border-radius: 8px;
+
+      cursor: pointer;
+
+      font-size: 14px;
+
+      font-weight: 600;
+
+      transition: all 0.3s ease;
+
+      margin-left: 15px;
+    }
+
+    .close-btn:hover {
+      background: #a30000;
+    }
+
+    /* Carrusel de imágenes */
+
+    .image-carousel {
+      padding: 20px;
+    }
+
+    .carousel-container {
+      position: relative;
+
+      background: #f8fafc;
+
+      border-radius: 12px;
+
+      overflow: hidden;
+
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+      border: 1px solid #e5e7eb;
+    }
+
+    .carousel-images {
+      position: relative;
+
+      height: 250px;
+
+      overflow: hidden;
+    }
+
+    .carousel-image {
+      position: absolute;
+
+      top: 0;
+
+      left: 0;
+
+      width: 100%;
+
+      height: 100%;
+
+      object-fit: cover;
+
+      opacity: 0;
+
+      transition: opacity 0.6s ease-in-out;
+
+      border-radius: 12px 12px 0 0;
+    }
+
+    .carousel-image.active {
+      opacity: 1;
+    }
+
+    .carousel-controls {
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      padding: 15px;
+
+      background: white;
+    }
+
+    .carousel-btn {
+      background: #8b0000;
+
+      color: white;
+
+      border: none;
+
+      padding: 8px 12px;
+
+      border-radius: 8px;
+
+      cursor: pointer;
+
+      font-size: 12px;
+
+      font-weight: 600;
+
+      transition: all 0.3s ease;
+    }
+
+    .carousel-btn:hover {
+      background: #a30000;
+    }
+
+    .carousel-indicators {
+      display: flex;
+
+      gap: 8px;
+
+      align-items: center;
+    }
+
+    .indicator {
+      width: 10px;
+
+      height: 10px;
+
+      border-radius: 50%;
+
+      background: #d1d5db;
+
+      cursor: pointer;
+
+      transition: all 0.3s ease;
+    }
+
+    .indicator.active {
+      background: #8b0000;
+
+      transform: scale(1.2);
+    }
+
+    .carousel-progress {
+      height: 3px;
+
+      background: #e5e7eb;
+
+      position: relative;
+
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+
+      background: #8b0000;
+
+      width: 0%;
+
+      transition: none;
+    }
+
+    /* Descripción del sitio */
+
+    .site-description {
+      padding: 0 20px 20px;
+    }
 .site-description p {
-line-height: 1.6;
-color: #374151;
-margin-bottom: 15px;
-text-align: justify;
-font-size: 14px;
-background: #f9fafb;
-padding: 15px;
-border-radius: 10px;
-border-left: 4px solid #8B0000;
+  line-height: 1.8; /* Mejora lectura */
+  letter-spacing: 0.3px; /* Espacio entre letras */
+  color: #374151;
+  margin: 0 auto 15px;
+  text-align: justify;
+  font-size: 14px;
+  background: #f9fafb;
+  padding: 15px;
+  border-radius: 10px;
+  border-left: 4px solid #8b0000;
+  white-space: pre-line; /* Respeta saltos de línea */
+  max-width: 95%; /* No ocupa todo el ancho */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08); /* Sombra suave */
 }
-.action-buttons {
-display: flex;
-gap: 10px;
-flex-direction: column;
+
+
+    .action-buttons {
+      display: flex;
+
+      gap: 10px;
+
+      flex-direction: column;
+    }
+
+    .speak-btn,
+    .center-btn,
+    .route-btn {
+      background: #8b0000;
+
+      color: white;
+
+      border: none;
+
+      padding: 10px 15px;
+
+      border-radius: 8px;
+
+      cursor: pointer;
+
+      font-size: 14px;
+
+      font-weight: 600;
+
+      transition: all 0.3s ease;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      gap: 8px;
+    }
+
+    #pauseBtn {
+      background: #6b7280;
+      /* gris oscuro */
+
+      color: white;
+
+      border: none;
+
+      padding: 10px 15px;
+
+      border-radius: 8px;
+
+      cursor: pointer;
+
+      font-size: 14px;
+
+      font-weight: 600;
+
+      transition: all 0.3s ease;
+
+      display: none;
+      /* para ocultarlo por defecto */
+    }
+
+    #pauseBtn:hover {
+      background: #4b5563;
+    }
+
+    .speak-btn:hover,
+    .center-btn:hover,
+    .route-btn:hover {
+      background: #a30000;
+    }
+
+    .speak-btn:disabled {
+      background: #9ca3af;
+
+      cursor: not-allowed;
+    }
+
+    /* Botón especial para crear ruta en sidebar */
+
+    .route-btn {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    }
+
+    .route-btn:hover {
+      background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+    }
+
+    #distance,
+    #description {
+      text-align: center;
+
+      margin-top: 10px;
+
+      font-size: 1.2em;
+
+      font-weight: bold;
+    }
+
+    #description {
+      padding: 10px;
+
+      margin-bottom: 10px;
+    }
+
+    .btn-red-vino {
+      background-color: #8b0000;
+
+      color: #fff;
+
+      border: none;
+
+      cursor: pointer;
+
+      transition: background 0.3s;
+
+      padding: 6px 12px;
+
+      border-radius: 8px;
+
+      margin: 2px;
+    }
+
+    .btn-red-vino:hover {
+      background-color: #a30000;
+    }
+
+    /* Botón cancelar ruta */
+
+    .btn-cancel {
+      background-color: #dc3545;
+
+      color: #fff;
+
+      border: none;
+
+      cursor: pointer;
+
+      transition: background 0.3s;
+
+      padding: 6px 12px;
+
+      border-radius: 8px;
+
+      margin: 2px;
+    }
+
+    .btn-cancel:hover {
+      background-color: #c82333;
+    }
+
+    /* Contenedor de botones de control */
+
+    .route-controls {
+      text-align: center;
+
+      margin-top: 10px;
+
+      display: flex;
+
+      justify-content: center;
+
+      gap: 10px;
+
+      flex-wrap: wrap;
+    }
+
+    /* Estado de ruta activa */
+
+    .route-status {
+      background: #d1fae5;
+
+      color: #065f46;
+
+      padding: 8px 15px;
+
+      border-radius: 8px;
+
+      margin: 10px auto;
+
+      display: none;
+
+      max-width: 300px;
+
+      text-align: center;
+
+      font-weight: 600;
+
+      border: 1px solid #10b981;
+    }
+
+    .route-status.active {
+      display: block;
+    }
+
+    /* Información del recorrido */
+
+    .tour-info {
+      background: #e0f2fe;
+
+      color: #0277bd;
+
+      padding: 10px 15px;
+
+      border-radius: 8px;
+
+      margin: 10px auto;
+
+      max-width: 400px;
+
+      text-align: center;
+
+      font-size: 14px;
+
+      border: 1px solid #29b6f6;
+    }
+
+    /* Botón ir al recorrido en popup */
+
+    .popup-route-btn {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+
+      color: white;
+
+      border: none;
+
+      padding: 8px 16px;
+
+      border-radius: 6px;
+
+      cursor: pointer;
+
+      font-size: 12px;
+
+      font-weight: 600;
+
+      margin-top: 8px;
+
+      width: 100%;
+
+      transition: all 0.3s ease;
+
+      box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2);
+    }
+
+    .popup-route-btn:hover {
+      background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+
+      transform: translateY(-1px);
+
+      box-shadow: 0 4px 8px rgba(5, 150, 105, 0.3);
+    }
+
+    .lang-switch {
+      position: absolute;
+
+      top: 10px;
+
+      right: 10px;
+    }
+
+    img {
+      max-width: 100%;
+
+      height: auto;
+
+      border-radius: 10px;
+
+      margin-bottom: 10px;
+    }
+
+    .popup-btn {
+      display: inline-block;
+
+      margin-top: 10px;
+
+      width: 100%;
+
+      text-align: center;
+    }
+
+    .btn-back {
+      background-color: #8b0000;
+
+      color: #fff;
+
+      padding: 10px 20px;
+
+      border: none;
+
+      border-radius: 8px;
+
+      font-size: 1.2em;
+
+      cursor: pointer;
+
+      margin-top: 20px;
+
+      margin-bottom: 40px;
+
+      transition: background-color 0.3s;
+    }
+
+    .btn-back:hover {
+      background-color: #a30000;
+    }
+
+    /* Popup simplificado */
+
+    .simple-popup {
+      text-align: center;
+
+      padding: 10px;
+
+      max-width: 200px;
+    }
+
+    .simple-popup h3 {
+      margin: 0 0 10px 0;
+
+      font-size: 16px;
+
+      font-weight: bold;
+
+      color: #8b0000;
+    }
+
+    .simple-popup img {
+      width: 100%;
+
+      height: 120px;
+
+      object-fit: cover;
+
+      border-radius: 8px;
+
+      margin: 0;
+    }
+
+    /* Responsive */
+
+    @media (max-width: 768px) {
+  #sidebar {
+    width: 100%;
+    right: -100%;
+  }
+
+  .carousel-images {
+    height: 200px;
+  }
+
+  .sidebar-header {
+    padding: 15px;
+  }
+
+  .sidebar-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .image-carousel {
+    padding: 15px;
+  }
+
+  .site-description {
+    padding: 0 15px 15px;
+  }
+
+  .site-description p {
+  font-size: 15px;
+  padding: 12px;
+  line-height: 1.8;
+  letter-spacing: 0.3px;
+  white-space: pre-line;
+  max-width: 95%;
+  margin: 0 auto 15px;
 }
-.speak-btn, .center-btn, .route-btn {
-background: #8B0000;
-color: white;
-border: none;
-padding: 10px 15px;
-border-radius: 8px;
-cursor: pointer;
-font-size: 14px;
-font-weight: 600;
-transition: all 0.3s ease;
-display: flex;
-align-items: center;
-justify-content: center;
-gap: 8px;
+
+
+
+
+      .route-controls {
+        flex-direction: column;
+
+        align-items: center;
+      }
+
+      .popup-route-btn {
+        font-size: 11px;
+
+        padding: 6px 12px;
+      }
+    }
+
+    /* Scrollbar personalizado */
+
+    #sidebar::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    #sidebar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+
+    #sidebar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+
+      border-radius: 3px;
+    }
+
+    #sidebar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    
+
+    @media (max-width: 768px) {
+      #siteButtons button {
+        flex: 1 1 100%;
+
+        max-width: 100%;
+
+        font-size: 16px;
+
+        padding: 12px;
+      }
+
+      #siteMenu h2 {
+        font-size: 1.2rem;
+      }
+    }
+
+    .number-icon {
+      pointer-events: none;
+      /* Para que no bloquee clics en el ícono */
+    }
+
+    .number-label {
+      background-color: #8b0000;
+
+      color: white;
+
+      font-size: 14px;
+
+      font-weight: bold;
+
+      border-radius: 50%;
+
+      width: 22px;
+
+      height: 22px;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+    }
+
+    @media screen and (max-width: 768px) {
+  header {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .lang-switch {
+    position: static;
+    margin-top: 10px;
+  }
+
+  header h1 {
+    font-size: 1.2em;
+    text-align: center;
+    margin: 10px 0;
+  }
+
+  header .logo {
+    height: 40px;
+  }
+
+  header img {
+    height: 40px;
+  }
+  header h1 {
+  font-size: 1.6em;
+  text-align: center;
+  margin: 10px 0;
+  line-height: 1.3;
 }
-.speak-btn:hover, .center-btn:hover, .route-btn:hover {
-background: #a30000;
+
 }
-.speak-btn:disabled {
-background: #9ca3af;
-cursor: not-allowed;
-}
-/* Botón especial para crear ruta en sidebar */
-.route-btn {
-background: linear-gradient(135deg, #059669 0%, #047857 100%);
-}
-.route-btn:hover {
-background: linear-gradient(135deg, #047857 0%, #065f46 100%);
-}
-#distance,
-#description {
-text-align: center;
-margin-top: 10px;
-font-size: 1.2em;
-font-weight: bold;
-}
-#description {
-padding: 10px;
-margin-bottom: 10px;
-}
-.btn-red-vino {
-background-color: #8B0000;
-color: #fff;
-border: none;
-cursor: pointer;
-transition: background 0.3s;
-padding: 6px 12px;
-border-radius: 8px;
-margin: 2px;
-}
-.btn-red-vino:hover {
-background-color: #a30000;
-}
-/* Botón cancelar ruta */
-.btn-cancel {
-background-color: #dc3545;
-color: #fff;
-border: none;
-cursor: pointer;
-transition: background 0.3s;
-padding: 6px 12px;
-border-radius: 8px;
-margin: 2px;
-}
-.btn-cancel:hover {
-background-color: #c82333;
-}
-/* Contenedor de botones de control */
-.route-controls {
-text-align: center;
-margin-top: 10px;
-display: flex;
-justify-content: center;
-gap: 10px;
-flex-wrap: wrap;
-}
-/* Estado de ruta activa */
-.route-status {
-background: #d1fae5;
-color: #065f46;
-padding: 8px 15px;
-border-radius: 8px;
-margin: 10px auto;
-display: none;
-max-width: 300px;
-text-align: center;
-font-weight: 600;
-border: 1px solid #10b981;
-}
-.route-status.active {
-display: block;
-}
-/* Información del recorrido */
-.tour-info {
-background: #e0f2fe;
-color: #0277bd;
-padding: 10px 15px;
-border-radius: 8px;
-margin: 10px auto;
-max-width: 400px;
-text-align: center;
-font-size: 14px;
-border: 1px solid #29b6f6;
-}
-/* Botón ir al recorrido en popup */
-.popup-route-btn {
-background: linear-gradient(135deg, #059669 0%, #047857 100%);
-color: white;
-border: none;
-padding: 8px 16px;
-border-radius: 6px;
-cursor: pointer;
-font-size: 12px;
-font-weight: 600;
-margin-top: 8px;
-width: 100%;
-transition: all 0.3s ease;
-box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2);
-}
-.popup-route-btn:hover {
-background: linear-gradient(135deg, #047857 0%, #065f46 100%);
-transform: translateY(-1px);
-box-shadow: 0 4px 8px rgba(5, 150, 105, 0.3);
-}
-.lang-switch {
-position: absolute;
-top: 10px;
-right: 10px;
-}
-img {
-max-width: 100%;
-height: auto;
-border-radius: 10px;
-margin-bottom: 10px;
-}
-.popup-btn {
-display: inline-block;
-margin-top: 10px;
-width: 100%;
-text-align: center;
-}
-.btn-back {
-background-color: #8B0000;
-color: #fff;
-padding: 10px 20px;
-border: none;
-border-radius: 8px;
-font-size: 1.2em;
-cursor: pointer;
-margin-top: 20px;
-margin-bottom: 40px;
-transition: background-color 0.3s;
-}
-.btn-back:hover {
-background-color: #a30000;
-}
-/* Popup simplificado */
-.simple-popup {
-text-align: center;
-padding: 10px;
-max-width: 200px;
-}
-.simple-popup h3 {
-margin: 0 0 10px 0;
-font-size: 16px;
-font-weight: bold;
-color: #8B0000;
-}
-.simple-popup img {
-width: 100%;
-height: 120px;
-object-fit: cover;
-border-radius: 8px;
-margin: 0;
-}
-/* Responsive */
-@media (max-width: 768px) {
-#sidebar {
-width: 100%;
-right: -100%;
-}
-.carousel-images {
-height: 200px;
-}
-.sidebar-header {
-padding: 15px;
-}
-.sidebar-header h2 {
-font-size: 1.2rem;
-}
-.image-carousel {
-padding: 15px;
-}
-.site-description {
-padding: 0 15px 15px;
-}
-.route-controls {
-flex-direction: column;
-align-items: center;
-}
-.popup-route-btn {
-font-size: 11px;
-padding: 6px 12px;
-}
-}
-/* Scrollbar personalizado */
-#sidebar::-webkit-scrollbar {
-width: 6px;
-}
-#sidebar::-webkit-scrollbar-track {
-background: #f1f5f9;
-}
-#sidebar::-webkit-scrollbar-thumb {
-background: #cbd5e1;
-border-radius: 3px;
-}
-#sidebar::-webkit-scrollbar-thumb:hover {
-background: #94a3b8;
-}
-</style>
+
+  </style>
 </head>
 <body>
-<header>
-<img src="img/LogoINAH_Dorado.png" alt="Logo" class="logo">
-<h1>Recorrido turistico cultural lado oriente</h1>
-<div class="lang-switch">
-<button id="btnEs" class="btn-red-vino">🇲🇽 Español</button>
-<button id="btnEn" class="btn-red-vino">🇺🇸 English</button>
-</div>
+<header style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 15px; padding: 10px 20px;">
+  <div style="display: flex; align-items: center; gap: 15px;">
+    <img src="logos/LogoINAH_Dorado.png" alt="Logo INAH" class="logo" />
+    <img src="logos/logoSecundario.png" alt="Mi logo" style="height: 50px;" />
+  </div>
+
+  <h1 style="flex: 1 1 100%; text-align: center;">Recorrido turístico cultural lado oriente</h1>
+
+  <div class="lang-switch">
+    <button id="btnEs" class="btn-red-vino">🇲🇽 Español</button>
+    <button id="btnEn" class="btn-red-vino">🇺🇸 English</button>
+  </div>
 </header>
 <div id="description">
 <p>Bienvenido al recorrido en coche por la ciudad de Campeche. Explora lugares históricos y hermosos paisajes. Recorrerás sitios emblemáticos de la ciudad y conocerás su rica historia. Asegúrate de disfrutar cada momento mientras avanzas en el recorrido. ¡Comencemos!</p>
@@ -501,10 +924,11 @@ background: #94a3b8;
 </div>
 
 <footer style="background-color:#702c37; color:#b38b28; text-align:center; padding:30px 10px; font-family: 'Arial', sans-serif;">
-  <div style="margin-bottom: 20px;">
-    <!-- Logo -->
-    <img src="img/LogoINAH_Dorado2.png" alt="Logo" style="width:90px; margin-bottom:10px;">
-  </div>
+  <div style="margin-bottom: 20px; display: flex; gap: 20px; justify-content: center; align-items: center;">
+  <img src="logos/LogoINAH_Dorado2.png" alt="Logo INAH" style="width: 90px;" />
+  <img src="logos/logoSecundario.png" alt="Mi logo" style="width: 90px;" />
+</div>
+
 
   <nav style="margin-bottom: 20px;">
     <a href="inicio.html" style="color:#b38b28; margin: 0 12px; text-decoration:none;">Inicio</a>
