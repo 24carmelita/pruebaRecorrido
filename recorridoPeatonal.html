@@ -966,6 +966,9 @@
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
 // Variables globales
+let isPaused = false;
+let currentUtterance = null;
+
 let map;
 let userMarker;
 let followUser = true;
@@ -1491,6 +1494,10 @@ ${translations[currentLang].nextImage} ❯
 <button onclick="speakDescription('${siteData.description.replace(/'/g, "\\'")}', '${siteName.replace(/'/g, "\\'")}'); return false;" class="speak-btn">
 🔊 ${translations[currentLang].listenDescription}
 </button>
+<button onclick="toggleSpeech();" id="pauseBtn" class="speak-btn" style="display: none;">
+  ⏸️ Pausar
+</button>
+
 <button onclick="centerMapOnSite(${site.lat}, ${site.lng})" class="center-btn">
 🎯 ${translations[currentLang].centerMap}
 </button>
@@ -1594,28 +1601,64 @@ startCarousel(images.length);
 
 // Función para text-to-speech
 function speakDescription(text, title) {
-if ('speechSynthesis' in window) {
-speechSynthesis.cancel();
-const fullText = `${title}. ${text}`;
-const utterance = new SpeechSynthesisUtterance(fullText);
-utterance.lang = currentLang === 'es' ? 'es-MX' : 'en-US';
-utterance.rate = 0.8;
-const speakBtn = document.querySelector('.speak-btn');
-if (speakBtn) {
-const originalText = speakBtn.innerHTML;
-speakBtn.innerHTML = '⏸️ Reproduciendo...';
-speakBtn.disabled = true;
-utterance.onend = () => {
-speakBtn.innerHTML = originalText;
-speakBtn.disabled = false;
-};
-utterance.onerror = () => {
-speakBtn.innerHTML = originalText;
-speakBtn.disabled = false;
-};
+  if ('speechSynthesis' in window) {
+    speechSynthesis.cancel(); // detener cualquier lectura anterior
+
+    const fullText = `${title}. ${text}`;
+    currentUtterance = new SpeechSynthesisUtterance(fullText);
+    const utterance = currentUtterance;
+    utterance.lang = currentLang === 'es' ? 'es-MX' : 'en-US';
+    utterance.rate = 0.8;
+
+    const speakBtn = document.querySelector('.speak-btn');
+    const pauseBtn = document.getElementById('pauseBtn');
+
+    if (speakBtn) {
+      const originalText = speakBtn.innerHTML;
+      speakBtn.innerHTML = '⏸️ Reproduciendo...';
+      speakBtn.disabled = true;
+
+      if (pauseBtn) {
+        pauseBtn.style.display = 'inline-block';
+        pauseBtn.innerText = '⏸️ Pausar';
+        isPaused = false;
+      }
+
+      utterance.onend = () => {
+        speakBtn.innerHTML = originalText;
+        speakBtn.disabled = false;
+        if (pauseBtn) pauseBtn.style.display = 'none';
+        isPaused = false;
+        currentUtterance = null;
+      };
+
+      utterance.onerror = () => {
+        speakBtn.innerHTML = originalText;
+        speakBtn.disabled = false;
+        if (pauseBtn) pauseBtn.style.display = 'none';
+        isPaused = false;
+        currentUtterance = null;
+      };
+    }
+
+    speechSynthesis.speak(utterance);
+  }
 }
-speechSynthesis.speak(utterance);
-}
+
+function toggleSpeech() {
+  const pauseBtn = document.getElementById('pauseBtn');
+
+  if (!currentUtterance || !speechSynthesis.speaking) return;
+
+  if (isPaused) {
+    speechSynthesis.resume();
+    pauseBtn.innerText = '⏸️ Pausar';
+    isPaused = false;
+  } else {
+    speechSynthesis.pause();
+    pauseBtn.innerText = '▶️ Reanudar';
+    isPaused = true;
+  }
 }
 
 // Centrar mapa en sitio específico
