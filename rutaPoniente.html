@@ -1765,22 +1765,23 @@ startCarousel(images.length);
 
 // Función para text-to-speech
 let isPaused = false;
+
 function speakDescription(text, title) {
   if ('speechSynthesis' in window) {
-    speechSynthesis.cancel(); // detener cualquier lectura anterior
+    window.speechSynthesis.cancel();
 
     const fullText = `${title}. ${text}`;
-    currentUtterance = new SpeechSynthesisUtterance(fullText);
-    const utterance = currentUtterance;
+    const utterance = new SpeechSynthesisUtterance(fullText);
+
     utterance.lang = currentLang === 'es' ? 'es-MX' : 'en-US';
-    utterance.rate = 0.8;
+    utterance.rate = 0.85;
 
     const speakBtn = document.querySelector('.speak-btn');
     const pauseBtn = document.getElementById('pauseBtn');
 
     if (speakBtn) {
       const originalText = speakBtn.innerHTML;
-      speakBtn.innerHTML = '⏸️ Reproduciendo...';
+      speakBtn.innerHTML = '🔊 Reproduciendo...';
       speakBtn.disabled = true;
 
       if (pauseBtn) {
@@ -1794,7 +1795,6 @@ function speakDescription(text, title) {
         speakBtn.disabled = false;
         if (pauseBtn) pauseBtn.style.display = 'none';
         isPaused = false;
-        currentUtterance = null;
       };
 
       utterance.onerror = () => {
@@ -1802,27 +1802,29 @@ function speakDescription(text, title) {
         speakBtn.disabled = false;
         if (pauseBtn) pauseBtn.style.display = 'none';
         isPaused = false;
-        currentUtterance = null;
       };
     }
 
+    // 🔊 Aquí es donde comienza a hablar
     speechSynthesis.speak(utterance);
+  } else {
+    alert("Tu navegador no soporta lectura de voz.");
   }
 }
 
+
 function toggleSpeech() {
   const pauseBtn = document.getElementById('pauseBtn');
-
-  if (!currentUtterance || !speechSynthesis.speaking) return;
-
-  if (isPaused) {
-    speechSynthesis.resume();
-    pauseBtn.innerText = '⏸️ Pausar';
-    isPaused = false;
-  } else {
-    speechSynthesis.pause();
-    pauseBtn.innerText = '▶️ Reanudar';
-    isPaused = true;
+  if ('speechSynthesis' in window && speechSynthesis.speaking) {
+    if (isPaused) {
+      speechSynthesis.resume();
+      pauseBtn.innerText = '⏸️ Pausar';
+      isPaused = false;
+    } else {
+      speechSynthesis.pause();
+      pauseBtn.innerText = '▶️ Reanudar';
+      isPaused = true;
+    }
   }
 }
 
