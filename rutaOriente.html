@@ -1724,64 +1724,72 @@ const siteData = translations[currentLang][siteName];
 const images = siteData.images || [site.image];
 sidebarContent.innerHTML = `
 <div class="sidebar-header">
-<div class="header-content">
-<h2>${siteName}</h2>
-${distanceInfo}
+  <div class="header-content">
+    <h2>${siteName}</h2>
+    ${distanceInfo}
+  </div>
+  <button onclick="closeSidebar()" class="close-btn">
+    ✕ ${translations[currentLang].closeSidebar}
+  </button>
 </div>
-<button onclick="closeSidebar()" class="close-btn">
-✕ ${translations[currentLang].closeSidebar}
-</button>
-</div>
-<div class="image-carousel">
-<div class="carousel-container">
-<div class="carousel-images" id="carousel-images">
-${images.map((img, index) => `
-<img src="${img}" alt="${siteName}"
-class="carousel-image ${index === 0 ? 'active' : ''}"
-data-index="${index}"
-onerror="this.src='${site.image}'">
-`).join('')}
-</div>
-${images.length > 1 ? `
-<div class="carousel-controls">
-<button onclick="prevImage()" class="carousel-btn prev-btn">
-❮ ${translations[currentLang].prevImage}
-</button>
-<div class="carousel-indicators">
-${images.map((_, index) => `
-<span class="indicator ${index === 0 ? 'active' : ''}"
-onclick="goToImage(${index})" data-index="${index}"></span>
-`).join('')}
-</div>
-<button onclick="nextImage()" class="carousel-btn next-btn">
-${translations[currentLang].nextImage} ❯
-</button>
-</div>
-<div class="carousel-progress">
-<div class="progress-bar" id="progress-bar"></div>
-</div>
-` : ''}
-</div>
-</div>
-<div class="site-description">
-<p>${siteData.description}</p>
-<div class="action-buttons">
-<button onclick="speakDescription('${siteData.description.replace(/'/g, "\\'")}', '${siteName.replace(/'/g, "\\'")}'); return false;" class="speak-btn">
-🔊 ${translations[currentLang].listenDescription}
-</button>
-<button onclick="toggleSpeech();" id="pauseBtn" class="speak-btn" style="display: none;">
-  ⏸️ Pausar
-</button>
 
-<button onclick="centerMapOnSite(${site.lat}, ${site.lng})" class="center-btn">
-🎯 ${translations[currentLang].centerMap}
-</button>
-<button onclick="createRouteFromSidebar('${siteName}')" class="route-btn">
-🚗 ${translations[currentLang].createRoute}
-</button>
+<div class="image-carousel">
+  <div class="carousel-container">
+    <div class="carousel-images" id="carousel-images">
+      ${images.map((img, index) => `
+        <img src="${img}" alt="${siteName}"
+          class="carousel-image ${index === 0 ? 'active' : ''}"
+          data-index="${index}"
+          onerror="this.src='${site.image}'">
+      `).join('')}
+    </div>
+
+    ${images.length > 1 ? `
+    <div class="carousel-controls">
+      <button onclick="prevImage()" class="carousel-btn prev-btn">❮ ${translations[currentLang].prevImage}</button>
+      <div class="carousel-indicators">
+        ${images.map((_, index) => `
+          <span class="indicator ${index === 0 ? 'active' : ''}" onclick="goToImage(${index})" data-index="${index}"></span>
+        `).join('')}
+      </div>
+      <button onclick="nextImage()" class="carousel-btn next-btn">${translations[currentLang].nextImage} ❯</button>
+    </div>
+    <div class="carousel-progress">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+    ` : ''}
+  </div>
 </div>
+
+<div class="site-description">
+<p>${siteData.description.replace(/\.\s+/g, '.<br><br>')}</p>
+
+  <div class="action-buttons">
+    <button id="speakBtn" class="speak-btn">
+      🔊 ${translations[currentLang].listenDescription}
+    </button>
+    <button onclick="toggleSpeech();" id="pauseBtn" class="speak-btn" style="display: none;">
+      ⏸️ Pausar
+    </button>
+    <button onclick="centerMapOnSite(${site.lat}, ${site.lng})" class="center-btn">
+      🎯 ${translations[currentLang].centerMap}
+    </button>
+    <button onclick="createRouteFromSidebar('${siteName}')" class="route-btn">
+      🚗 ${translations[currentLang].createRoute}
+    </button>
+  </div>
 </div>
 `;
+
+setTimeout(() => {
+  const speakBtn = document.getElementById('speakBtn');
+  if (speakBtn) {
+    speakBtn.addEventListener('click', () => {
+      speakDescription(siteData.description, siteName);
+    });
+  }
+}, 50);
+
 // Mostrar sidebar
 sidebar.classList.add('active');
 
@@ -1889,20 +1897,22 @@ let isPaused = false;
 
 function speakDescription(text, title) {
   if ('speechSynthesis' in window) {
-    speechSynthesis.cancel(); // detener cualquier lectura anterior
+    window.speechSynthesis.cancel();
 
     const fullText = `${title}. ${text}`;
     const utterance = new SpeechSynthesisUtterance(fullText);
+
     utterance.lang = currentLang === 'es' ? 'es-MX' : 'en-US';
-    utterance.rate = 0.8;
+    utterance.rate = 0.85;
 
     const speakBtn = document.querySelector('.speak-btn');
     const pauseBtn = document.getElementById('pauseBtn');
 
     if (speakBtn) {
       const originalText = speakBtn.innerHTML;
-      speakBtn.innerHTML = '⏸️ Reproduciendo...';
+      speakBtn.innerHTML = '🔊 Reproduciendo...';
       speakBtn.disabled = true;
+
       if (pauseBtn) {
         pauseBtn.style.display = 'inline-block';
         pauseBtn.innerText = '⏸️ Pausar';
@@ -1912,25 +1922,25 @@ function speakDescription(text, title) {
       utterance.onend = () => {
         speakBtn.innerHTML = originalText;
         speakBtn.disabled = false;
-        if (pauseBtn) {
-          pauseBtn.style.display = 'none';
-        }
+        if (pauseBtn) pauseBtn.style.display = 'none';
         isPaused = false;
       };
 
       utterance.onerror = () => {
         speakBtn.innerHTML = originalText;
         speakBtn.disabled = false;
-        if (pauseBtn) {
-          pauseBtn.style.display = 'none';
-        }
+        if (pauseBtn) pauseBtn.style.display = 'none';
         isPaused = false;
       };
     }
 
+    // 🔊 Aquí es donde comienza a hablar
     speechSynthesis.speak(utterance);
+  } else {
+    alert("Tu navegador no soporta lectura de voz.");
   }
 }
+
 
 function toggleSpeech() {
   const pauseBtn = document.getElementById('pauseBtn');

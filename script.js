@@ -1,579 +1,575 @@
 // Variables globales
 let map;
 let userMarker;
-let watchId;
-let followMode = false;
-let currentLanguage = 'es';
+let followUser = true;
 let currentCarouselIndex = 0;
 let carouselInterval;
+let blueRouteLine;
+let selectedRouteLine;
+let selectedSite = null;
+let routeToStartLine;
+let distanceInterval;
+let activeRouteType = null;
+let userMovedMap = false;
+let currentLang = 'es';
+let sites = [];
+let translations = {};
+let markers = [];
+let isPaused = false;
+let voices = [];
 
-// Datos de los sitios (manteniendo la estructura existente)
-const sites = [
-    {
-        id: 1,
-        coords: [19.8301, -90.5349],
-        title: { es: "Fuerte de San Miguel", en: "Fort of San Miguel" },
-        images: [
-            "img/fuerte-san-miguel-1.jpg",
-            "img/fuerte-san-miguel-2.jpg", 
-            "img/fuerte-san-miguel-3.jpg"
-        ],
-        description: {
-            es: "El Fuerte de San Miguel es una fortificación del siglo XVIII que alberga el Museo de Arqueología Maya. Construido para defender la ciudad de los ataques piratas, hoy es uno de los principales atractivos turísticos de Campeche.",
-            en: "Fort San Miguel is an 18th-century fortification that houses the Museum of Mayan Archaeology. Built to defend the city from pirate attacks, it is now one of Campeche's main tourist attractions."
-        }
-    },
-    {
-        id: 2,
-        coords: [19.8456, -90.5234],
-        title: { es: "Centro Histórico", en: "Historic Center" },
-        images: [
-            "img/centro-historico-1.jpg",
-            "img/centro-historico-2.jpg",
-            "img/centro-historico-3.jpg",
-            "img/centro-historico-4.jpg"
-        ],
-        description: {
-            es: "El Centro Histórico de Campeche es Patrimonio Mundial de la UNESCO desde 1999. Sus coloridas casas coloniales y murallas fortificadas cuentan la historia de una ciudad que fue clave en el comercio entre España y América.",
-            en: "Campeche's Historic Center has been a UNESCO World Heritage Site since 1999. Its colorful colonial houses and fortified walls tell the story of a city that was key in trade between Spain and America."
-        }
-    },
-    {
-        id: 3,
-        coords: [19.8123, -90.5456],
-        title: { es: "Sitio Arqueológico Submarino", en: "Underwater Archaeological Site" },
-        images: [
-            "img/sitio-submarino-1.jpg",
-            "img/sitio-submarino-2.jpg",
-            "img/sitio-submarino-3.jpg"
-        ],
-        description: {
-            es: "Este sitio arqueológico submarino contiene restos de embarcaciones históricas y artefactos que datan de los siglos XVI al XVIII. Es parte del patrimonio cultural subacuático de Campeche.",
-            en: "This underwater archaeological site contains remains of historic vessels and artifacts dating from the 16th to 18th centuries. It is part of Campeche's underwater cultural heritage."
-        }
-    },
-    {
-        id: 4,
-        coords: [19.8567, -90.5123],
-        title: { es: "Puerta de Mar", en: "Sea Gate" },
-        images: [
-            "img/puerta-mar-1.jpg",
-            "img/puerta-mar-2.jpg",
-            "img/puerta-mar-3.jpg"
-        ],
-        description: {
-            es: "La Puerta de Mar era una de las principales entradas a la ciudad amurallada de Campeche. Construida en el siglo XVII, conectaba el puerto con el centro de la ciudad y era punto de control para el comercio marítimo.",
-            en: "The Sea Gate was one of the main entrances to the walled city of Campeche. Built in the 17th century, it connected the port with the city center and was a control point for maritime trade."
-        }
-    },
-    {
-        id: 5,
-        coords: [19.8234, -90.5567],
-        title: { es: "Baluarte de Santiago", en: "Santiago Bastion" },
-        images: [
-            "img/baluarte-santiago-1.jpg",
-            "img/baluarte-santiago-2.jpg"
-        ],
-        description: {
-            es: "El Baluarte de Santiago forma parte del sistema defensivo de Campeche. Actualmente alberga el Jardín Botánico Xmuch'haltun, donde se pueden apreciar especies vegetales de la región.",
-            en: "The Santiago Bastion is part of Campeche's defensive system. It currently houses the Xmuch'haltun Botanical Garden, where you can appreciate plant species from the region."
-        }
-    }
-];
-
-// Traducciones para la interfaz
-const translations = {
-    es: {
-        sidebarTitle: "Información del Sitio",
-        closeSidebar: "Cerrar",
-        prevImage: "Anterior",
-        nextImage: "Siguiente",
-        listenDescription: "Escuchar descripción",
-        followLocation: "Seguir ubicación",
-        stopFollowing: "Dejar de seguir",
-        distance: "Distancia",
-        meters: "metros",
-        kilometers: "kilómetros"
-    },
-    en: {
-        sidebarTitle: "Site Information",
-        closeSidebar: "Close",
-        prevImage: "Previous", 
-        nextImage: "Next",
-        listenDescription: "Listen to description",
-        followLocation: "Follow location",
-        stopFollowing: "Stop following",
-        distance: "Distance",
-        meters: "meters",
-        kilometers: "kilometers"
-    }
-};
-
-// Inicialización del mapa
-function initMap() {
-    map = L.map('map').setView([19.8301, -90.5349], 13);
-    
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
-    
-    addSiteMarkers();
-    initGeolocation();
-    updateFollowButton();
+// Función para detectar si es dispositivo móvil
+function isMobileDevice() {
+  return window.innerWidth <= 768;
 }
 
-// Agregar marcadores de sitios
+// Función para hacer scroll suave
+function scrollToMapOnMobile() {
+  if (isMobileDevice()) {
+    const mapContainer = document.getElementById("mapContainer");
+    if (mapContainer) {
+      setTimeout(() => {
+        mapContainer.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 200);
+    }
+  }
+}
+
+// Cargar voces para la síntesis de voz
+function loadVoices() {
+    voices = window.speechSynthesis.getVoices();
+    // A veces, la lista de voces se carga de forma asíncrona.
+    // Este truco ayuda a asegurar que las voces estén disponibles.
+    if (voices.length === 0) {
+        speechSynthesis.speak(new SpeechSynthesisUtterance(""));
+    }
+}
+
+// Función para text-to-speech
+function speakDescription(text, title) {
+    if ('speechSynthesis' in window) {
+        speechSynthesis.cancel(); // Detener cualquier lectura anterior
+
+        const fullText = `${title}. ${text}`;
+        const utterance = new SpeechSynthesisUtterance(fullText);
+
+        const langCode = currentLang === 'es' ? 'es-MX' : 'en-US';
+        utterance.lang = langCode;
+
+        const selectedVoice = voices.find(voice => voice.lang === langCode || voice.lang.startsWith(currentLang));
+        if (selectedVoice) {
+            utterance.voice = selectedVoice;
+        }
+
+        utterance.rate = 0.9;
+        utterance.pitch = 1;
+        utterance.volume = 1;
+
+        const speakBtn = document.querySelector('.speak-btn');
+        const pauseBtn = document.getElementById('pauseBtn');
+
+        utterance.onstart = () => {
+            if (speakBtn) {
+                speakBtn.innerHTML = '▶️ Reproduciendo...';
+                speakBtn.disabled = true;
+            }
+            if (pauseBtn) {
+                pauseBtn.style.display = 'inline-block';
+                pauseBtn.innerText = '⏸️ Pausar';
+                isPaused = false;
+            }
+        };
+
+        utterance.onend = () => {
+            if (speakBtn) {
+                speakBtn.innerHTML = `🔊 ${translations[currentLang].listenDescription}`;
+                speakBtn.disabled = false;
+            }
+            if (pauseBtn) pauseBtn.style.display = 'none';
+            isPaused = false;
+        };
+
+        utterance.onerror = (event) => {
+            console.error('Error en la síntesis de voz:', event.error);
+            if (speakBtn) {
+                speakBtn.innerHTML = `🔊 ${translations[currentLang].listenDescription}`;
+                speakBtn.disabled = false;
+            }
+            if (pauseBtn) pauseBtn.style.display = 'none';
+        };
+
+        speechSynthesis.speak(utterance);
+    } else {
+        alert('Tu navegador no soporta la síntesis de voz.');
+    }
+}
+
+
+function toggleSpeech() {
+  const pauseBtn = document.getElementById('pauseBtn');
+  if ('speechSynthesis' in window && speechSynthesis.speaking) {
+    if (isPaused) {
+      speechSynthesis.resume();
+      if(pauseBtn) pauseBtn.innerText = '⏸️ Pausar';
+      isPaused = false;
+    } else {
+      speechSynthesis.pause();
+      if(pauseBtn) pauseBtn.innerText = '▶️ Reanudar';
+      isPaused = true;
+    }
+  }
+}
+
+// Función para inicializar los datos de la página (sitios y traducciones)
+function initializePageData(pageSites, pageTranslations) {
+    sites = pageSites;
+    translations = pageTranslations;
+    currentLang = 'es'; // o detectar del navegador/localStorage
+    setupMap();
+    createSiteMenu();
+    updateUI();
+}
+
+function setupMap() {
+    map = L.map("map").setView([19.845, -90.523], 12);
+    map.on("movestart", () => {
+        followUser = false;
+        userMovedMap = true;
+    });
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "&copy; OpenStreetMap contributors",
+    }).addTo(map);
+
+    map.on("zoomend", () => {
+      const zoom = map.getZoom();
+      let size = 32;
+      if (zoom >= 17) size = 64;
+      else if (zoom >= 15) size = 48;
+      else if (zoom >= 13) size = 36;
+      else size = 28;
+      const siteIcons = createIcon(size);
+       markers.forEach(({ marker, site }) => {
+            if(siteIcons[site.name]) {
+                marker.setIcon(siteIcons[site.name]);
+            }
+      });
+    });
+
+    addSiteMarkers();
+    setupGeolocation();
+    getOSRMRoute(sites);
+}
+
 function addSiteMarkers() {
-    sites.forEach(site => {
-        const customIcon = L.icon({
-            iconUrl: 'iconos/marker-icon.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34]
+    markers.forEach(({ marker, numberMarker }) => {
+        map.removeLayer(marker);
+        map.removeLayer(numberMarker);
+    });
+    markers = [];
+
+    const siteIcons = createIcon();
+    sites.forEach((site, index) => {
+        const icon = siteIcons[site.name] || L.icon({ iconUrl: 'iconos/default.png', iconSize: [32, 32] });
+        const marker = L.marker([site.lat, site.lng], { icon }).addTo(map);
+        marker.bindPopup(createSimplePopup(site));
+
+        const numberIcon = L.divIcon({
+            className: 'number-icon',
+            html: `<div class="number-label">${index + 1}</div>`,
+            iconSize: [24, 24],
+            iconAnchor: [12, 12]
         });
-        
-        const marker = L.marker(site.coords, { icon: customIcon }).addTo(map);
-        
-        // Popup simplificado con solo el título clickeable
-        const popupContent = `
-            <div class="simple-popup">
-                <h3 class="site-title-link" onclick="openSidebar(${site.id})" style="cursor: pointer; color: #2563eb; text-decoration: underline; margin: 0; font-size: 16px; font-weight: bold;">
-                    ${site.title[currentLanguage]}
-                </h3>
-            </div>
-        `;
-        
-        marker.bindPopup(popupContent);
+        const numberMarker = L.marker([site.lat, site.lng], { icon: numberIcon }).addTo(map);
+
+        markers.push({ marker, numberMarker, site });
     });
 }
 
-// Abrir panel lateral con información del sitio
-function openSidebar(siteId) {
-    const site = sites.find(s => s.id === siteId);
-    if (!site) return;
-    
-    const sidebar = document.getElementById('sidebar');
-    const sidebarContent = document.getElementById('sidebar-content');
-    
-    // Detener carrusel anterior si existe
-    if (carouselInterval) {
-        clearInterval(carouselInterval);
+
+function createSimplePopup(site) {
+    return `
+    <div class="simple-popup">
+    <h3>${site.name}</h3>
+    <img src="${site.image}" alt="${site.name}">
+    <button onclick="startRouteToSite('${site.name}', ${site.lat}, ${site.lng})" class="popup-route-btn">
+    ${translations[currentLang].goToRoute}
+    </button>
+    </div>
+    `;
+}
+
+function startRouteToSite(siteName, lat, lng) {
+    if (!userMarker) {
+        alert(translations[currentLang].locationNotAvailable);
+        return;
     }
-    
-    // Calcular distancia si hay ubicación del usuario
+    clearAllRoutes(true); // Limpia rutas pero no la completa
+    const site = sites.find(s => s.name === siteName);
+    if (site) {
+        selectedSite = site;
+        drawRouteToSite(lat, lng, siteName);
+    }
+    map.closePopup();
+    closeSidebar();
+}
+
+function createRouteFromSidebar(siteName) {
+    const site = sites.find(s => s.name === siteName);
+    if (!site) return;
+    if (!userMarker) {
+        alert(translations[currentLang].locationNotAvailable);
+        return;
+    }
+    clearAllRoutes(true); // Limpia rutas pero no la completa
+    selectedSite = site;
+    drawRouteToSite(site.lat, site.lng, siteName);
+    closeSidebar();
+}
+
+function createIcon(size = 32) {
+    const iconDefaults = {
+        iconSize: [size, size],
+        iconAnchor: [size / 2, size],
+        popupAnchor: [0, -size]
+    };
+    return {
+      'Barrio de San Román': L.icon({ ...iconDefaults, iconUrl: 'iconos/iglesia.png' }),
+      'Atarazanas Playa San Román': L.icon({ ...iconDefaults, iconUrl: 'iconos/puerto.png' }),
+      'Novia del Mar': L.icon({ ...iconDefaults, iconUrl: 'iconos/noviaMar.png' }),
+      'Iglesia de Guadalupe': L.icon({ ...iconDefaults, iconUrl: 'iconos/iglesia.png' }),
+      'Edificio INAH Arqueologia Subacuatica': L.icon({ ...iconDefaults, iconUrl: 'iconos/inah.png' }),
+      'Iglesia de San Francisco': L.icon({ ...iconDefaults, iconUrl: 'iconos/iglesia.png' }),
+      'Bateria de San Matias': L.icon({ ...iconDefaults, iconUrl: 'iconos/baterias.png' }),
+      'Bateria de San Lucas': L.icon({ ...iconDefaults, iconUrl: 'iconos/baterias.png' }),
+      'Museo de Arqueología Subacuática': L.icon({ ...iconDefaults, iconUrl: 'iconos/baterias.png' }),
+      'Baluarte de San Carlos': L.icon({ ...iconDefaults, iconUrl: 'iconos/fuertes.png' }),
+      'Catedral de Campeche': L.icon({ ...iconDefaults, iconUrl: 'iconos/catedral.png' }),
+      'Baluarte de la Soledad': L.icon({ ...iconDefaults, iconUrl: 'iconos/fuertes.png' }),
+      'Puerta de Mar': L.icon({ ...iconDefaults, iconUrl: 'iconos/puertaMar.png' }),
+      'Baluarte de San Juan': L.icon({ ...iconDefaults, iconUrl: 'iconos/fuertes.png' }),
+      'Baluarte de Santa Rosa': L.icon({ ...iconDefaults, iconUrl: 'iconos/fuertes.png' }),
+      'Baluarte de San Pedro': L.icon({ ...iconDefaults, iconUrl: 'iconos/fuertes.png' }),
+      'Puerta de Tierra': L.icon({ ...iconDefaults, iconUrl: 'iconos/puertaTierra.png' }),
+      'Baluarte de San Francisco': L.icon({ ...iconDefaults, iconUrl: 'iconos/fuertes.png' }),
+      'Baluarte de Santiago': L.icon({ ...iconDefaults, iconUrl: 'iconos/fuertes.png' }),
+       'Parque Principal': L.icon({ ...iconDefaults, iconUrl: 'iconos/parque.png' }),
+      'Barrio de guadalupe': L.icon({ ...iconDefaults, iconUrl: 'iconos/iglesia.png' }),
+      'Barrio de san francisco': L.icon({ ...iconDefaults, iconUrl: 'iconos/iglesia.png' }),
+      'Pozo de la Conquista': L.icon({ ...iconDefaults, iconUrl: 'iconos/pozo.png' }),
+      'Parque de las Baterías': L.icon({ ...iconDefaults, iconUrl: 'iconos/parque.png' }),
+      'Asta Bandera': L.icon({ ...iconDefaults, iconUrl: 'iconos/asta.png' }),
+      'Monumento a la Madre': L.icon({ ...iconDefaults, iconUrl: 'iconos/monumento.png' }),
+      'Monumento a Justo Sierra': L.icon({ ...iconDefaults, iconUrl: 'iconos/monumento.png' }),
+    };
+}
+
+function updateRouteUI() {
+    const routeStatus = document.getElementById('routeStatus');
+    const routeStatusText = document.getElementById('routeStatusText');
+    const tourInfoText = document.getElementById('tourInfoText');
+    const cancelBtn = document.getElementById('cancelRouteBtn');
+    const clearBtn = document.getElementById('clearAllRoutesBtn');
+
+    if (selectedSite && selectedRouteLine) {
+        routeStatus.classList.add('active');
+        routeStatusText.textContent = `${translations[currentLang].routeActive}${selectedSite.name}`;
+        tourInfoText.textContent = `${translations[currentLang].routeCreated} ${selectedSite.name}`;
+        cancelBtn.style.display = 'inline-block';
+        clearBtn.style.display = 'inline-block';
+    } else if (routeToStartLine) {
+        routeStatus.classList.add('active');
+        routeStatusText.textContent = translations[currentLang].routeToStart;
+        tourInfoText.textContent = translations[currentLang].tourInfoToSite;
+        cancelBtn.style.display = 'inline-block';
+        clearBtn.style.display = 'inline-block';
+    } else if (blueRouteLine) {
+        routeStatus.classList.remove('active');
+        tourInfoText.textContent = translations[currentLang].tourInfoComplete;
+        clearBtn.style.display = 'inline-block';
+        cancelBtn.style.display = 'none';
+    } else {
+        routeStatus.classList.remove('active');
+        tourInfoText.textContent = translations[currentLang].tourInfoDefault;
+        cancelBtn.style.display = 'none';
+        clearBtn.style.display = 'none';
+    }
+
+    document.getElementById('startRouteBtn').textContent = translations[currentLang].viewCompleteRoute;
+    document.getElementById('startTourBtn').textContent = translations[currentLang].goToFirstSite;
+    cancelBtn.textContent = translations[currentLang].cancelRoute;
+    clearBtn.textContent = translations[currentLang].clearAll;
+}
+
+function cancelActiveRoute() {
+    selectedSite = null;
+    localStorage.removeItem('selectedSite');
+    document.getElementById('distance').innerText = 'Distancia al destino: -';
+    if (selectedRouteLine) map.removeLayer(selectedRouteLine);
+    selectedRouteLine = null;
+    if (routeToStartLine) map.removeLayer(routeToStartLine);
+    routeToStartLine = null;
+    updateRouteUI();
+}
+
+function clearAllRoutes(keepComplete = false) {
+    cancelActiveRoute();
+    if (!keepComplete && blueRouteLine) {
+        map.removeLayer(blueRouteLine);
+        blueRouteLine = null;
+    }
+    updateRouteUI();
+}
+
+function openSidebar(siteName) {
+    const site = sites.find(s => s.name === siteName);
+    if (!site) return;
+
+    if (carouselInterval) clearInterval(carouselInterval);
+
     let distanceInfo = '';
     if (userMarker) {
-        const userPos = userMarker.getLatLng();
-        const sitePos = L.latLng(site.coords);
-        const distance = userPos.distanceTo(sitePos);
-        
-        const distanceText = distance > 1000 
-            ? `${(distance / 1000).toFixed(2)} ${translations[currentLanguage].kilometers}`
-            : `${Math.round(distance)} ${translations[currentLanguage].meters}`;
-            
-        distanceInfo = `
-            <div class="distance-info">
-                <span class="distance-label">${translations[currentLanguage].distance}:</span>
-                <span class="distance-value">${distanceText}</span>
-            </div>
-        `;
+        const dist = userMarker.getLatLng().distanceTo([site.lat, site.lng]);
+        const distText = dist > 1000 ? `${(dist / 1000).toFixed(2)} ${translations[currentLang].kilometers}` : `${Math.round(dist)} ${translations[currentLang].meters}`;
+        distanceInfo = `<div class="distance-info"><span class="distance-value">${distText}</span></div>`;
     }
-    
+
+    const siteData = translations[currentLang][siteName];
+    if (!siteData) return;
+    const images = siteData.images || [site.image];
+
+    const sidebarContent = document.getElementById('sidebar-content');
     sidebarContent.innerHTML = `
         <div class="sidebar-header">
             <div class="header-content">
-                <h2>${site.title[currentLanguage]}</h2>
+                <h2>${siteName}</h2>
                 ${distanceInfo}
             </div>
-            <button onclick="closeSidebar()" class="close-btn">
-                ✕ ${translations[currentLanguage].closeSidebar}
-            </button>
+            <button onclick="closeSidebar()" class="close-btn">✕ ${translations[currentLang].closeSidebar}</button>
         </div>
-        
         <div class="image-carousel">
             <div class="carousel-container">
                 <div class="carousel-images" id="carousel-images">
-                    ${site.images.map((img, index) => `
-                        <img src="${img}" alt="${site.title[currentLanguage]}" 
-                             class="carousel-image ${index === 0 ? 'active' : ''}" 
-                             data-index="${index}"
-                             onerror="this.src='img/placeholder.jpg'">
-                    `).join('')}
+                    ${images.map((img, i) => `<img src="${img}" class="carousel-image ${i === 0 ? 'active' : ''}" data-index="${i}">`).join('')}
                 </div>
+                ${images.length > 1 ? `
                 <div class="carousel-controls">
-                    <button onclick="prevImage()" class="carousel-btn prev-btn">
-                        ❮ ${translations[currentLanguage].prevImage}
-                    </button>
+                    <button onclick="prevImage()" class="carousel-btn">❮ ${translations[currentLang].prevImage}</button>
                     <div class="carousel-indicators">
-                        ${site.images.map((_, index) => `
-                            <span class="indicator ${index === 0 ? 'active' : ''}" 
-                                  onclick="goToImage(${index})" data-index="${index}"></span>
-                        `).join('')}
+                        ${images.map((_, i) => `<span class="indicator ${i === 0 ? 'active' : ''}" onclick="goToImage(${i})"></span>`).join('')}
                     </div>
-                    <button onclick="nextImage()" class="carousel-btn next-btn">
-                        ${translations[currentLanguage].nextImage} ❯
-                    </button>
+                    <button onclick="nextImage()" class="carousel-btn">${translations[currentLang].nextImage} ❯</button>
                 </div>
-                <div class="carousel-progress">
-                    <div class="progress-bar" id="progress-bar"></div>
-                </div>
+                <div class="carousel-progress"><div class="progress-bar" id="progress-bar"></div></div>
+                ` : ''}
             </div>
         </div>
-        
         <div class="site-description">
-            <p>${site.description[currentLanguage]}</p>
+            <p>${siteData.description}</p>
             <div class="action-buttons">
-                <button onclick="speakDescription('${site.description[currentLanguage].replace(/'/g, "\\'")}', '${site.title[currentLanguage].replace(/'/g, "\\'")}'); return false;" class="speak-btn">
-                    🔊 ${translations[currentLanguage].listenDescription}
-                </button>
-                <button onclick="centerMapOnSite(${site.coords[0]}, ${site.coords[1]})" class="center-btn">
-                    🎯 Centrar en mapa
-                </button>
+                <button onclick="speakDescription(translations[currentLang]['${siteName}'].description, '${siteName}')" class="speak-btn">🔊 ${translations[currentLang].listenDescription}</button>
+                <button onclick="toggleSpeech()" id="pauseBtn" style="display: none;">⏸️ Pausar</button>
+                <button onclick="centerMapOnSite(${site.lat}, ${site.lng})" class="center-btn">🎯 ${translations[currentLang].centerMap}</button>
+                <button onclick="createRouteFromSidebar('${siteName}')" class="route-btn">🚗 ${translations[currentLang].createRoute}</button>
             </div>
-        </div>
-    `;
+        </div>`;
     
-    // Mostrar sidebar
-    sidebar.classList.add('active');
-    
-    // Inicializar carrusel automático
-    currentCarouselIndex = 0;
-    startCarousel(site.images.length);
-    updateProgressBar();
-}
+    document.getElementById('sidebar').classList.add('active');
+    scrollToMapOnMobile();
 
-// Cerrar panel lateral
-function closeSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    sidebar.classList.remove('active');
-    
-    // Detener carrusel
-    if (carouselInterval) {
-        clearInterval(carouselInterval);
+    if (images.length > 1) {
+        currentCarouselIndex = 0;
+        startCarousel(images.length);
     }
 }
 
-// Iniciar carrusel automático
-function startCarousel(totalImages) {
-    updateProgressBar();
-    
-    carouselInterval = setInterval(() => {
-        nextImage(totalImages);
-        updateProgressBar();
-    }, 4000); // Cambiar imagen cada 4 segundos
+function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('active');
+    if (carouselInterval) clearInterval(carouselInterval);
+    if (speechSynthesis.speaking) speechSynthesis.cancel();
 }
 
-// Actualizar barra de progreso del carrusel
+function startCarousel(totalImages) {
+    updateProgressBar();
+    carouselInterval = setInterval(() => nextImage(totalImages), 4000);
+}
+
 function updateProgressBar() {
     const progressBar = document.getElementById('progress-bar');
     if (progressBar) {
+        progressBar.style.transition = 'none';
         progressBar.style.width = '0%';
-        progressBar.style.transition = 'width 4s linear';
-        
         setTimeout(() => {
+            progressBar.style.transition = 'width 4s linear';
             progressBar.style.width = '100%';
         }, 50);
     }
 }
 
-// Navegar a imagen anterior
-function prevImage() {
+function navigateCarousel(offset) {
     const images = document.querySelectorAll('.carousel-image');
-    const indicators = document.querySelectorAll('.indicator');
-    
-    if (images.length === 0) return;
-    
+    if (images.length <= 1) return;
     images[currentCarouselIndex].classList.remove('active');
-    indicators[currentCarouselIndex].classList.remove('active');
-    
-    currentCarouselIndex = currentCarouselIndex === 0 ? images.length - 1 : currentCarouselIndex - 1;
-    
+    document.querySelector(`.indicator[onclick="goToImage(${currentCarouselIndex})"]`).classList.remove('active');
+    currentCarouselIndex = (currentCarouselIndex + offset + images.length) % images.length;
     images[currentCarouselIndex].classList.add('active');
-    indicators[currentCarouselIndex].classList.add('active');
-    
-    // Reiniciar carrusel automático
-    if (carouselInterval) {
-        clearInterval(carouselInterval);
-        startCarousel(images.length);
-    }
+    document.querySelector(`.indicator[onclick="goToImage(${currentCarouselIndex})"]`).classList.add('active');
+    if (carouselInterval) clearInterval(carouselInterval);
+    startCarousel(images.length);
 }
 
-// Navegar a imagen siguiente
-function nextImage(totalImages = null) {
-    const images = document.querySelectorAll('.carousel-image');
-    const indicators = document.querySelectorAll('.indicator');
-    
-    if (images.length === 0) return;
-    
-    const total = totalImages || images.length;
-    
-    images[currentCarouselIndex].classList.remove('active');
-    indicators[currentCarouselIndex].classList.remove('active');
-    
-    currentCarouselIndex = (currentCarouselIndex + 1) % total;
-    
-    images[currentCarouselIndex].classList.add('active');
-    indicators[currentCarouselIndex].classList.add('active');
-}
-
-// Ir a imagen específica
+function prevImage() { navigateCarousel(-1); }
+function nextImage() { navigateCarousel(1); }
 function goToImage(index) {
-    const images = document.querySelectorAll('.carousel-image');
-    const indicators = document.querySelectorAll('.indicator');
-    
-    if (images.length === 0) return;
-    
-    images[currentCarouselIndex].classList.remove('active');
-    indicators[currentCarouselIndex].classList.remove('active');
-    
-    currentCarouselIndex = index;
-    
-    images[currentCarouselIndex].classList.add('active');
-    indicators[currentCarouselIndex].classList.add('active');
-    
-    // Reiniciar carrusel automático
-    if (carouselInterval) {
-        clearInterval(carouselInterval);
-        startCarousel(images.length);
-    }
+    navigateCarousel(index - currentCarouselIndex);
 }
 
-// Función para text-to-speech mejorada
-function speakDescription(text, title) {
-    if ('speechSynthesis' in window) {
-        // Detener cualquier síntesis en curso
-        speechSynthesis.cancel();
-        
-        const fullText = `${title}. ${text}`;
-        const utterance = new SpeechSynthesisUtterance(fullText);
-        utterance.lang = currentLanguage === 'es' ? 'es-ES' : 'en-US';
-        utterance.rate = 0.8;
-        utterance.pitch = 1;
-        utterance.volume = 1;
-        
-        // Cambiar el botón mientras habla
-        const speakBtn = document.querySelector('.speak-btn');
-        if (speakBtn) {
-            const originalText = speakBtn.innerHTML;
-            speakBtn.innerHTML = '⏸️ Reproduciendo...';
-            speakBtn.disabled = true;
-            
-            utterance.onend = () => {
-                speakBtn.innerHTML = originalText;
-                speakBtn.disabled = false;
-            };
-            
-            utterance.onerror = () => {
-                speakBtn.innerHTML = originalText;
-                speakBtn.disabled = false;
-            };
-        }
-        
-        speechSynthesis.speak(utterance);
-    } else {
-        alert('Tu navegador no soporta la síntesis de voz');
-    }
-}
-
-// Centrar mapa en sitio específico
 function centerMapOnSite(lat, lng) {
     map.setView([lat, lng], 16);
     closeSidebar();
 }
 
-// Cambiar idioma
-function changeLanguage(lang) {
-    currentLanguage = lang;
-    
-    // Limpiar marcadores existentes
-    map.eachLayer(layer => {
-        if (layer instanceof L.Marker && layer !== userMarker) {
-            map.removeLayer(layer);
-        }
-    });
-    
-    // Agregar marcadores con nuevo idioma
-    addSiteMarkers();
-    
-    // Cerrar sidebar si está abierto
-    closeSidebar();
-    
-    // Actualizar botones de idioma
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    document.querySelector(`[onclick="changeLanguage('${lang}')"]`).classList.add('active');
-    
-    // Actualizar botón de seguimiento
-    updateFollowButton();
-}
-
-// Actualizar texto del botón de seguimiento
-function updateFollowButton() {
-    const btn = document.getElementById('follow-btn');
-    if (btn) {
-        btn.textContent = followMode 
-            ? translations[currentLanguage].stopFollowing 
-            : translations[currentLanguage].followLocation;
-    }
-}
-
-// Geolocalización
-function initGeolocation() {
-    if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                updateUserLocation(position);
-                // Iniciar seguimiento continuo
-                watchId = navigator.geolocation.watchPosition(
-                    updateUserLocation,
-                    handleLocationError,
-                    { 
-                        enableHighAccuracy: true, 
-                        maximumAge: 30000, 
-                        timeout: 27000 
-                    }
-                );
-            },
-            handleLocationError,
-            { enableHighAccuracy: true }
-        );
-    } else {
-        console.error('Geolocalización no disponible');
-    }
-}
-
-function updateUserLocation(position) {
-    const lat = position.coords.latitude;
-    const lng = position.coords.longitude;
-    const accuracy = position.coords.accuracy;
-    
-    // Crear o actualizar marcador de usuario
-    if (userMarker) {
-        userMarker.setLatLng([lat, lng]);
-    } else {
-        const userIcon = L.icon({
-            iconUrl: 'iconos/user-location.png',
-            iconSize: [20, 20],
-            iconAnchor: [10, 10]
+function setupGeolocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(onLocationFound, onLocationError, {
+            enableHighAccuracy: true, timeout: 10000, maximumAge: 0
         });
-        
-        userMarker = L.marker([lat, lng], { icon: userIcon }).addTo(map);
-        userMarker.bindPopup(`Tu ubicación (±${Math.round(accuracy)}m)`);
+    } else {
+        console.log('La geolocalización no está disponible.');
     }
-    
-    // Seguir ubicación si está activado
-    if (followMode) {
-        map.setView([lat, lng], Math.max(map.getZoom(), 15));
-    }
-    
-    // Actualizar distancias en sidebar si está abierto
-    updateDistanceInSidebar();
 }
 
-function updateDistanceInSidebar() {
-    const distanceValue = document.querySelector('.distance-value');
-    if (distanceValue && userMarker) {
-        const sidebarTitle = document.querySelector('.sidebar-header h2');
-        if (sidebarTitle) {
-            const siteName = sidebarTitle.textContent;
-            const site = sites.find(s => 
-                s.title[currentLanguage] === siteName
-            );
-            
-            if (site) {
-                const userPos = userMarker.getLatLng();
-                const sitePos = L.latLng(site.coords);
-                const distance = userPos.distanceTo(sitePos);
-                
-                const distanceText = distance > 1000 
-                    ? `${(distance / 1000).toFixed(2)} ${translations[currentLanguage].kilometers}`
-                    : `${Math.round(distance)} ${translations[currentLanguage].meters}`;
-                    
-                distanceValue.textContent = distanceText;
+function onLocationFound(position) {
+    const userLocation = L.latLng(position.coords.latitude, position.coords.longitude);
+    if (!userMarker) {
+        userMarker = L.marker(userLocation).addTo(map).bindPopup('Tu ubicación').openPopup();
+    } else {
+        userMarker.setLatLng(userLocation);
+    }
+    if (selectedSite) {
+        drawRouteToSite(selectedSite.lat, selectedSite.lng, selectedSite.name);
+    }
+}
+
+function onLocationError(e) {
+    console.error('Error de geolocalización:', e.message);
+}
+
+function getOSRMRoute(routeSites) {
+    const coordinates = routeSites.map(s => `${s.lng},${s.lat}`).join(';');
+    fetch(`https://router.project-osrm.org/route/v1/driving/${coordinates}?overview=full&geometries=geojson`)
+    .then(res => res.json())
+    .then(data => {
+        if (data.routes && data.routes.length > 0) {
+            const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+            if (blueRouteLine) map.removeLayer(blueRouteLine);
+            blueRouteLine = L.polyline(coords, { color: 'blue', weight: 4 }).addTo(map);
+            updateRouteUI();
+        }
+    }).catch(err => console.error('Error al trazar ruta completa:', err));
+}
+
+function drawRouteToSite(destLat, destLng, siteName) {
+    if (!userMarker) return;
+    const userLocation = userMarker.getLatLng();
+    const url = `https://router.project-osrm.org/route/v1/driving/${userLocation.lng},${userLocation.lat};${destLng},${destLat}?overview=full&geometries=geojson`;
+    
+    fetch(url).then(res => res.json()).then(data => {
+        if (selectedRouteLine) map.removeLayer(selectedRouteLine);
+        const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+        selectedRouteLine = L.polyline(coords, { color: 'red', weight: 5 }).addTo(map);
+        if (!userMovedMap) map.fitBounds(selectedRouteLine.getBounds());
+        
+        const dist = (data.routes[0].distance / 1000).toFixed(2);
+        document.getElementById('distance').innerText = `${translations[currentLang].distance}: ${dist} km`;
+        
+        selectedSite = { lat: destLat, lng: destLng, name: siteName };
+        localStorage.setItem('selectedSite', JSON.stringify(selectedSite));
+        updateRouteUI();
+    }).catch(err => console.error('Error al trazar ruta al sitio:', err));
+}
+
+function createSiteMenu() {
+    const container = document.getElementById('siteButtons');
+    container.innerHTML = '';
+    sites.forEach((site, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'btn-red-vino';
+        btn.innerText = `${index + 1}. ${site.name}`;
+        btn.onclick = () => openSidebar(site.name);
+        container.appendChild(btn);
+    });
+}
+
+function updateUI() {
+    document.querySelector('#description p').innerText = translations[currentLang].welcome;
+    addSiteMarkers();
+    closeSidebar();
+    updateRouteUI();
+}
+
+function setupEventListeners() {
+    document.getElementById('btnEs').addEventListener('click', () => { currentLang = 'es'; updateUI(); });
+    document.getElementById('btnEn').addEventListener('click', () => { currentLang = 'en'; updateUI(); });
+    document.getElementById('cancelRouteBtn').addEventListener('click', cancelActiveRoute);
+    document.getElementById('clearAllRoutesBtn').addEventListener('click', () => clearAllRoutes(false));
+
+    document.getElementById('startRouteBtn').addEventListener('click', () => {
+        clearAllRoutes(true);
+        if (!blueRouteLine) getOSRMRoute(sites);
+        else map.fitBounds(blueRouteLine.getBounds());
+    });
+
+    document.getElementById('startTourBtn').addEventListener('click', () => {
+        if (!userMarker) return;
+        const userLocation = userMarker.getLatLng();
+        const nearest = sites.reduce((a, b) => userLocation.distanceTo([a.lat, a.lng]) < userLocation.distanceTo([b.lat, b.lng]) ? a : b);
+        clearAllRoutes(true);
+        drawRouteToSite(nearest.lat, nearest.lng, nearest.name);
+    });
+}
+
+window.addEventListener('load', () => {
+    const pageName = window.location.pathname.split('/').pop();
+    let pageSites, pageTranslations;
+
+    if (pageName === 'rutaOriente.html') {
+        pageSites = data_rutaOriente.sites;
+        pageTranslations = data_rutaOriente.translations;
+    } else if (pageName === 'rutaPoniente.html') {
+        pageSites = data_rutaPoniente.sites;
+        pageTranslations = data_rutaPoniente.translations;
+    } else if (pageName === 'rutaPeaton.html') {
+         pageSites = data_rutaPeaton.sites;
+        pageTranslations = data_rutaPeaton.translations;
+    } else if (pageName === 'recorridoPeatonal.html') {
+         pageSites = data_recorridoPeatonal.sites;
+        pageTranslations = data_recorridoPeatonal.translations;
+    }
+    
+    if (pageSites && pageTranslations) {
+        initializePageData(pageSites, pageTranslations);
+        setupEventListeners();
+
+        const saved = localStorage.getItem('selectedSite');
+        if (saved) {
+            const site = JSON.parse(saved);
+            if (sites.find(s => s.name === site.name)) {
+                 selectedSite = site;
+                 drawRouteToSite(site.lat, site.lng, site.name);
             }
         }
     }
-}
-
-function handleLocationError(error) {
-    console.error('Error de geolocalización:', error);
-    let message = 'Error desconocido';
     
-    switch(error.code) {
-        case error.PERMISSION_DENIED:
-            message = "Permiso de geolocalización denegado";
-            break;
-        case error.POSITION_UNAVAILABLE:
-            message = "Información de ubicación no disponible";
-            break;
-        case error.TIMEOUT:
-            message = "Tiempo de espera agotado";
-            break;
-    }
-    
-    console.warn(message);
-}
-
-function toggleFollowMode() {
-    followMode = !followMode;
-    updateFollowButton();
-    
-    const btn = document.getElementById('follow-btn');
-    btn.classList.toggle('active', followMode);
-    
-    if (followMode && userMarker) {
-        const userPos = userMarker.getLatLng();
-        map.setView(userPos, Math.max(map.getZoom(), 15));
-    }
-}
-
-// Funciones de utilidad
-function calculateDistance(lat1, lng1, lat2, lng2) {
-    const R = 6371e3; // Radio de la Tierra en metros
-    const φ1 = lat1 * Math.PI/180;
-    const φ2 = lat2 * Math.PI/180;
-    const Δφ = (lat2-lat1) * Math.PI/180;
-    const Δλ = (lng2-lng1) * Math.PI/180;
-
-    const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-              Math.cos(φ1) * Math.cos(φ2) *
-              Math.sin(Δλ/2) * Math.sin(Δλ/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-
-    return R * c;
-}
-
-// Limpiar recursos al cerrar
-window.addEventListener('beforeunload', function() {
-    if (watchId) {
-        navigator.geolocation.clearWatch(watchId);
-    }
-    if (carouselInterval) {
-        clearInterval(carouselInterval);
-    }
     if ('speechSynthesis' in window) {
-        speechSynthesis.cancel();
+      loadVoices();
+      if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = loadVoices;
+      }
     }
 });
 
-// Inicializar cuando se carga la página
-document.addEventListener('DOMContentLoaded', function() {
-    initMap();
-});
-
-// Manejar cambios de visibilidad de la página
-document.addEventListener('visibilitychange', function() {
-    if (document.hidden) {
-        // Pausar carrusel cuando la página no es visible
-        if (carouselInterval) {
-            clearInterval(carouselInterval);
-        }
-    } else {
-        // Reanudar carrusel cuando la página vuelve a ser visible
-        const images = document.querySelectorAll('.carousel-image');
-        if (images.length > 0) {
-            startCarousel(images.length);
-        }
-    }
+window.addEventListener('beforeunload', () => {
+    if (carouselInterval) clearInterval(carouselInterval);
+    if ('speechSynthesis'in window) speechSynthesis.cancel();
 });
